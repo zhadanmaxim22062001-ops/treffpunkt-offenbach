@@ -1,0 +1,47 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Treffpunkt Offenbach — Brand Sheet</title>
+<style>
+body{margin:0;background:#E9ECEA;color:#101A1D;font:13px/1.5 ui-monospace,Menlo,monospace}
+h2{font:600 11px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#5C6B6C;margin:34px 0 12px}
+.sheet{padding:32px 34px 60px;max-width:1200px}
+.row{display:flex;align-items:flex-end;gap:34px;flex-wrap:wrap;background:#F4F6F4;border:1px solid #C6CFCB;padding:24px}
+.row.dark{background:#0D1517;border-color:#22312F;color:#8A9B9A}
+.row.bw{filter:grayscale(1) contrast(3)}
+.row.blur{filter:blur(3px)}
+figure{margin:0;text-align:center}
+figcaption{font-size:9px;letter-spacing:.12em;color:#8A9B9A;margin-top:9px}
+img{display:block}
+.pair{display:flex;gap:44px;align-items:flex-end}
+.note{font-size:11px;color:#5C6B6C;margin:8px 0 0}
+</style></head><body><div class="sheet">
+<h2>1 · Основной знак / mark.svg — размерный ряд</h2>
+<div class="row" id="r1"></div>
+<h2>2 · На тёмном / mark-inverse.svg</h2>
+<div class="row dark" id="r2"></div>
+<h2>3 · Кроссовер: mark.svg против mark-compact.svg</h2>
+<div class="row" id="r3"></div>
+<p class="note">Слева в каждой паре — основной, справа — компактный. Точка перехода объявлена на 64 px.</p>
+<h2>4 · Чёрно-белый тест</h2>
+<div class="row bw" id="r4"></div>
+<h2>5 · Тест на расфокус (витрина с 10 метров)</h2>
+<div class="row blur" id="r5"></div>
+<h2>6 · Локапы</h2>
+<div class="row" id="r6"></div>
+<h2>7 · Clearspace</h2>
+<div class="row" id="r7"></div>
+<h2>8 · Наклейка на дверь члена союза, 320×320 (печать 60 мм)</h2>
+<div class="row" id="r8"></div>
+</div>
+<script>
+const S=(f,h,cap)=>`<figure><img src="${f}" style="height:${h}px"><figcaption>${cap||h+' PX'}</figcaption></figure>`;
+r1.innerHTML=[16,24,40,96,320].map(h=>S('mark.svg',h)).join('');
+r2.innerHTML=[24,40,96,320].map(h=>S('mark-inverse.svg',h)).join('');
+r3.innerHTML=[40,56,72].map(h=>`<figure><div class="pair">
+  <div><img src="mark.svg" style="height:${h}px"><figcaption>основной</figcaption></div>
+  <div><img src="mark-compact.svg" style="height:${h}px"><figcaption>компактный</figcaption></div>
+</div><figcaption>${h} PX</figcaption></figure>`).join('');
+r4.innerHTML=[24,40,96].map(h=>S('mark.svg',h)).join('')+[24,40,96].map(h=>S('mark-compact.svg',h,h+' PX КОМП.')).join('');
+r5.innerHTML=[40,96,200].map(h=>S('mark.svg',h)).join('');
+r6.innerHTML=S('lockup-h.svg',68,'LOCKUP-H')+S('lockup-h.svg',34,'LOCKUP-H 50%')+S('lockup-v.svg',160,'LOCKUP-V');
+r7.innerHTML=S('clearspace.svg',120,'CLEARSPACE');
+r8.innerHTML=S('sticker.svg',320,'STICKER');
+</script></body></html>

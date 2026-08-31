@@ -1,0 +1,18 @@
+{
+  "_note": "TODO-COPY: платцхалтеры. Настоящий список членов должен прийти от правления вместе с согласием на публикацию. Имена здесь намеренно описательные, а не выдуманные конкретные фирмы.",
+  "branchen": ["Einzelhandel", "Gastronomie", "Handwerk", "Dienstleistung", "Gesundheit", "Bildung"],
+  "members": [
+    { "slug": "buchhandlung-innenstadt", "name": "Buchhandlung Innenstadt", "branche": "Einzelhandel", "street": "Frankfurter Straße", "line": "Sortiment, Bestellservice und Lesungen mitten in der Fußgängerzone." },
+    { "slug": "cafe-am-markt", "name": "Café am Markt", "branche": "Gastronomie", "street": "Marktplatz", "line": "Frühstück, Mittagstisch und Außengastronomie in der Saison." },
+    { "slug": "elektro-meisterbetrieb", "name": "Elektro-Meisterbetrieb", "branche": "Handwerk", "street": "Kaiserstraße", "line": "Installation, Wartung und Ladeinfrastruktur für Betriebe." },
+    { "slug": "steuerkanzlei-am-main", "name": "Steuerkanzlei am Main", "branche": "Dienstleistung", "street": "Berliner Straße", "line": "Buchhaltung und Jahresabschluss für kleine und mittlere Betriebe." },
+    { "slug": "optiker-fussgaengerzone", "name": "Optiker Fußgängerzone", "branche": "Gesundheit", "street": "Frankfurter Straße", "line": "Sehtest, Anpassung und eigene Werkstatt im Haus." },
+    { "slug": "sprachschule-offenbach", "name": "Sprachschule Offenbach", "branche": "Bildung", "street": "Herrnstraße", "line": "Deutsch- und Integrationskurse, auch für Teams aus Betrieben." },
+    { "slug": "blumen-am-buesingpark", "name": "Blumen am Büsingpark", "branche": "Einzelhandel", "street": "Berliner Straße", "line": "Sträuße, Trauerfloristik und Dekoration für Veranstaltungen." },
+    { "slug": "pizzeria-herrnstrasse", "name": "Pizzeria Herrnstraße", "branche": "Gastronomie", "street": "Herrnstraße", "line": "Mittagsgeschäft, Abendkarte und Lieferung in die Innenstadt." },
+    { "slug": "schreinerei-nordend", "name": "Schreinerei Nordend", "branche": "Handwerk", "street": "Bismarckstraße", "line": "Ladenbau, Möbel nach Maß und Reparaturen." },
+    { "slug": "friseur-kaiserstrasse", "name": "Friseur Kaiserstraße", "branche": "Dienstleistung", "street": "Kaiserstraße", "line": "Termine ohne Wartezeit, eigenes Ausbildungsprogramm." },
+    { "slug": "physiotherapie-innenstadt", "name": "Physiotherapie Innenstadt", "branche": "Gesundheit", "street": "Marktplatz", "line": "Behandlung auf Rezept und Prävention für Betriebe." },
+    { "slug": "goldschmiede-am-rathaus", "name": "Goldschmiede am Rathaus", "branche": "Einzelhandel", "street": "Herrnstraße", "line": "Eigene Werkstatt, Anfertigung und Reparatur." }
+  ]
+}

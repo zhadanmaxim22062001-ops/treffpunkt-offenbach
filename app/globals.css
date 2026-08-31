@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Treffpunkt Offenbach — дизайн-токены
+   Пропорция цвета примерно 80 нейтраль / 15 river / 5 accent.
+   Акцент никогда не занимает большую площадь.
+   ============================================================ */
+
+@theme {
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-paper: var(--c-paper);
+  --color-paper-2: var(--c-paper-2);
+  --color-line: var(--c-line);
+  --color-muted: var(--c-muted);
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-river: var(--c-river);
+  --color-river-soft: var(--c-river-soft);
+  --color-invert: var(--c-invert-bg);
+  --color-on-invert: var(--c-invert-fg);
+
+  --font-display: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius-pill: 999px;
+
+  --ease-brand: cubic-bezier(0.4, 0, 0.15, 1);
+}
+
+/* Светлая тема — база. Токены переопределяются, компоненты их только читают. */
+:root {
+  --c-ink: #101a1d;
+  --c-ink-2: #2c3a3e;
+  --c-paper: #e9ecea;
+  --c-paper-2: #f4f6f4;
+  --c-line: #c6cfcb;
+  --c-muted: #5c6b6c;
+  --c-accent: #e23d1f;
+  --c-accent-soft: #f6ded7;
+  --c-river: #1f6f6b;
+  --c-river-soft: #d9e7e4;
+  --c-invert-bg: #101a1d;
+  --c-invert-fg: #e9ecea;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-ink: #e4eae7;
+    --c-ink-2: #b4c1be;
+    --c-paper: #0d1517;
+    --c-paper-2: #141f22;
+    --c-line: #2a3a3d;
+    --c-muted: #8a9b9a;
+    --c-accent: #ff5a38;
+    --c-accent-soft: #3a1810;
+    --c-river: #4fb3ab;
+    --c-river-soft: #12302e;
+    --c-invert-bg: #e9ecea;
+    --c-invert-fg: #101a1d;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --c-ink: #e4eae7;
+  --c-ink-2: #b4c1be;
+  --c-paper: #0d1517;
+  --c-paper-2: #141f22;
+  --c-line: #2a3a3d;
+  --c-muted: #8a9b9a;
+  --c-accent: #ff5a38;
+  --c-accent-soft: #3a1810;
+  --c-river: #4fb3ab;
+  --c-river-soft: #12302e;
+  --c-invert-bg: #e9ecea;
+  --c-invert-fg: #101a1d;
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    /* фон обязателен явно: артефакт/вьюер подкладывает свой */
+    background-color: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    hyphens: auto; /* немецкие композиты переносятся правильно */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  p { margin: 0; }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2.5px solid var(--c-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--c-accent);
+    color: #fff;
+  }
+
+  /* цифры в колонках и обратных отсчётах всегда моноширинные */
+  time, .tnum { font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    font-weight: 500;
+  }
+
+  /* Подчёркивание, растущее слева — единственный эффект у текстовых ссылок */
+  .link-underline {
+    background-image: linear-gradient(var(--c-accent), var(--c-accent));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 2px;
+    transition: background-size 180ms var(--ease-brand);
+    padding-bottom: 1px;
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 2px;
+  }
+
+  .prose-body p + p { margin-top: 1em; }
+  .prose-body { max-width: 66ch; color: var(--c-ink-2); }
+}
+
+/* Знак: три элемента с классами tpof-*, прочерчиваются по очереди */
+.logo-draw .tpof-ring {
+  stroke-dasharray: 484;
+  stroke-dashoffset: 484;
+  animation: tpof-draw 0.85s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
+}
+.logo-draw .tpof-f {
+  stroke-dasharray: 236;
+  stroke-dashoffset: 236;
+  animation: tpof-draw 0.75s 0.5s var(--ease-brand) forwards;
+}
+.logo-draw .tpof-bar {
+  stroke-dasharray: 72;
+  stroke-dashoffset: 72;
+  animation: tpof-draw 0.3s 1.05s ease-out forwards;
+}
+
+@keyframes tpof-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.marquee-track {
+  animation: tpof-marquee 40s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes tpof-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .logo-draw .tpof-ring,
+  .logo-draw .tpof-f,
+  .logo-draw .tpof-bar {
+    stroke-dashoffset: 0;
+  }
+  .marquee-track { animation: none; }
+}

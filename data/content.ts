@@ -1,0 +1,173 @@
+/**
+ * Seed-контент для главной. События реальные (Offenbacher Woche 2026 прошла
+ * 28–31 мая 28-й раз, Lichterfest в Büsingpark), описания — рабочие черновики,
+ * которые правление должно вычитать. Всё, что нужно править, помечено TODO-COPY.
+ */
+
+export type Event = {
+  slug: string;
+  title: string;
+  when: string;
+  isoStart: string;
+  place: string;
+  summary: string;
+  tone: "accent" | "river";
+};
+
+export const EVENTS: Event[] = [
+  {
+    slug: "offenbacher-woche",
+    title: "Offenbacher Woche",
+    when: "28. bis 31. Mai",
+    isoStart: "2027-05-27",
+    place: "Innenstadt",
+    summary:
+      "Vier Tage Musik, Marktstände und verkaufsoffener Sonntag. 2026 haben wir sie zum 28. Mal ausgerichtet — gemeinsam mit dem Einzelhandel der Innenstadt.",
+    tone: "accent",
+  },
+  {
+    slug: "lichterfest-buesingpark",
+    title: "Lichterfest im Büsingpark",
+    when: "Sommer",
+    isoStart: "2027-07-15",
+    place: "Büsingpark",
+    summary:
+      "Ein Abend im beleuchteten Park, getragen von Vereinen und Sponsoren aus der Stadt. Für Betriebe in der Innenstadt einer der stärksten Abende des Jahres.",
+    tone: "river",
+  },
+  {
+    slug: "verkaufsoffene-sonntage",
+    title: "Verkaufsoffene Sonntage",
+    when: "Mehrmals im Jahr",
+    isoStart: "2027-03-21",
+    place: "Innenstadt",
+    summary:
+      "Wir beantragen sie, stimmen die Termine ab und bewerben sie gebündelt — damit nicht jeder Betrieb einzeln um Aufmerksamkeit kämpfen muss.",
+    tone: "river",
+  },
+  {
+    slug: "weihnachtsbeleuchtung",
+    title: "Weihnachtliche Innenstadtbeleuchtung",
+    when: "November bis Januar",
+    isoStart: "2026-11-20",
+    place: "Innenstadt",
+    summary:
+      "Die Lichter in der Innenstadt hängen nicht von allein. Der Verein organisiert und finanziert sie mit — sichtbar für jeden, der im Advent in die Stadt kommt.",
+    tone: "accent",
+  },
+];
+
+export type Leistung = { title: string; body: string };
+
+export const LEISTUNGEN: Leistung[] = [
+  {
+    title: "Innenstadt beleben",
+    body: "Wir richten die Formate aus, die Menschen in die Stadt holen: Offenbacher Woche, Lichterfest, verkaufsoffene Sonntage, Weihnachtsbeleuchtung. Frequenz entsteht nicht von selbst.",
+  },
+  {
+    title: "Netzwerk statt Einzelkampf",
+    body: "Über hundert Betriebe, die dieselben Straßen teilen. Wer seine Nachbarn kennt, findet schneller einen Handwerker, einen Nachmieter oder jemanden, der dasselbe Problem schon gelöst hat.",
+  },
+  {
+    title: "Interessen vertreten",
+    body: "Sondernutzung, Ladenöffnung, Baustellen, Gestaltungssatzung: Entscheidungen im Rathaus treffen Betriebe direkt. Als Verein sitzen wir früher am Tisch als jeder Einzelne.",
+  },
+];
+
+/** Первые записи OF-Radar — на seed-данных, до подключения базы. */
+export type RadarItem = {
+  slug: string;
+  category: "rathaus" | "baustelle" | "foerderung" | "frequenz" | "stadt" | "recht";
+  headline: string;
+  summary: string;
+  action: string;
+  source: string;
+  date: string;
+  urgency: "low" | "mid" | "high";
+  deadline?: string;
+};
+
+export const RADAR_CATEGORIES: Record<
+  RadarItem["category"],
+  { label: string; tone: "accent" | "river" | "neutral" }
+> = {
+  rathaus: { label: "Rathaus & Regeln", tone: "accent" },
+  baustelle: { label: "Baustellen", tone: "accent" },
+  foerderung: { label: "Förderung & Fristen", tone: "accent" },
+  frequenz: { label: "Frequenz-Kalender", tone: "river" },
+  stadt: { label: "Stadt entwickelt sich", tone: "river" },
+  recht: { label: "Recht & Kosten", tone: "neutral" },
+};
+
+// TODO-COPY: это демонстрационные записи для оценки вёрстки.
+// Настоящие приходят из /api/radar/ingest и публикуются только после
+// одобрения в /admin/radar — ничего не уходит в эфир автоматически.
+export const RADAR_SEED: RadarItem[] = [
+  {
+    slug: "sondernutzung-aussengastronomie",
+    category: "rathaus",
+    headline: "Neue Gebührenordnung für Außengastronomie ab dem Frühjahr",
+    summary:
+      "Die Stadt hat die Sätze für Sondernutzung im öffentlichen Raum neu gefasst. Betroffen sind Tische, Stühle und Warenauslagen auf dem Gehweg.",
+    action: "Wer Fläche vor dem Laden nutzt, sollte den Antrag vor Saisonbeginn neu stellen.",
+    source: "Stadt Offenbach, Pressemeldung",
+    date: "2026-08-27",
+    urgency: "mid",
+  },
+  {
+    slug: "frankfurter-strasse-sperrung",
+    category: "baustelle",
+    headline: "Frankfurter Straße: Teilsperrung über sechs Wochen",
+    summary:
+      "Wegen Leitungsarbeiten ist ein Abschnitt der Frankfurter Straße nur einspurig befahrbar. Die Zufahrt zu den Geschäften bleibt zu Fuß frei.",
+    action: "Betriebe an der Strecke: Lieferzeiten verschieben und Kundschaft aktiv auf die Erreichbarkeit hinweisen.",
+    source: "Stadt Offenbach",
+    date: "2026-08-25",
+    urgency: "high",
+  },
+  {
+    slug: "digitalbonus-hessen",
+    category: "foerderung",
+    headline: "Digitalbonus Hessen: nächstes Antragsfenster",
+    summary:
+      "Zuschuss für Digitalisierungsvorhaben kleiner Betriebe. Antragsberechtigt sind Unternehmen mit Sitz oder Betriebsstätte in Hessen.",
+    action: "Wer Kasse, Warenwirtschaft oder Shop erneuern will, sollte den Antrag jetzt vorbereiten.",
+    source: "WIBank",
+    date: "2026-08-20",
+    urgency: "mid",
+    deadline: "2026-10-31",
+  },
+  {
+    slug: "lichterfest-frequenz",
+    category: "frequenz",
+    headline: "Lichterfest im Büsingpark: mit hoher Besucherzahl rechnen",
+    summary:
+      "Der Vorverkauf läuft, Vereine und Sponsoren tragen das Fest mit. Erfahrungsgemäß einer der stärksten Abende des Sommers in der Innenstadt.",
+    action: "Personal und Warenbestand für den Abend und den Folgetag entsprechend planen.",
+    source: "Stadt Offenbach",
+    date: "2026-07-31",
+    urgency: "low",
+  },
+  {
+    slug: "kaiserlei-buerobau",
+    category: "stadt",
+    headline: "Kaiserlei: weiterer Büroneubau bezugsfertig",
+    summary:
+      "Am Kaiserlei entstehen weiter Büroflächen. Jeder neue Standort dort bedeutet zusätzliche Mittagsgäste und Laufkundschaft für die angrenzende Innenstadt.",
+    action: "Mittagsangebot und Öffnungszeiten auf Bürorhythmus prüfen.",
+    source: "Stadt Offenbach",
+    date: "2026-07-18",
+    urgency: "low",
+  },
+  {
+    slug: "e-rechnung-pflicht",
+    category: "recht",
+    headline: "E-Rechnung: Übergangsfristen laufen weiter aus",
+    summary:
+      "Im Geschäftsverkehr zwischen Unternehmen gilt die Pflicht zum Empfang elektronischer Rechnungen. Die Fristen für das Versenden sind gestaffelt.",
+    action: "Prüfen, ob die eigene Software das Format kann — und wer im Betrieb dafür zuständig ist.",
+    source: "IHK Offenbach am Main",
+    date: "2026-07-02",
+    urgency: "mid",
+  },
+];
