@@ -1,18 +1,213 @@
 {
-  "_note": "TODO-COPY: placeholders. The real member list must come from the board along with consent to publish. Names here are intentionally generic descriptions, not invented specific companies.",
-  "branchen": ["Einzelhandel", "Gastronomie", "Handwerk", "Dienstleistung", "Gesundheit", "Bildung"],
+  "_note": "TODO-COPY: placeholders. The real member list must come from the board along with consent to publish. Names here are intentionally generic descriptions, not invented specific companies. Records are deliberately incomplete in different ways (some with no website, no hours, no email) to exercise the directory's graceful fallback rendering — do not fill every field just to make the demo look tidy.",
+  "branchen": [
+    "Einzelhandel",
+    "Gastronomie",
+    "Handwerk",
+    "Dienstleistung",
+    "Gesundheit",
+    "Bildung"
+  ],
   "members": [
-    { "slug": "buchhandlung-innenstadt", "name": "Buchhandlung Innenstadt", "branche": "Einzelhandel", "street": "Frankfurter Straße", "line": "Sortiment, Bestellservice und Lesungen mitten in der Fußgängerzone." },
-    { "slug": "cafe-am-markt", "name": "Café am Markt", "branche": "Gastronomie", "street": "Marktplatz", "line": "Frühstück, Mittagstisch und Außengastronomie in der Saison." },
-    { "slug": "elektro-meisterbetrieb", "name": "Elektro-Meisterbetrieb", "branche": "Handwerk", "street": "Kaiserstraße", "line": "Installation, Wartung und Ladeinfrastruktur für Betriebe." },
-    { "slug": "steuerkanzlei-am-main", "name": "Steuerkanzlei am Main", "branche": "Dienstleistung", "street": "Berliner Straße", "line": "Buchhaltung und Jahresabschluss für kleine und mittlere Betriebe." },
-    { "slug": "optiker-fussgaengerzone", "name": "Optiker Fußgängerzone", "branche": "Gesundheit", "street": "Frankfurter Straße", "line": "Sehtest, Anpassung und eigene Werkstatt im Haus." },
-    { "slug": "sprachschule-offenbach", "name": "Sprachschule Offenbach", "branche": "Bildung", "street": "Herrnstraße", "line": "Deutsch- und Integrationskurse, auch für Teams aus Betrieben." },
-    { "slug": "blumen-am-buesingpark", "name": "Blumen am Büsingpark", "branche": "Einzelhandel", "street": "Berliner Straße", "line": "Sträuße, Trauerfloristik und Dekoration für Veranstaltungen." },
-    { "slug": "pizzeria-herrnstrasse", "name": "Pizzeria Herrnstraße", "branche": "Gastronomie", "street": "Herrnstraße", "line": "Mittagsgeschäft, Abendkarte und Lieferung in die Innenstadt." },
-    { "slug": "schreinerei-nordend", "name": "Schreinerei Nordend", "branche": "Handwerk", "street": "Bismarckstraße", "line": "Ladenbau, Möbel nach Maß und Reparaturen." },
-    { "slug": "friseur-kaiserstrasse", "name": "Friseur Kaiserstraße", "branche": "Dienstleistung", "street": "Kaiserstraße", "line": "Termine ohne Wartezeit, eigenes Ausbildungsprogramm." },
-    { "slug": "physiotherapie-innenstadt", "name": "Physiotherapie Innenstadt", "branche": "Gesundheit", "street": "Marktplatz", "line": "Behandlung auf Rezept und Prävention für Betriebe." },
-    { "slug": "goldschmiede-am-rathaus", "name": "Goldschmiede am Rathaus", "branche": "Einzelhandel", "street": "Herrnstraße", "line": "Eigene Werkstatt, Anfertigung und Reparatur." }
+    {
+      "slug": "buchhandlung-innenstadt",
+      "name": "Buchhandlung Innenstadt",
+      "branche": "Einzelhandel",
+      "street": "Frankfurter Straße",
+      "houseNumber": "12",
+      "plz": "63065",
+      "phone": "069 800000",
+      "email": "info@buchhandlung-innenstadt-beispiel.de",
+      "website": "https://www.buchhandlung-innenstadt-beispiel.de",
+      "hours": [
+        {
+          "days": "Mo–Fr",
+          "hours": "09:30–18:30"
+        },
+        {
+          "days": "Sa",
+          "hours": "09:30–14:00"
+        }
+      ],
+      "teaser": "Sortiment, Bestellservice und Lesungen mitten in der Fußgängerzone.",
+      "description": "Vom Bestseller bis zur Spezialbestellung: die Buchhandlung Innenstadt führt ein breites Sortiment und bestellt, was nicht im Regal steht, meist über Nacht. Regelmäßige Lesungen und ein eigener Kinderbuch-Bereich."
+    },
+    {
+      "slug": "cafe-am-markt",
+      "name": "Café am Markt",
+      "branche": "Gastronomie",
+      "street": "Marktplatz",
+      "houseNumber": "3",
+      "plz": "63065",
+      "phone": "069 800001",
+      "hours": [
+        {
+          "days": "täglich",
+          "hours": "08:00–19:00"
+        }
+      ],
+      "teaser": "Frühstück, Mittagstisch und Außengastronomie in der Saison."
+    },
+    {
+      "slug": "elektro-meisterbetrieb",
+      "name": "Elektro-Meisterbetrieb",
+      "branche": "Handwerk",
+      "street": "Kaiserstraße",
+      "houseNumber": "45",
+      "plz": "63065",
+      "phone": "069 800002",
+      "email": "kontakt@elektro-meisterbetrieb-beispiel.de",
+      "website": "https://www.elektro-meisterbetrieb-beispiel.de",
+      "teaser": "Installation, Wartung und Ladeinfrastruktur für Betriebe.",
+      "description": "Vom Zählerschrank bis zur Wallbox: Installation und Wartung für Gewerbe und Privat, Notdienst nach Vereinbarung."
+    },
+    {
+      "slug": "steuerkanzlei-am-main",
+      "name": "Steuerkanzlei am Main",
+      "branche": "Dienstleistung",
+      "street": "Berliner Straße",
+      "houseNumber": "22",
+      "plz": "63065",
+      "phone": "069 800003",
+      "email": "kanzlei@steuerkanzlei-am-main-beispiel.de",
+      "hours": [
+        {
+          "days": "Mo–Do",
+          "hours": "08:30–17:00"
+        },
+        {
+          "days": "Fr",
+          "hours": "08:30–13:00"
+        }
+      ],
+      "teaser": "Buchhaltung und Jahresabschluss für kleine und mittlere Betriebe."
+    },
+    {
+      "slug": "optiker-fussgaengerzone",
+      "name": "Optiker Fußgängerzone",
+      "branche": "Gesundheit",
+      "street": "Frankfurter Straße",
+      "houseNumber": "58",
+      "plz": "63065",
+      "phone": "069 800004",
+      "email": "info@optiker-fussgaengerzone-beispiel.de",
+      "website": "https://www.optiker-fussgaengerzone-beispiel.de",
+      "hours": [
+        {
+          "days": "Mo–Fr",
+          "hours": "09:00–18:30"
+        },
+        {
+          "days": "Sa",
+          "hours": "09:00–13:00"
+        }
+      ],
+      "teaser": "Sehtest, Anpassung und eigene Werkstatt im Haus.",
+      "description": "Sehtest, individuelle Anpassung und eine eigene Werkstatt im Haus — die meisten Reparaturen sind noch am selben Tag fertig."
+    },
+    {
+      "slug": "sprachschule-offenbach",
+      "name": "Sprachschule Offenbach",
+      "branche": "Bildung",
+      "street": "Herrnstraße",
+      "houseNumber": "14",
+      "plz": "63065",
+      "phone": "069 800005",
+      "email": "kurse@sprachschule-offenbach-beispiel.de",
+      "website": "https://www.sprachschule-offenbach-beispiel.de",
+      "teaser": "Deutsch- und Integrationskurse, auch für Teams aus Betrieben.",
+      "description": "Deutsch- und Integrationskurse in Klein- und Firmengruppen. Auf Anfrage auch berufsbezogene Kurse direkt im Betrieb."
+    },
+    {
+      "slug": "blumen-am-buesingpark",
+      "name": "Blumen am Büsingpark",
+      "branche": "Einzelhandel",
+      "street": "Berliner Straße",
+      "houseNumber": "71",
+      "plz": "63065",
+      "phone": "069 800006",
+      "hours": [
+        {
+          "days": "Mo–Sa",
+          "hours": "08:00–18:00"
+        }
+      ],
+      "teaser": "Sträuße, Trauerfloristik und Dekoration für Veranstaltungen."
+    },
+    {
+      "slug": "pizzeria-herrnstrasse",
+      "name": "Pizzeria Herrnstraße",
+      "branche": "Gastronomie",
+      "street": "Herrnstraße",
+      "houseNumber": "27",
+      "plz": "63065",
+      "phone": "069 800007",
+      "website": "https://www.pizzeria-herrnstrasse-beispiel.de",
+      "hours": [
+        {
+          "days": "täglich",
+          "hours": "11:30–23:00"
+        }
+      ],
+      "teaser": "Mittagsgeschäft, Abendkarte und Lieferung in die Innenstadt."
+    },
+    {
+      "slug": "schreinerei-nordend",
+      "name": "Schreinerei Nordend",
+      "branche": "Handwerk",
+      "street": "Bismarckstraße",
+      "houseNumber": "9",
+      "plz": "63073",
+      "phone": "069 800008",
+      "email": "werkstatt@schreinerei-nordend-beispiel.de",
+      "teaser": "Ladenbau, Möbel nach Maß und Reparaturen."
+    },
+    {
+      "slug": "friseur-kaiserstrasse",
+      "name": "Friseur Kaiserstraße",
+      "branche": "Dienstleistung",
+      "street": "Kaiserstraße",
+      "houseNumber": "18",
+      "plz": "63065",
+      "phone": "069 800009",
+      "hours": [
+        {
+          "days": "Di–Fr",
+          "hours": "09:00–18:00"
+        },
+        {
+          "days": "Sa",
+          "hours": "09:00–14:00"
+        }
+      ],
+      "teaser": "Termine ohne Wartezeit, eigenes Ausbildungsprogramm."
+    },
+    {
+      "slug": "physiotherapie-innenstadt",
+      "name": "Physiotherapie Innenstadt",
+      "branche": "Gesundheit",
+      "street": "Marktplatz",
+      "houseNumber": "8",
+      "plz": "63065",
+      "phone": "069 800010",
+      "email": "praxis@physiotherapie-innenstadt-beispiel.de",
+      "hours": [
+        {
+          "days": "Mo–Fr",
+          "hours": "08:00–19:00"
+        }
+      ],
+      "teaser": "Behandlung auf Rezept und Prävention für Betriebe."
+    },
+    {
+      "slug": "goldschmiede-am-rathaus",
+      "name": "Goldschmiede am Rathaus",
+      "branche": "Einzelhandel",
+      "street": "Herrnstraße",
+      "houseNumber": "40",
+      "plz": "63065",
+      "phone": "069 800011",
+      "teaser": "Eigene Werkstatt, Anfertigung und Reparatur."
+    }
   ]
 }

@@ -1,0 +1,18 @@
+# Treffpunkt Offenbach – Mitgliederverzeichnis, Vorlage
+# Zeilen, die mit # beginnen, werden beim Einlesen ignoriert.
+# Branche bitte genau einen dieser Werte: Einzelhandel, Gastronomie, Handwerk, Dienstleistung, Gesundheit, Bildung
+# Öffnungszeiten bitte im Format "Mo–Fr 09:00–18:00; Sa 10:00–14:00" — mehrere Zeilen mit Semikolon trennen
+# Felder, die Sie nicht ausfüllen können, einfach leer lassen — sie werden auf der Seite dann nicht angezeigt.
+Name,Branche,Straße,Hausnummer,PLZ,Ort,Telefon,E-Mail,Website,Öffnungszeiten,Kurzbeschreibung,Beschreibung,Logo-Datei
+Buchhandlung Innenstadt,Einzelhandel,Frankfurter Straße,12,63065,Offenbach am Main,069 800000,info@buchhandlung-innenstadt-beispiel.de,https://www.buchhandlung-innenstadt-beispiel.de,Mo–Fr 09:30–18:30; Sa 09:30–14:00,"Sortiment, Bestellservice und Lesungen mitten in der Fußgängerzone.","Vom Bestseller bis zur Spezialbestellung: die Buchhandlung Innenstadt führt ein breites Sortiment und bestellt, was nicht im Regal steht, meist über Nacht. Regelmäßige Lesungen und ein eigener Kinderbuch-Bereich.",
+Café am Markt,Gastronomie,Marktplatz,3,63065,Offenbach am Main,069 800001,,,täglich 08:00–19:00,"Frühstück, Mittagstisch und Außengastronomie in der Saison.",,
+Elektro-Meisterbetrieb,Handwerk,Kaiserstraße,45,63065,Offenbach am Main,069 800002,kontakt@elektro-meisterbetrieb-beispiel.de,https://www.elektro-meisterbetrieb-beispiel.de,,"Installation, Wartung und Ladeinfrastruktur für Betriebe.","Vom Zählerschrank bis zur Wallbox: Installation und Wartung für Gewerbe und Privat, Notdienst nach Vereinbarung.",
+Steuerkanzlei am Main,Dienstleistung,Berliner Straße,22,63065,Offenbach am Main,069 800003,kanzlei@steuerkanzlei-am-main-beispiel.de,,Mo–Do 08:30–17:00; Fr 08:30–13:00,Buchhaltung und Jahresabschluss für kleine und mittlere Betriebe.,,
+Optiker Fußgängerzone,Gesundheit,Frankfurter Straße,58,63065,Offenbach am Main,069 800004,info@optiker-fussgaengerzone-beispiel.de,https://www.optiker-fussgaengerzone-beispiel.de,Mo–Fr 09:00–18:30; Sa 09:00–13:00,"Sehtest, Anpassung und eigene Werkstatt im Haus.","Sehtest, individuelle Anpassung und eine eigene Werkstatt im Haus — die meisten Reparaturen sind noch am selben Tag fertig.",
+Sprachschule Offenbach,Bildung,Herrnstraße,14,63065,Offenbach am Main,069 800005,kurse@sprachschule-offenbach-beispiel.de,https://www.sprachschule-offenbach-beispiel.de,,"Deutsch- und Integrationskurse, auch für Teams aus Betrieben.",Deutsch- und Integrationskurse in Klein- und Firmengruppen. Auf Anfrage auch berufsbezogene Kurse direkt im Betrieb.,
+Blumen am Büsingpark,Einzelhandel,Berliner Straße,71,63065,Offenbach am Main,069 800006,,,Mo–Sa 08:00–18:00,"Sträuße, Trauerfloristik und Dekoration für Veranstaltungen.",,
+Pizzeria Herrnstraße,Gastronomie,Herrnstraße,27,63065,Offenbach am Main,069 800007,,https://www.pizzeria-herrnstrasse-beispiel.de,täglich 11:30–23:00,"Mittagsgeschäft, Abendkarte und Lieferung in die Innenstadt.",,
+Schreinerei Nordend,Handwerk,Bismarckstraße,9,63073,Offenbach am Main,069 800008,werkstatt@schreinerei-nordend-beispiel.de,,,"Ladenbau, Möbel nach Maß und Reparaturen.",,
+Friseur Kaiserstraße,Dienstleistung,Kaiserstraße,18,63065,Offenbach am Main,069 800009,,,Di–Fr 09:00–18:00; Sa 09:00–14:00,"Termine ohne Wartezeit, eigenes Ausbildungsprogramm.",,
+Physiotherapie Innenstadt,Gesundheit,Marktplatz,8,63065,Offenbach am Main,069 800010,praxis@physiotherapie-innenstadt-beispiel.de,,Mo–Fr 08:00–19:00,Behandlung auf Rezept und Prävention für Betriebe.,,
+Goldschmiede am Rathaus,Einzelhandel,Herrnstraße,40,63065,Offenbach am Main,069 800011,,,,"Eigene Werkstatt, Anfertigung und Reparatur.",,

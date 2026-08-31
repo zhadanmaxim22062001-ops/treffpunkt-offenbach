@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "geocode": "node scripts/geocode-members.mjs",
+    "csv:import": "node scripts/csv-to-members.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -1,0 +1,50 @@
+{
+  "buchhandlung-innenstadt": {
+    "lat": 50.1045434,
+    "lon": 8.7630676
+  },
+  "cafe-am-markt": {
+    "lat": 50.1041433,
+    "lon": 8.7641902
+  },
+  "elektro-meisterbetrieb": {
+    "lat": 50.1117141,
+    "lon": 8.7568324
+  },
+  "steuerkanzlei-am-main": {
+    "lat": 50.1066549,
+    "lon": 8.7597055
+  },
+  "optiker-fussgaengerzone": {
+    "lat": 50.104529,
+    "lon": 8.7577251
+  },
+  "sprachschule-offenbach": {
+    "lat": 50.1041826,
+    "lon": 8.762518
+  },
+  "blumen-am-buesingpark": {
+    "lat": 50.1048122,
+    "lon": 8.7684128
+  },
+  "pizzeria-herrnstrasse": {
+    "lat": 50.1041254,
+    "lon": 8.7626803
+  },
+  "schreinerei-nordend": {
+    "lat": 50.1018153,
+    "lon": 8.7719707
+  },
+  "friseur-kaiserstrasse": {
+    "lat": 50.1018792,
+    "lon": 8.7595451
+  },
+  "physiotherapie-innenstadt": {
+    "lat": 50.1045987,
+    "lon": 8.7641858
+  },
+  "goldschmiede-am-rathaus": {
+    "lat": 50.1041254,
+    "lon": 8.7626803
+  }
+}
