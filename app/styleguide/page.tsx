@@ -1,14 +1,14 @@
 import { Button, Card, Chip, Eyebrow, Heading, Lead, Rule, Section } from "@/components/ui";
 import { LogoLockup, LogoMark } from "@/components/Logo";
 
-export const metadata = { title: "Styleguide" };
+export const metadata = { title: "Styleguide", robots: { index: false, follow: false } };
 
 const COLORS = [
-  ["Ink", "#101A1D", "Текст, знак, тёмные секции"],
-  ["Signalrot", "#E23D1F", "F в знаке, CTA, срочность"],
-  ["Main-Grün", "#1F6F6B", "Теги рубрик, статус «всё ок»"],
-  ["Kalkweiß", "#E9ECEA", "Основной фон"],
-  ["Beton", "#C6CFCB", "Линейки и рамки"],
+  ["Ink", "#101A1D", "Text, Zeichen, dunkle Sektionen"],
+  ["Signalrot", "#E23D1F", "F im Zeichen, CTA, Dringlichkeit"],
+  ["Main-Grün", "#1F6F6B", "Rubrik-Chips, Status „alles in Ordnung“"],
+  ["Kalkweiß", "#E9ECEA", "Grundfläche"],
+  ["Beton", "#C6CFCB", "Linien und Rahmen"],
 ];
 
 export default function Styleguide() {
@@ -73,11 +73,11 @@ export default function Styleguide() {
         <Rule className="my-10" />
         <div className="grid gap-5 md:grid-cols-3">
           <Card><h3 className="font-display text-[17px] font-semibold">Card</h3>
-            <p className="mt-2 text-[15px] text-ink-2">Волосяная рамка вместо тени, скругления нет.</p></Card>
+            <p className="mt-2 text-[15px] text-ink-2">Haarlinie statt Schatten, keine Rundung.</p></Card>
           <Card accent><h3 className="font-display text-[17px] font-semibold">Card, accent</h3>
-            <p className="mt-2 text-[15px] text-ink-2">Акцентная рамка — только для одного элемента на экране.</p></Card>
+            <p className="mt-2 text-[15px] text-ink-2">Akzentrahmen — nur für ein Element pro Bildschirm.</p></Card>
           <Card><p className="tnum font-mono text-[15px]">28.–31.05.2026 · 1 180 px · 66ch</p>
-            <p className="mt-2 text-[14px] text-muted">tabular-nums во всех числах.</p></Card>
+            <p className="mt-2 text-[14px] text-muted">tabular-nums bei jeder Zahl.</p></Card>
         </div>
       </Section>
     </>
