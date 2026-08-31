@@ -1,5 +1,19 @@
 import membersData from "@/data/members.json";
 import geocodeData from "@/data/members.geocode.json";
+import mapMetaData from "@/data/members.mapmeta.json";
+
+/**
+ * True as long as data/members.json still carries its TODO-COPY note — i.e.
+ * the member list is still the demo placeholders, not real businesses with
+ * consent to publish. Every place that renders member data in public checks
+ * this and shows an honest "under construction" state instead, so invented
+ * names can't go live by accident. csv-to-members.mjs always carries `_note`
+ * forward unchanged, even after a real import — on purpose: going live is a
+ * deliberate act, not a side effect of running a script. Once the real list
+ * is confirmed and published with consent, remove the TODO-COPY note from
+ * data/members.json by hand.
+ */
+export const MEMBERS_ARE_PLACEHOLDER = typeof (membersData as { _note?: string })._note === "string" && (membersData as { _note?: string })._note!.includes("TODO-COPY");
 
 export type Branche = "Einzelhandel" | "Gastronomie" | "Handwerk" | "Dienstleistung" | "Gesundheit" | "Bildung";
 
@@ -25,10 +39,12 @@ export type Member = {
 };
 
 export type GeoPoint = { lat: number; lon: number };
+export type MapMeta = { xPct: number; yPct: number };
 
 const DEFAULT_CITY = "Offenbach am Main";
 
 const GEOCODES: Record<string, GeoPoint | null> = geocodeData;
+const MAP_META: Record<string, MapMeta> = mapMetaData;
 
 export function getAllMembers(): Member[] {
   return membersData.members as Member[];
@@ -49,6 +65,10 @@ export function getMembersOnSameStreet(member: Member): Member[] {
 
 export function getMemberCoords(slug: string): GeoPoint | null {
   return GEOCODES[slug] ?? null;
+}
+
+export function getMemberMapMeta(slug: string): MapMeta | null {
+  return MAP_META[slug] ?? null;
 }
 
 /** "Straße Hausnummer, PLZ Ort" — every part after the street is optional and simply omitted. */

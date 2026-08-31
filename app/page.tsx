@@ -4,9 +4,9 @@ import { LogoMark } from "@/components/Logo";
 import { CountUp, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
 import { EVENTS, LEISTUNGEN, RADAR_CATEGORIES, RADAR_SEED } from "@/data/content";
-import membersData from "@/data/members.json";
+import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 
-const members = membersData.members;
+const members = getAllMembers();
 
 export default function Home() {
   const next = EVENTS[0];
@@ -138,35 +138,38 @@ export default function Home() {
       </Section>
 
       {/* ------------------------------------------ 5. Mitglieder-Marquee */}
-      <section className="border-t py-14" style={{ borderColor: "var(--c-line)" }}>
-        <Container>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <Eyebrow>Unsere Mitglieder</Eyebrow>
-            <Link href="/mitglieder" className="link-underline font-display text-[14px] font-medium">
-              Zum Verzeichnis
-            </Link>
-          </div>
-        </Container>
-        <div className="marquee mt-8 overflow-hidden" aria-label="Mitgliedsbetriebe">
-          <div className="marquee-track flex w-max gap-3">
-            {[...members, ...members].map((m, i) => (
-              <Link
-                key={`${m.slug}-${i}`}
-                href={`/mitglieder/${m.slug}`}
-                aria-hidden={i >= members.length}
-                tabIndex={i >= members.length ? -1 : 0}
-                className="shrink-0 border px-5 py-3 font-display text-[15px] font-medium transition-colors duration-[120ms] hover:text-accent"
-                style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
-              >
-                {m.name}
-                <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                  {m.branche}
-                </span>
+      {/* Hidden while the member list is still placeholders — see lib/members.ts MEMBERS_ARE_PLACEHOLDER. */}
+      {!MEMBERS_ARE_PLACEHOLDER && (
+        <section className="border-t py-14" style={{ borderColor: "var(--c-line)" }}>
+          <Container>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <Eyebrow>Unsere Mitglieder</Eyebrow>
+              <Link href="/mitglieder" className="link-underline font-display text-[14px] font-medium">
+                Zum Verzeichnis
               </Link>
-            ))}
+            </div>
+          </Container>
+          <div className="marquee mt-8 overflow-hidden" aria-label="Mitgliedsbetriebe">
+            <div className="marquee-track flex w-max gap-3">
+              {[...members, ...members].map((m, i) => (
+                <Link
+                  key={`${m.slug}-${i}`}
+                  href={`/mitglieder/${m.slug}`}
+                  aria-hidden={i >= members.length}
+                  tabIndex={i >= members.length ? -1 : 0}
+                  className="shrink-0 border px-5 py-3 font-display text-[15px] font-medium transition-colors duration-[120ms] hover:text-accent"
+                  style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
+                >
+                  {m.name}
+                  <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                    {m.branche}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* --------------------------------------- 6. Nächste Veranstaltung */}
       <Section tone="paper-2">

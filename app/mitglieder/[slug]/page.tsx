@@ -4,17 +4,24 @@ import type { Metadata } from "next";
 import { Eyebrow, Heading, Section } from "@/components/ui";
 import { StaticMap } from "@/components/StaticMap";
 import {
+  MEMBERS_ARE_PLACEHOLDER,
   formatAddress,
   getAllMembers,
   getMemberBySlug,
   getMemberCoords,
+  getMemberMapMeta,
   getMembersOnSameStreet,
   toOpeningHoursSpecification,
 } from "@/lib/members";
 
+// While the member list is still placeholders, no detail page exists at
+// all — not prerendered, and not reachable dynamically either (see
+// dynamicParams below). See lib/members.ts for why.
 export function generateStaticParams() {
-  return getAllMembers().map((m) => ({ slug: m.slug }));
+  return MEMBERS_ARE_PLACEHOLDER ? [] : getAllMembers().map((m) => ({ slug: m.slug }));
 }
+
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -28,10 +35,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (MEMBERS_ARE_PLACEHOLDER) notFound();
   const member = getMemberBySlug(slug);
   if (!member) notFound();
 
   const coords = getMemberCoords(member.slug);
+  const mapMeta = getMemberMapMeta(member.slug);
   const neighbours = getMembersOnSameStreet(member);
   const address = formatAddress(member);
 
@@ -119,7 +128,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
 
         <div>
-          <StaticMap point={coords} label={`${member.name}, ${address}`} />
+          <StaticMap slug={member.slug} meta={mapMeta} label={`${member.name}, ${address}`} />
         </div>
       </div>
 

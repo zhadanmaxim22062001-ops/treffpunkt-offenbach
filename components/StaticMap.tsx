@@ -1,51 +1,57 @@
-import type { GeoPoint } from "@/lib/members";
+import type { MapMeta } from "@/lib/members";
+
+const GRID = 3;
 
 /**
  * A flat map image, never an interactive embed — see house rule 7 (no map
- * iframes). Backed by Wikimedia's keyless static map renderer, which serves
- * a plain PNG with no cookies and no client-side script. When a member has
- * no cached geocode result yet, this renders a bordered placeholder instead
- * of failing — most members won't have coordinates until `npm run geocode`
- * has run against their real address.
+ * iframes). Built from OpenStreetMap raster tiles that scripts/geocode-
+ * members.mjs fetches ONCE at import time and caches under public/maps/.
+ * This component only ever reads those local files — a visitor's browser
+ * makes no third-party request and hands nobody an IP address. That's the
+ * whole point: the same reasoning that keeps fonts local (see lib/fonts.ts)
+ * applies here too.
+ *
+ * When a member has no cached tiles yet (new address, not yet geocoded),
+ * this renders a bordered placeholder instead of failing.
  */
-export function StaticMap({
-  point,
-  label,
-  zoom = 16,
-  width = 480,
-  height = 280,
-}: {
-  point: GeoPoint | null;
-  label: string;
-  zoom?: number;
-  width?: number;
-  height?: number;
-}) {
-  if (!point) {
+export function StaticMap({ slug, meta, label }: { slug: string; meta: MapMeta | null; label: string }) {
+  if (!meta) {
     return (
       <div
-        className="flex items-center justify-center border font-mono text-[11px] uppercase tracking-[0.12em] text-muted"
-        style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)", aspectRatio: `${width} / ${height}` }}
+        className="flex aspect-square items-center justify-center border font-mono text-[11px] uppercase tracking-[0.12em] text-muted"
+        style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
       >
         Karte folgt
       </div>
     );
   }
 
-  const src = `https://maps.wikimedia.org/img/osm-intl,${zoom},${point.lat},${point.lon},${width}x${height}.png`;
+  const tiles = Array.from({ length: GRID }, (_, row) => row).flatMap((row) =>
+    Array.from({ length: GRID }, (_, col) => ({ row, col })),
+  );
 
   return (
-    <div className="relative border" style={{ borderColor: "var(--c-line)" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- external static image, not an optimizable local asset */}
-      <img src={src} alt={`Lageplan: ${label}`} width={width} height={height} loading="lazy" className="block w-full" style={{ aspectRatio: `${width} / ${height}` }} />
-      <span
-        aria-hidden
-        className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
-        style={{ borderColor: "var(--c-accent)", backgroundColor: "var(--c-paper)" }}
-      />
-      <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted" style={{ position: "absolute", right: 4, bottom: 2 }}>
-        © OpenStreetMap
-      </p>
-    </div>
+    <figure className="m-0">
+      <div className="relative aspect-square overflow-hidden border" style={{ borderColor: "var(--c-line)" }}>
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+          {tiles.map(({ row, col }) => (
+            // eslint-disable-next-line @next/next/no-img-element -- locally cached tile, not an optimizable next/image candidate (already a fixed 256px raster)
+            <img key={`${row}-${col}`} src={`/maps/${slug}/${row}-${col}.png`} alt="" width={256} height={256} loading="lazy" className="block h-full w-full" />
+          ))}
+        </div>
+        <span
+          aria-hidden
+          className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+          style={{ left: `${meta.xPct}%`, top: `${meta.yPct}%`, borderColor: "var(--c-accent)", backgroundColor: "var(--c-paper)" }}
+        />
+        <span className="sr-only">Lageplan: {label}</span>
+      </div>
+      <figcaption className="mt-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+        Kartendaten:{" "}
+        <a className="link-underline" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">
+          © OpenStreetMap-Mitwirkende
+        </a>
+      </figcaption>
+    </figure>
   );
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Eyebrow, Heading, Lead, Section } from "@/components/ui";
-import { BRANCHEN, filterMembers, getAllMembers, getDistinctStreets } from "@/lib/members";
+import { BRANCHEN, MEMBERS_ARE_PLACEHOLDER, filterMembers, getAllMembers, getDistinctStreets } from "@/lib/members";
 
 export const metadata: Metadata = {
   title: "Mitgliederverzeichnis",
@@ -21,6 +21,28 @@ function buildHref(current: SearchParams, overrides: SearchParams): string {
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  if (MEMBERS_ARE_PLACEHOLDER) {
+    return (
+      <Section>
+        <Eyebrow className="mb-4">Mitglieder</Eyebrow>
+        <Heading level={1} className="max-w-[20ch]">
+          Verzeichnis im Aufbau.
+        </Heading>
+        <Lead className="mt-6 max-w-[60ch]">
+          Wir stellen gerade die echte Liste unserer Mitgliedsbetriebe zusammen — mit Zustimmung jedes einzelnen
+          Betriebs zur Veröffentlichung. Bis dahin zeigen wir hier keine Platzhalter-Namen.
+        </Lead>
+        <p className="prose-body mt-8">
+          Sind Sie Mitglied und möchten im Verzeichnis stehen?{" "}
+          <Link href="/kontakt" className="link-underline">
+            Schreiben Sie uns
+          </Link>
+          .
+        </p>
+      </Section>
+    );
+  }
+
   const sp = await searchParams;
   const streets = getDistinctStreets();
   const results = filterMembers(getAllMembers(), sp);

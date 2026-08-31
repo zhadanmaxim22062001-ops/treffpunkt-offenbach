@@ -161,7 +161,14 @@ async function main() {
   const output = { ...existing, members };
   await writeFile(MEMBERS_PATH, JSON.stringify(output, null, 2) + "\n");
   console.log(`\nImported ${members.length} members, skipped ${skipped}, wrote ${MEMBERS_PATH}`);
-  console.log("Run `npm run geocode` next to fetch map coordinates for any new addresses.");
+  console.log("Run `npm run geocode` next to fetch map tiles for any new addresses.");
+  if (typeof output._note === "string" && output._note.includes("TODO-COPY")) {
+    console.log(
+      "\nNote: data/members.json still carries its TODO-COPY marker, so the site will keep showing\n" +
+        '"Verzeichnis im Aufbau" instead of this data. Once the list is confirmed real and every\n' +
+        "business has consented to publication, remove that note from data/members.json by hand.",
+    );
+  }
 }
 
 main();
