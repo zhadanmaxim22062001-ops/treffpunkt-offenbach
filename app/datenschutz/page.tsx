@@ -10,16 +10,48 @@ export default function Page() {
         <p>Diese Website setzt keine Cookies. Schriften, Kartenausschnitte und alle sonstigen Inhalte werden vom
           eigenen Server ausgeliefert — es besteht keine Verbindung zu Google Fonts oder anderen
           Drittanbieter-Einbindungen.</p>
-        <p>Beim Aufruf der Seite verarbeitet unser Hoster technisch notwendige Zugriffsdaten. Eine
-          Zusammenführung mit anderen Daten findet nicht statt.</p>
+
+        <p>
+          <strong className="font-display">Hosting</strong><br />
+          Diese Website wird bei Vercel Inc. gehostet, einem Unternehmen mit Sitz in den USA. Vercel verarbeitet
+          dabei als Auftragsverarbeiter die technisch notwendigen Zugriffsdaten, die beim Aufruf der Seite anfallen.
+          Eine Zusammenführung mit anderen Daten findet nicht statt.{" "}
+          <span className="font-mono text-[12px] text-muted">
+            [TODO-COPY: Abschluss eines Auftragsverarbeitungsvertrags (AVV) mit Vercel bestätigen und hier
+            referenzieren.]
+          </span>
+        </p>
+
         <p>
           <strong className="font-display">Kontakt- und Mitgliedsformular</strong><br />
           Daten, die Sie über das Kontakt- oder Mitgliedsformular an uns senden, verarbeiten wir ausschließlich
-          zur Bearbeitung Ihrer Anfrage. Für den Versand nutzen wir den E-Mail-Dienstleister Resend (Resend, Inc.)
-          als Auftragsverarbeiter; die Inhalte werden zu diesem Zweck über dessen Server geleitet. Eine
-          Weitergabe an andere Dritte findet nicht statt. Näheres zur Speicherdauer finden Sie im
-          Einwilligungstext direkt am jeweiligen Formular.
+          zur Bearbeitung Ihrer Anfrage. Für den Versand nutzen wir den E-Mail-Dienstleister Resend (Resend, Inc.),
+          ebenfalls ein Unternehmen mit Sitz in den USA, als Auftragsverarbeiter; die Inhalte werden zu diesem
+          Zweck über dessen Server geleitet. Eine Weitergabe an andere Dritte findet nicht statt. Näheres zur
+          Speicherdauer finden Sie im Einwilligungstext direkt am jeweiligen Formular.{" "}
+          <span className="font-mono text-[12px] text-muted">
+            [TODO-COPY: Abschluss eines Auftragsverarbeitungsvertrags (AVV) mit Resend bestätigen und hier
+            referenzieren.]
+          </span>
         </p>
+
+        <p>
+          <strong className="font-display">Datenübermittlung in Drittländer</strong><br />
+          Sowohl Vercel als auch Resend haben ihren Sitz in den USA, einem Land außerhalb der EU und des EWR. Die
+          Übermittlung personenbezogener Daten dorthin erfordert eine Rechtsgrundlage nach Art. 44 ff. DSGVO.{" "}
+          <span className="font-mono text-[12px] text-muted">
+            [TODO-COPY: Rechtsgrundlage je Anbieter bestätigen und konkret benennen — z. B. Zertifizierung nach dem
+            EU-US Data Privacy Framework oder Standardvertragsklauseln (SCC) — bevor die Seite live geht.]
+          </span>
+        </p>
+
+        <p>
+          <strong className="font-display">Speicherdauer</strong><br />
+          <span className="font-mono text-[12px] text-muted">
+            [TODO-COPY: Aufbewahrungsfristen für Formulardaten und Zugriffsprotokolle mit dem Vorstand festlegen.]
+          </span>
+        </p>
+
         <p>Verantwortlich: {VEREIN.name}, {VEREIN.street}, {VEREIN.zip} {VEREIN.city}, {VEREIN.email}.</p>
         <p className="font-mono text-[12px] text-muted">
           TODO: vollständige Fassung juristisch prüfen lassen, bevor die Seite live geht.
