@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "geocode": "node scripts/geocode-members.mjs",
-    "csv:import": "node scripts/csv-to-members.mjs"
+    "csv:import": "node scripts/csv-to-members.mjs",
+    "map:verein": "node scripts/fetch-verein-map.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -23,6 +24,7 @@
     "@fontsource/archivo": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/newsreader": "^5.3.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.4.0",
     "@types/react": "^19.2.18",
