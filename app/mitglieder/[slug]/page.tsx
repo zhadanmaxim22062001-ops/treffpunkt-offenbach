@@ -2,14 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Eyebrow, Heading, Section } from "@/components/ui";
-import { StaticMap } from "@/components/StaticMap";
 import {
   MEMBERS_ARE_PLACEHOLDER,
   formatAddress,
   getAllMembers,
   getMemberBySlug,
   getMemberCoords,
-  getMemberMapMeta,
+  getMemberOsmUrl,
   getMembersOnSameStreet,
   toOpeningHoursSpecification,
 } from "@/lib/members";
@@ -40,7 +39,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (!member) notFound();
 
   const coords = getMemberCoords(member.slug);
-  const mapMeta = getMemberMapMeta(member.slug);
   const neighbours = getMembersOnSameStreet(member);
   const address = formatAddress(member);
 
@@ -73,63 +71,65 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       </Eyebrow>
       <Heading level={1}>{member.name}</Heading>
 
-      <div className="mt-10 grid gap-10 md:grid-cols-[1.1fr_0.9fr]">
-        <div className="flex flex-col gap-8">
-          {(member.description ?? member.teaser) && (
-            <p className="prose-body text-[17px]">{member.description ?? member.teaser}</p>
-          )}
-
-          <div>
-            <p className="eyebrow mb-3">Kontakt</p>
-            <address className="not-italic text-[15px] leading-relaxed text-ink-2">
-              {address}
-              {member.phone && (
-                <>
-                  <br />
-                  <a className="link-underline" href={`tel:${member.phone.replace(/\s/g, "")}`}>
-                    {member.phone}
-                  </a>
-                </>
-              )}
-              {member.email && (
-                <>
-                  <br />
-                  <a className="link-underline" href={`mailto:${member.email}`}>
-                    {member.email}
-                  </a>
-                </>
-              )}
-              {member.website && (
-                <>
-                  <br />
-                  <a className="link-underline" href={member.website} target="_blank" rel="noopener noreferrer">
-                    {member.website.replace(/^https?:\/\//, "")}
-                  </a>
-                </>
-              )}
-            </address>
-          </div>
-
-          {member.hours && member.hours.length > 0 && (
-            <div>
-              <p className="eyebrow mb-3">Öffnungszeiten</p>
-              <dl className="flex flex-col gap-1 text-[15px] text-ink-2">
-                {member.hours.map((line, i) => (
-                  <div key={i} className="flex gap-4">
-                    <dt className="w-24 shrink-0 font-mono text-[12px] uppercase tracking-[0.08em] text-muted">
-                      {line.days}
-                    </dt>
-                    <dd className="tnum">{line.hours}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
-        </div>
+      <div className="mt-10 flex max-w-[60ch] flex-col gap-8">
+        {(member.description ?? member.teaser) && (
+          <p className="prose-body text-[17px]">{member.description ?? member.teaser}</p>
+        )}
 
         <div>
-          <StaticMap slug={member.slug} meta={mapMeta} label={`${member.name}, ${address}`} />
+          <p className="eyebrow mb-3">Kontakt</p>
+          <address className="not-italic text-[15px] leading-relaxed text-ink-2">
+            {address}
+            {member.phone && (
+              <>
+                <br />
+                <a className="link-underline" href={`tel:${member.phone.replace(/\s/g, "")}`}>
+                  {member.phone}
+                </a>
+              </>
+            )}
+            {member.email && (
+              <>
+                <br />
+                <a className="link-underline" href={`mailto:${member.email}`}>
+                  {member.email}
+                </a>
+              </>
+            )}
+            {member.website && (
+              <>
+                <br />
+                <a className="link-underline" href={member.website} target="_blank" rel="noopener noreferrer">
+                  {member.website.replace(/^https?:\/\//, "")}
+                </a>
+              </>
+            )}
+          </address>
+          <a
+            className="link-underline mt-3 inline-block font-mono text-[11px] uppercase tracking-[0.1em] text-muted"
+            href={getMemberOsmUrl(member)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Auf OpenStreetMap ansehen
+          </a>
         </div>
+
+        {member.hours && member.hours.length > 0 && (
+          <div>
+            <p className="eyebrow mb-3">Öffnungszeiten</p>
+            <dl className="flex flex-col gap-1 text-[15px] text-ink-2">
+              {member.hours.map((line, i) => (
+                <div key={i} className="flex gap-4">
+                  <dt className="w-24 shrink-0 font-mono text-[12px] uppercase tracking-[0.08em] text-muted">
+                    {line.days}
+                  </dt>
+                  <dd className="tnum">{line.hours}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
       </div>
 
       {neighbours.length > 0 && (

@@ -1,18 +1,23 @@
-import type { MapMeta } from "@/lib/members";
+import type { MapMeta } from "@/lib/maps";
 
 const GRID = 3;
 
 /**
  * A flat map image, never an interactive embed — see house rule 7 (no map
- * iframes). Built from OpenStreetMap raster tiles that scripts/geocode-
- * members.mjs fetches ONCE at import time and caches under public/maps/.
- * This component only ever reads those local files — a visitor's browser
- * makes no third-party request and hands nobody an IP address. That's the
- * whole point: the same reasoning that keeps fonts local (see lib/fonts.ts)
- * applies here too.
+ * iframes). Built from OpenStreetMap raster tiles fetched ONCE at import
+ * time and cached under public/maps/<slug>/. This component only ever reads
+ * those local files — a visitor's browser makes no third-party request and
+ * hands nobody an IP address. Same reasoning as keeping fonts local (see
+ * lib/fonts.ts).
  *
- * When a member has no cached tiles yet (new address, not yet geocoded),
- * this renders a bordered placeholder instead of failing.
+ * Used for exactly one map on the whole site: the association's own address
+ * on /kontakt, fetched by scripts/fetch-verein-map.mjs. Member pages link
+ * out to OpenStreetMap instead of rendering a map — see
+ * scripts/geocode-members.mjs for why a rendered map per member doesn't
+ * scale to the real member list.
+ *
+ * When there's no cached data yet, this renders a bordered placeholder
+ * instead of failing.
  */
 export function StaticMap({ slug, meta, label }: { slug: string; meta: MapMeta | null; label: string }) {
   if (!meta) {

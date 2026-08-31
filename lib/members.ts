@@ -1,6 +1,5 @@
 import membersData from "@/data/members.json";
 import geocodeData from "@/data/members.geocode.json";
-import mapMetaData from "@/data/members.mapmeta.json";
 
 /**
  * True as long as data/members.json still carries its TODO-COPY note — i.e.
@@ -39,12 +38,10 @@ export type Member = {
 };
 
 export type GeoPoint = { lat: number; lon: number };
-export type MapMeta = { xPct: number; yPct: number };
 
 const DEFAULT_CITY = "Offenbach am Main";
 
 const GEOCODES: Record<string, GeoPoint | null> = geocodeData;
-const MAP_META: Record<string, MapMeta> = mapMetaData;
 
 export function getAllMembers(): Member[] {
   return membersData.members as Member[];
@@ -67,16 +64,24 @@ export function getMemberCoords(slug: string): GeoPoint | null {
   return GEOCODES[slug] ?? null;
 }
 
-export function getMemberMapMeta(slug: string): MapMeta | null {
-  return MAP_META[slug] ?? null;
-}
-
 /** "Straße Hausnummer, PLZ Ort" — every part after the street is optional and simply omitted. */
 export function formatAddress(member: Member): string {
   const line1 = member.houseNumber ? `${member.street} ${member.houseNumber}` : member.street;
   const city = member.city ?? DEFAULT_CITY;
   const line2 = member.plz ? `${member.plz} ${city}` : city;
   return `${line1}, ${line2}`;
+}
+
+/**
+ * Outbound link to OpenStreetMap — no map rendered on our side (see
+ * scripts/geocode-members.mjs for why member pages don't get a local map
+ * image). Precise pin when we have coordinates, a text search as a fallback
+ * when we don't.
+ */
+export function getMemberOsmUrl(member: Member): string {
+  const coords = getMemberCoords(member.slug);
+  if (coords) return `https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lon}#map=18/${coords.lat}/${coords.lon}`;
+  return `https://www.openstreetmap.org/search?query=${encodeURIComponent(formatAddress(member))}`;
 }
 
 const DAY_ORDER = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] as const;
