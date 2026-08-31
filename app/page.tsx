@@ -3,13 +3,14 @@ import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "
 import { LogoMark } from "@/components/Logo";
 import { CountUp, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
-import { EVENTS, LEISTUNGEN, RADAR_CATEGORIES, RADAR_SEED } from "@/data/content";
+import { LEISTUNGEN, RADAR_CATEGORIES, RADAR_SEED } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
+import { getNextConfirmedEvent } from "@/lib/events";
 
 const members = getAllMembers();
 
 export default function Home() {
-  const next = EVENTS[0];
+  const next = getNextConfirmedEvent();
   const radar = RADAR_SEED.slice(0, 3);
 
   return (
@@ -172,30 +173,46 @@ export default function Home() {
       )}
 
       {/* --------------------------------------- 6. Nächste Veranstaltung */}
+      {/* Only ever shows a specific date once lib/events.ts confirms one exists — see data/content.ts for why. */}
       <Section tone="paper-2">
-        <Eyebrow className="mb-4">Nächste Veranstaltung</Eyebrow>
+        <Eyebrow className="mb-4">Veranstaltungen</Eyebrow>
         <Reveal>
-          <article
-            className="grid gap-8 border p-8 md:grid-cols-[auto_1fr] md:p-12"
-            style={{ borderColor: "var(--c-accent)", backgroundColor: "var(--c-paper)" }}
-          >
-            <p className="font-display text-[clamp(30px,4vw,44px)] font-extrabold leading-none tracking-[-0.035em] text-accent tnum">
-              {next.when}
-            </p>
-            <div>
+          {next ? (
+            <article
+              className="grid gap-8 border p-8 md:grid-cols-[auto_1fr] md:p-12"
+              style={{ borderColor: "var(--c-accent)", backgroundColor: "var(--c-paper)" }}
+            >
+              <p className="font-display text-[clamp(30px,4vw,44px)] font-extrabold leading-none tracking-[-0.035em] text-accent tnum">
+                {next.when}
+              </p>
+              <div>
+                <h3 className="font-display text-[clamp(22px,2.6vw,30px)] font-extrabold tracking-[-0.03em]">
+                  {next.title}
+                </h3>
+                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{next.place}</p>
+                <p className="prose-body mt-4">{next.summary}</p>
+                <Link
+                  href={`/veranstaltungen/${next.slug}`}
+                  className="link-underline mt-5 inline-block font-display text-[14px] font-semibold"
+                >
+                  Alle Veranstaltungen
+                </Link>
+              </div>
+            </article>
+          ) : (
+            <article className="border p-8 md:p-12" style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper)" }}>
               <h3 className="font-display text-[clamp(22px,2.6vw,30px)] font-extrabold tracking-[-0.03em]">
-                {next.title}
+                Die Termine für 2027 stehen noch nicht fest.
               </h3>
-              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{next.place}</p>
-              <p className="prose-body mt-4">{next.summary}</p>
-              <Link
-                href={`/veranstaltungen/${next.slug}`}
-                className="link-underline mt-5 inline-block font-display text-[14px] font-semibold"
-              >
+              <p className="prose-body mt-4">
+                Offenbacher Woche, Lichterfest, verkaufsoffene Sonntage: Sobald der Vorstand die Termine bestätigt,
+                erscheinen sie hier und im Veranstaltungskalender.
+              </p>
+              <Link href="/veranstaltungen" className="link-underline mt-5 inline-block font-display text-[14px] font-semibold">
                 Alle Veranstaltungen
               </Link>
-            </div>
-          </article>
+            </article>
+          )}
         </Reveal>
       </Section>
 
