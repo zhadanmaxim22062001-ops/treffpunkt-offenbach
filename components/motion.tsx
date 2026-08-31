@@ -3,7 +3,7 @@
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-/** Появление секции: 16px вверх + прозрачность, один раз, стагger 60мс. */
+/** Section reveal: 16px up + fade, once, ~60ms stagger. */
 export function Reveal({
   children,
   delay = 0,
@@ -29,7 +29,7 @@ export function Reveal({
   );
 }
 
-/** Счётчик Kennzahlen: считает при попадании в вьюпорт, уважает reduced-motion. */
+/** Kennzahlen counter: counts up once it enters the viewport, respects reduced motion. */
 export function CountUp({
   to,
   suffix = "",
@@ -54,7 +54,7 @@ export function CountUp({
     const start = performance.now();
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / duration);
-      // easeOutCubic — цифра тормозит к финалу, а не щёлкает
+      // easeOutCubic — the number eases into its final value instead of snapping
       setValue(Math.round(to * (1 - Math.pow(1 - p, 3))));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
@@ -70,7 +70,7 @@ export function CountUp({
   );
 }
 
-/** Плавный скролл. Отключается при prefers-reduced-motion. */
+/** Smooth scroll. Disabled under prefers-reduced-motion. */
 export function SmoothScroll() {
   const reduce = useReducedMotion();
   useEffect(() => {

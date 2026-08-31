@@ -3,8 +3,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /* ------------------------------------------------------------------
-   Общие примитивы. Визуальный язык — печатный спец-лист, а не дашборд:
-   волосяные рамки в 1px вместо теней, скругления только у пилюль.
+   Shared primitives. Visual language is a printed spec sheet, not a
+   dashboard: 1px hairline borders instead of shadows, rounded corners
+   only on pills.
    ------------------------------------------------------------------ */
 
 export function Container({ children, className }: { children: ReactNode; className?: string }) {

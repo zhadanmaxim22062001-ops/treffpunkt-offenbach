@@ -1,10 +1,10 @@
 import { clsx } from "clsx";
 
 /**
- * Знак OF-Siegel. Два разных рисунка, не один с масштабом:
- *   size >= 64  -> основной, кольцо разорвано, перекладина проходит насквозь
- *   size <  64  -> компактный, кольцо замкнуто, штрих толще
- * Порог зашит здесь, чтобы про него не приходилось помнить на каждой странице.
+ * The OF-Siegel mark. Two distinct drawings, not one drawing scaled:
+ *   size >= 64  -> primary, ring has a gap, the bar runs through it
+ *   size <  64  -> compact, ring is closed, heavier stroke
+ * The threshold lives here so nobody has to remember it on every page.
  */
 
 const COMPACT_BELOW = 64;
@@ -53,7 +53,7 @@ export function LogoMark({
   );
 }
 
-/** Горизонтальный локап: знак + две строки, оптически равные по ширине. */
+/** Horizontal lockup: mark + two lines, optically equal in width. */
 export function LogoLockup({
   markSize = 44,
   animated = false,

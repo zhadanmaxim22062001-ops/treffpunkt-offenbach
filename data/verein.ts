@@ -1,6 +1,6 @@
 /**
- * Реальные данные союза. Взяты с treffpunkt-offenbach.com (Impressum, Vorstand).
- * Всё, чего там не было, помечено TODO — не выдумывать.
+ * Real association data, taken from treffpunkt-offenbach.com (Impressum, Vorstand).
+ * Anything not found there is marked TODO — never invented.
  */
 
 export const VEREIN = {
@@ -13,7 +13,7 @@ export const VEREIN = {
   phone: "0160 92240226",
   email: "info@treffpunkt-offenbach.com",
   responsible: "Klaus Kohlweyer",
-  // TODO-COPY: номер в Vereinsregister и год основания — запросить у правления
+  // TODO-COPY: Vereinsregister number and founding year — ask the board
   registerNumber: null as string | null,
   foundedYear: null as number | null,
 };
@@ -31,7 +31,7 @@ export const VORSTAND = [
 ];
 
 export const KENNZAHLEN = [
-  // TODO-COPY: точное число членов запросить у правления
+  // TODO-COPY: ask the board for the exact member count
   { value: 100, suffix: "+", label: "Mitgliedsbetriebe", note: "Handel, Gastronomie, Handwerk, Dienstleistung" },
   { value: 28, suffix: ".", label: "Offenbacher Woche", note: "2026 zum 28. Mal, vom 28. bis 31. Mai" },
   { value: 4, suffix: "", label: "Große Formate im Jahr", note: "OF-Woche, Lichterfest, offene Sonntage, Beleuchtung" },

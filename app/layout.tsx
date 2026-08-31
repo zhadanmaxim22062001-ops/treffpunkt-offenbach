@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de" className={`${archivo.variable} ${newsreader.variable} ${plexMono.variable}`}>
       <head>
-        {/* без JS motion оставил бы блоки на opacity 0 — контент обязан быть виден всегда */}
+        {/* without JS, motion would leave blocks at opacity 0 — content must always be visible */}
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
         </noscript>

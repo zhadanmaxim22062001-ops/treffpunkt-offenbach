@@ -1,5 +1,5 @@
 {
-  "_note": "TODO-COPY: платцхалтеры. Настоящий список членов должен прийти от правления вместе с согласием на публикацию. Имена здесь намеренно описательные, а не выдуманные конкретные фирмы.",
+  "_note": "TODO-COPY: placeholders. The real member list must come from the board along with consent to publish. Names here are intentionally generic descriptions, not invented specific companies.",
   "branchen": ["Einzelhandel", "Gastronomie", "Handwerk", "Dienstleistung", "Gesundheit", "Bildung"],
   "members": [
     { "slug": "buchhandlung-innenstadt", "name": "Buchhandlung Innenstadt", "branche": "Einzelhandel", "street": "Frankfurter Straße", "line": "Sortiment, Bestellservice und Lesungen mitten in der Fußgängerzone." },

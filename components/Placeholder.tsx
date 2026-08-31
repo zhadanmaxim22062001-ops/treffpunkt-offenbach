@@ -1,6 +1,6 @@
 import { Eyebrow, Heading, Section } from "@/components/ui";
 
-/** Заглушка для страниц, которые собираются на следующих шагах. */
+/** Stub for pages that get built in later steps. */
 export function Placeholder({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
   return (
     <Section>

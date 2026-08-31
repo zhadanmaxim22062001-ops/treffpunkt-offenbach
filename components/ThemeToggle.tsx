@@ -6,9 +6,9 @@ type Mode = "system" | "light" | "dark";
 const KEY = "tpof-theme";
 
 /**
- * Переключатель темы. Три состояния, а не два: по умолчанию сайт следует
- * системе и ничего не штампует на <html>, поэтому в этом состоянии работает
- * только prefers-color-scheme.
+ * Theme toggle. Three states, not two: by default the site follows the
+ * system and stamps nothing on <html>, so only prefers-color-scheme
+ * applies in that state.
  */
 export function ThemeToggle() {
   const [mode, setMode] = useState<Mode>("system");
@@ -18,7 +18,7 @@ export function ThemeToggle() {
       const saved = localStorage.getItem(KEY) as Mode | null;
       if (saved === "light" || saved === "dark") setMode(saved);
     } catch {
-      /* приватный режим или заблокированное хранилище — остаёмся на system */
+      /* private browsing or blocked storage — stay on system */
     }
   }, []);
 
@@ -30,7 +30,7 @@ export function ThemeToggle() {
       if (mode === "system") localStorage.removeItem(KEY);
       else localStorage.setItem(KEY, mode);
     } catch {
-      /* нечего делать: тема применится, просто не переживёт перезагрузку */
+      /* nothing to do: the theme still applies, it just won't survive a reload */
     }
   }, [mode]);
 

@@ -1,7 +1,8 @@
 /**
- * Seed-контент для главной. События реальные (Offenbacher Woche 2026 прошла
- * 28–31 мая 28-й раз, Lichterfest в Büsingpark), описания — рабочие черновики,
- * которые правление должно вычитать. Всё, что нужно править, помечено TODO-COPY.
+ * Seed content for the homepage. Events are real (Offenbacher Woche 2026 ran
+ * 28–31 May for the 28th time, Lichterfest in Büsingpark), descriptions are
+ * working drafts the board still needs to proofread. Anything that needs
+ * fixing is marked TODO-COPY.
  */
 
 export type Event = {
@@ -74,7 +75,7 @@ export const LEISTUNGEN: Leistung[] = [
   },
 ];
 
-/** Первые записи OF-Radar — на seed-данных, до подключения базы. */
+/** First OF-Radar entries — seed data, until the database is wired up. */
 export type RadarItem = {
   slug: string;
   category: "rathaus" | "baustelle" | "foerderung" | "frequenz" | "stadt" | "recht";
@@ -99,9 +100,9 @@ export const RADAR_CATEGORIES: Record<
   recht: { label: "Recht & Kosten", tone: "neutral" },
 };
 
-// TODO-COPY: это демонстрационные записи для оценки вёрстки.
-// Настоящие приходят из /api/radar/ingest и публикуются только после
-// одобрения в /admin/radar — ничего не уходит в эфир автоматически.
+// TODO-COPY: these are demo entries for judging the layout.
+// Real ones come from /api/radar/ingest and go live only after approval
+// in /admin/radar — nothing publishes automatically.
 export const RADAR_SEED: RadarItem[] = [
   {
     slug: "sondernutzung-aussengastronomie",

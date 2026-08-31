@@ -1,10 +1,11 @@
 import localFont from "next/font/local";
 
 /**
- * Шрифты подключены локально, а не через next/font/google.
- * Причина не в скорости, а в DSGVO: обращение к серверам Google при
- * рендере передаёт им IP посетителя, и именно за это в Германии судятся.
- * Файлы взяты из @fontsource (лицензия OFL) и лежат в /public/fonts.
+ * Fonts are loaded locally rather than via next/font/google.
+ * The reason isn't speed, it's the DSGVO: fetching from Google's servers
+ * on render hands them the visitor's IP, and that is exactly what German
+ * courts have penalised. Files come from @fontsource (OFL license) and
+ * live in /public/fonts.
  */
 
 export const archivo = localFont({
