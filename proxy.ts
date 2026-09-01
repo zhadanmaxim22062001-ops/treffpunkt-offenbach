@@ -61,6 +61,15 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   return NextResponse.next();
 }
 
+// PARKED FOR v2. /admin/radar was cut from v1 (no database exists to review
+// anything against — see README), so there's nothing left under /admin for
+// this to protect. The matcher below is deliberately inert: it can't match
+// any real request, so /admin/* falls through to Next's normal routing and
+// 404s like any other nonexistent path, rather than this proxy answering
+// with a 503 (ADMIN_PASSWORD is intentionally unset in v1) ahead of the
+// router ever getting a chance to 404 it. The auth logic above is untouched
+// and ready — when /admin/radar comes back in v2, restore the real matcher:
+//   matcher: ["/admin/:path*"]
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/__parked-for-v2__/:path*"],
 };

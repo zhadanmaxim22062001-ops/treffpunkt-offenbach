@@ -1,0 +1,83 @@
+{
+  "_note": "TODO-COPY: specimens for judging the layout, not real published items. See RADAR_ITEMS_ARE_PLACEHOLDER in lib/radar-content.ts — the public site shows an honest empty state while this note is present. To publish a real item: replace an entry below with real content (category, headline, summary, action, sourceName, sourceUrl, date, urgency, optional deadline — origin stays \"manual\"), remove this note once every entry is real, commit.",
+  "items": [
+    {
+      "slug": "sondernutzung-aussengastronomie",
+      "category": "rathaus",
+      "headline": "Neue Gebührenordnung für Außengastronomie ab dem Frühjahr",
+      "summary": "Die Stadt hat die Sätze für Sondernutzung im öffentlichen Raum neu gefasst. Betroffen sind Tische, Stühle und Warenauslagen auf dem Gehweg.",
+      "action": "Wer Fläche vor dem Laden nutzt, sollte den Antrag vor Saisonbeginn neu stellen.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/sondernutzung",
+      "date": "2026-08-27",
+      "urgency": "mid",
+      "deadline": null,
+      "origin": "manual"
+    },
+    {
+      "slug": "frankfurter-strasse-sperrung",
+      "category": "baustelle",
+      "headline": "Frankfurter Straße: Teilsperrung über sechs Wochen",
+      "summary": "Wegen Leitungsarbeiten ist ein Abschnitt der Frankfurter Straße nur einspurig befahrbar. Die Zufahrt zu den Geschäften bleibt zu Fuß frei.",
+      "action": "Betriebe an der Strecke: Lieferzeiten verschieben und Kundschaft aktiv auf die Erreichbarkeit hinweisen.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/frankfurter-strasse",
+      "date": "2026-08-25",
+      "urgency": "high",
+      "deadline": null,
+      "origin": "manual"
+    },
+    {
+      "slug": "digitalbonus-hessen",
+      "category": "foerderung",
+      "headline": "Digitalbonus Hessen: nächstes Antragsfenster",
+      "summary": "Zuschuss für Digitalisierungsvorhaben kleiner Betriebe. Antragsberechtigt sind Unternehmen mit Sitz oder Betriebsstätte in Hessen.",
+      "action": "Wer Kasse, Warenwirtschaft oder Shop erneuern will, sollte den Antrag jetzt vorbereiten.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/digitalbonus",
+      "date": "2026-08-20",
+      "urgency": "mid",
+      "deadline": "2026-10-31",
+      "origin": "manual"
+    },
+    {
+      "slug": "lichterfest-frequenz",
+      "category": "frequenz",
+      "headline": "Lichterfest im Büsingpark: mit hoher Besucherzahl rechnen",
+      "summary": "Der Vorverkauf läuft, Vereine und Sponsoren tragen das Fest mit. Erfahrungsgemäß einer der stärksten Abende des Sommers in der Innenstadt.",
+      "action": "Personal und Warenbestand für den Abend und den Folgetag entsprechend planen.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/lichterfest",
+      "date": "2026-07-31",
+      "urgency": "low",
+      "deadline": null,
+      "origin": "manual"
+    },
+    {
+      "slug": "kaiserlei-buerobau",
+      "category": "stadt",
+      "headline": "Kaiserlei: weiterer Büroneubau bezugsfertig",
+      "summary": "Am Kaiserlei entstehen weiter Büroflächen. Jeder neue Standort dort bedeutet zusätzliche Mittagsgäste und Laufkundschaft für die angrenzende Innenstadt.",
+      "action": "Mittagsangebot und Öffnungszeiten auf Bürorhythmus prüfen.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/kaiserlei",
+      "date": "2026-07-18",
+      "urgency": "low",
+      "deadline": null,
+      "origin": "manual"
+    },
+    {
+      "slug": "e-rechnung-pflicht",
+      "category": "recht",
+      "headline": "E-Rechnung: Übergangsfristen laufen weiter aus",
+      "summary": "Im Geschäftsverkehr zwischen Unternehmen gilt die Pflicht zum Empfang elektronischer Rechnungen. Die Fristen für das Versenden sind gestaffelt.",
+      "action": "Prüfen, ob die eigene Software das Format kann — und wer im Betrieb dafür zuständig ist.",
+      "sourceName": "BEISPIELQUELLE (Testdaten)",
+      "sourceUrl": "https://example.com/beispielquelle/e-rechnung",
+      "date": "2026-07-02",
+      "urgency": "mid",
+      "deadline": null,
+      "origin": "manual"
+    }
+  ]
+}

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Card, Eyebrow, Heading, Lead, Rule, Section } from "@/components/ui";
-import { ContactForm } from "@/components/ContactForm";
+import { Card, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 import { VEREIN } from "@/data/verein";
 
 export const metadata: Metadata = {
   title: "Mitglied werden",
-  description: "Vorteile der Mitgliedschaft im Gewerbeverein Treffpunkt Offenbach und das Antragsformular.",
+  description: "Vorteile der Mitgliedschaft im Gewerbeverein Treffpunkt Offenbach und wie Sie beitreten.",
 };
 
 const VORTEILE = [
@@ -29,10 +28,10 @@ export default function Page() {
       <Section>
         <Eyebrow className="mb-4">Mitglied werden</Eyebrow>
         <Heading level={1} className="max-w-[22ch]">
-          Beitreten dauert fünf Minuten, nicht einen PDF-Download.
+          So werden Sie Mitglied.
         </Heading>
         <Lead className="mt-6 max-w-[60ch]">
-          Vorteile, eine offene Beitragstabelle und ein Formular direkt auf dieser Seite.
+          Die Vorteile, eine offene Beitragstabelle und der direkte Weg zum Beitritt — eine Nachricht genügt.
         </Lead>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -70,38 +69,24 @@ export default function Page() {
       </Section>
 
       <Section>
-        <Eyebrow className="mb-4">Antrag</Eyebrow>
-        <Heading className="max-w-[24ch]">Formular</Heading>
-        <p className="prose-body mt-4 max-w-[60ch] text-[15px] text-muted">
-          TODO-COPY: Wer den Beitritt lieber schriftlich beantragt, soll hier auch das bisherige PDF-Formular
-          herunterladen können — das Dokument liegt uns aktuell nicht vor. Sobald es vorhanden ist, verlinken wir
-          es an dieser Stelle als Alternative zum Formular unten.
+        <Eyebrow className="mb-4">Beitritt</Eyebrow>
+        <Heading className="max-w-[24ch]">Schreiben Sie uns.</Heading>
+        <p className="prose-body mt-4 max-w-[60ch] text-[15px]">
+          Am schnellsten per E-Mail oder Telefon — wir schicken Ihnen die Beitrittsunterlagen zu.
         </p>
-        <Rule className="my-10" />
-        <div className="max-w-[52ch]">
-          <ContactForm
-            endpoint="/api/mitglied-werden"
-            extraFields={["betrieb", "branche", "adresse", "telefon"]}
-            submitLabel="Antrag senden"
-            consentText={
-              <>
-                Ich bin damit einverstanden, dass der {VEREIN.name} die oben angegebenen Daten (Name, Betrieb,
-                Branche, Adresse, E-Mail-Adresse, ggf. Telefon, Nachricht) zur Bearbeitung dieser Mitgliedsanfrage
-                verarbeitet. Der Versand erfolgt über den E-Mail-Dienstleister Resend als Auftragsverarbeiter. Die
-                Daten werden{" "}
-                <span className="font-mono text-[12px] text-muted">
-                  [TODO-COPY: Aufbewahrungsdauer beim Vorstand erfragen]
-                </span>{" "}
-                gespeichert und nicht an Dritte weitergegeben. Sie können diese Einwilligung jederzeit per E-Mail an{" "}
-                {VEREIN.email} widerrufen. Näheres in der{" "}
-                <a href="/datenschutz" className="link-underline">
-                  Datenschutzerklärung
-                </a>
-                .
-              </>
-            }
-          />
-        </div>
+        <address className="prose-body mt-6 not-italic text-[15px] leading-relaxed">
+          <a className="link-underline font-display font-semibold" href={`mailto:${VEREIN.email}`}>
+            {VEREIN.email}
+          </a>
+          <br />
+          <a className="link-underline" href={`tel:${VEREIN.phone.replace(/\s/g, "")}`}>
+            {VEREIN.phone}
+          </a>
+        </address>
+        <p className="mt-6 font-mono text-[12px] text-muted">
+          TODO-COPY: Das bisherige PDF-Beitrittsformular soll hier zusätzlich als Download stehen — das Dokument
+          liegt uns aktuell nicht vor. Sobald der Vorstand es bereitstellt, verlinken wir es an dieser Stelle.
+        </p>
       </Section>
     </>
   );

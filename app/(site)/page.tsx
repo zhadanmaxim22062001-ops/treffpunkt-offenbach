@@ -3,15 +3,16 @@ import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "
 import { LogoMark } from "@/components/Logo";
 import { CountUp, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
-import { LEISTUNGEN, RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, RADAR_SEED } from "@/data/content";
+import { LEISTUNGEN } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 import { getNextConfirmedEvent } from "@/lib/events";
+import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/lib/radar-content";
 
 const members = getAllMembers();
 
 export default function Home() {
   const next = getNextConfirmedEvent();
-  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : RADAR_SEED.slice(0, 3);
+  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().slice(0, 3);
 
   return (
     <>
@@ -130,7 +131,7 @@ export default function Home() {
                       {item.action}
                     </p>
                     <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                      Quelle: {item.source}
+                      Quelle: {item.sourceName}
                     </p>
                   </li>
                 </Reveal>
