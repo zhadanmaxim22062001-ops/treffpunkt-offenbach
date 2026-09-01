@@ -3,6 +3,13 @@
 Website for Gewerbeverein Treffpunkt Offenbach e. V. Next.js 16 (App Router),
 TypeScript, Tailwind v4, motion, lenis. Deploys to Vercel, region fra1.
 
+**v1 is a fully static site — zero external services.** No database, no
+email service, no AI API, no login screen. Every route needs nothing but the
+files in this repo; the only environment variable v1 uses at all is
+`NEXT_PUBLIC_SITE_URL`. That was a deliberate scope cut for the first
+deploy, not the original plan — see "v2, parked" below for what was built
+and set aside, and why.
+
 ## Running locally
 
 ```bash
@@ -28,48 +35,67 @@ npm run build    # production build, must pass with zero errors
   free-text search, filter state lives in `searchParams` so a filtered view is a
   real, shareable, indexable URL. `/mitglieder/[slug]` adds `LocalBusiness`
   JSON-LD, an "other businesses on this street" block, and a link out to
-  OpenStreetMap (no map rendered on member pages — see "Member data" below).
-  **Currently shows an honest "Verzeichnis im Aufbau" state** — see below.
-- **`/mitglied-werden`** — benefits, an open (currently TODO-COPY) fee table, and
-  an application form that posts to `/api/mitglied-werden` and sends mail via
-  Resend. No database yet — see "Email and forms" below.
+  OpenStreetMap. **Currently shows an honest "Verzeichnis im Aufbau" state** —
+  see "Member data" below.
+- **`/mitglied-werden`** — benefits, an open (currently TODO-COPY) fee table,
+  and a contact block: mailto, phone. No form — see "v2, parked" below.
 - **`/veranstaltungen`** and `/veranstaltungen/[slug]` — event pages with Event
   JSON-LD and an Europe/Berlin-correct `.ics` download, both gated on the event
   actually having a confirmed date — see "Events and dates" below.
 - **`/verein`** — the real Vorstand from `data/verein.ts`, with roles. No founding
   year or Satzung yet; the page says so rather than guessing or leaving a gap.
-- **`/kontakt`** — the same form component as `/mitglied-werden` with fewer
-  fields (name, email, message), plus the one map the site renders locally: the
-  association's own address, fetched by `scripts/fetch-verein-map.mjs`.
+- **`/kontakt`** — address, phone, mailto, and the one map the site renders
+  locally: the association's own address, fetched by `scripts/fetch-verein-map.mjs`.
+- **`/radar`** — file-based, no database. Reads `data/radar.json` at build
+  time; shows an honest empty state while that file holds only specimens —
+  see "OF-Radar" below.
 - 301 redirects from the old `.php` URLs in `next.config.ts`;
-- **`/admin/radar`** — the OF-Radar editorial screen: compose a manual item,
-  review/edit a draft, publish or discard. Basic-Auth protected, noindex,
-  mobile-first. See "OF-Radar" below.
 - `tests/visual.spec.ts` (Playwright) — screenshots every route in both themes
   at 1360px and 420px and fails on any console error. See "Visual verification"
   below.
 
-### Route structure
-
-Public pages live under `app/(site)/` (a route group — doesn't affect any
-URL), with their own root layout (`app/(site)/layout.tsx`: Header, Footer,
-SmoothScroll, Organization JSON-LD). `/admin` has a **separate** root layout
-(`app/admin/layout.tsx`) with none of that — see "OF-Radar" below for why
-that split exists; it wasn't there from the start and the reason is worth
-reading before adding a third area to the app.
-
 ### What's left
 
-1. **OF-Radar ingest**: `/api/radar/ingest` on a Vercel Cron, classification
-   via the Anthropic API for the feed-fed categories only (`foerderung` and
-   `recht` stay manual-only — see "OF-Radar" below). Schema and the editorial
-   admin are both done; the classifier's first deliverable is a `--dry-run`
-   report on real offenbach.de items, not code merged sight unseen.
-2. **OF-Radar public UI**: filters, deadline countdowns, a frequency calendar,
-   `/radar/[slug]`, `/radar/feed.xml`, the weekly digest. Currently shows an
-   honest empty state — see "OF-Radar" below.
-3. Accessibility (axe-core) and performance pass, OG images via `next/og`.
-4. Deploy.
+1. Deploy (in progress — see the PR/commit history around the deploy).
+2. OG images via `next/og`.
+3. v2: the real member list, the real event calendar, OF-Radar's database
+   and classifier — see "v2, parked" below.
+
+## v2, parked
+
+A database-backed OF-Radar (Postgres/Neon + Drizzle, an Anthropic-classified
+ingest pipeline, a Basic-Auth editorial admin at `/admin/radar`) and a
+Resend-backed contact/membership form were built and working before v1's
+scope was deliberately cut to "no external services" for the first deploy.
+**Nothing was deleted.** It's all still in the repo:
+
+- `lib/db/`, `drizzle/`, `drizzle.config.ts` — the Postgres schema, untouched;
+- `lib/mail.ts`, `lib/forms.ts`, `components/ContactForm.tsx` — the Resend
+  wrapper and form validation, untouched;
+- `_v2-parked/` — the admin route, its components, its query/validation
+  layer, and both Resend-backed API routes, moved here (not deleted) because
+  they cross-reference each other and `tsconfig.json` now excludes this
+  directory from type-checking. `_v2-parked/README.md` has the exact restore
+  path for every file.
+- `proxy.ts` stays at the project root with its real Basic-Auth logic intact,
+  but its matcher is deliberately pointed at a path nothing can request —
+  see the comment in that file for why (short version: with `/admin/radar`
+  gone, the live matcher would make `/admin` answer 503 instead of 404).
+
+None of this is reachable from the v1 build. Verified two ways after cutting
+it: grepped the build output and the compiled `.next` bundles for
+`DATABASE_URL`, `RESEND_API_KEY`, `ANTHROPIC_API_KEY`, and `ADMIN_PASSWORD` —
+clean, except `ADMIN_PASSWORD` inside `proxy.ts`'s own bundled (but inert)
+code.
+
+Also parked, from before the scope cut: a full source audit of OF-Radar
+candidate feeds (offenbach.de and of-news.de work; op-online.de and
+hessenschau.de were deliberately excluded; several others have no feed at
+all), a manual-vs-automated design for the two highest-liability categories,
+and a computed cost estimate for the classifier (~$1–3/month at Haiku 4.5
+rates). All of that reasoning is preserved in the git history — see the
+commits titled around "step 4a" through "step 4c" — and applies unchanged
+whenever v2 happens.
 
 ## Member data
 
@@ -149,246 +175,25 @@ start *time* the moment one exists.
 
 ## OF-Radar
 
-The seed items in `data/content.ts` were briefly rendering on the homepage
-attributed to real institutions — Stadt Offenbach, WIBank, IHK Offenbach am
-Main — that never published any of it. Fixed: `RADAR_ITEMS_ARE_PLACEHOLDER`
-gates every public render of the seed (same pattern as the member-list
-guard), and every seed item's `source` is now the unmistakably-fake
-`"BEISPIELQUELLE (Testdaten)"`. See `data/content.ts` for the full reasoning.
-This is why `/radar` currently shows "Der OF-Radar startet in Kürze" instead
-of anything from the seed.
+File-based in v1 — no database, no ingest, no classifier (all parked, see
+"v2, parked" above). `data/radar.json` holds the same field shape the parked
+Drizzle schema uses (`category`, `headline`, `summary`, `action`,
+`sourceName`, `sourceUrl`, `date`, `urgency`, optional `deadline`, `origin`
+always `"manual"`), read at build time by `lib/radar-content.ts`.
 
-### Source audit
+`RADAR_ITEMS_ARE_PLACEHOLDER` (in `lib/radar-content.ts`, same pattern as the
+member-list guard) is `true` while `data/radar.json`'s `_note` field still
+says `TODO-COPY`. While true, `/radar` and the homepage teaser both show an
+honest "Der OF-Radar startet in Kürze" empty state and render nothing from
+the file. This exists because an earlier seed array briefly rendered
+fabricated headlines on the homepage attributed to real institutions (Stadt
+Offenbach, WIBank, IHK Offenbach am Main) that never published any of it —
+see the git history for the fix.
 
-Before writing any ingest code, we ran a throwaway script against every
-candidate source from the original plan: does a feed exist, does it return
-items, headline-only or with summaries, and what do robots.txt and the terms
-of use say about automated access. Result, and what it changed:
-
-- **offenbach.de** (city Meldungen feed) — real, working, 26 live items with
-  full summaries, `robots.txt: Allow: /`. The strongest possible source: it's
-  the Rathaus publishing about itself. Covers **rathaus, baustelle, frequenz,
-  stadt** well.
-- **of-news.de** — real, working WordPress feed, open `robots.txt`. Local
-  news, needs relevance filtering per item but mechanically solid.
-- **op-online.de** (Offenbach-Post) — **excluded.** `robots.txt` disallows
-  `/` for all agents except two unrelated paths, plus an explicit comment:
-  *"The use of robots or other automated means to access www.op-online.de or
-  collect or mine data without express permission is strictly prohibited."*
-  Unambiguous either way.
-- **hessenschau.de** — **excluded, on purpose, not for lack of a working
-  feed.** The feed works, but it's Hessen-wide and would need heavy filtering
-  for Offenbach relevance anyway, and ARD publishes a "Nutzungsvorbehalt"
-  naming AI bots (ClaudeBot among them) it doesn't want touching its content.
-  Classifying isn't training, but the association lobbies public
-  institutions — it doesn't need a defensible-but-arguable position against a
-  public broadcaster to gain a low-yield source. Don't re-add this without
-  re-litigating that reasoning.
-- **IHK Offenbach am Main** — a real RSS mechanism exists
-  (`offenbach.ihk.de/rss/?type=100...`, auto-discovered from their own
-  homepage) but currently returns zero items. Worth keeping registered and
-  marked fragile — it may simply start publishing through it later — but
-  nothing to ingest today.
-- **Handwerkskammer Frankfurt-Rhein-Main** and **foerderdatenbank.de** — no
-  feed found by either automated discovery or manual inspection of their
-  Presse/search pages. Would mean an HTML scraper, not a feed adapter.
-- **RMV Verkehrsmeldungen** — no public feed; the only automated path is
-  `rmv.de/hapi/`, a registered API requiring its own ToS acceptance. Deferred
-  — the city's own feed already covers road closures, and registering for a
-  separate API is its own project. Revisit only if Baustellen looks thin
-  after a month of real data.
-
-### Manual entry is a first-class feature, not a fallback
-
-The audit's real finding: what has no usable automated feed is exactly
-**foerderung** and **recht** — Förderdatenbank, WIBank, IHK, Handwerkskammer.
-Those two categories are also the slowest-moving (a handful of items a
-quarter, not a day) and the highest-liability: a wrong grant deadline or a
-wrong statement of legal obligation costs a member real money, not just an
-awkward correction.
-
-So the design inverts the usual shape: automate the fast-moving categories,
-hand-curate the slow and dangerous ones. **The classifier never authors
-`foerderung` or `recht` items — those are always `origin: 'manual'`,** typed
-into `/admin/radar` by a human with the same fields and the same publish gate
-as everything else. This takes the LLM out of the liability path entirely for
-the two categories where it mattered most, and it means the module is useful
-from day one even with zero feeds working.
-
-### Build order: admin before ingest
-
-4c (this admin) was built before 4b (ingest/classifier), deliberately out of
-the original step order. Manual entry needs nothing but the schema — no API
-key, no cron, no live feed — so building it first means the module is
-genuinely usable the day the database exists, gives a place to put real items
-to judge the public UI against, and gives the classifier a working review
-screen to land its drafts in once it exists, instead of judging it from a
-terminal.
-
-**When the classifier is built, its first deliverable is not code merged
-sight unseen — it's a `--dry-run` mode** that fetches the live offenbach.de
-feed, classifies real items, writes nothing to the database, and prints a
-table: headline in, relevant y/n, category, urgency, deadline, generated
-headline/summary/action. That table gets reviewed against real Offenbach
-items before a single row is written or a cron is armed.
-
-### Admin (`/admin/radar`)
-
-Compose a manual item, review a draft (feed-origin or manual, same screen),
-edit it, publish it, or discard it.
-
-- **Auth**: `proxy.ts` (Next 16 renamed `middleware.ts` → `proxy.ts`; this is
-  that file) gates the whole `/admin` path with Basic Auth against
-  `ADMIN_PASSWORD`. The comparison is constant-time — both the supplied and
-  expected password are hashed to a fixed-length SHA-256 digest first, so a
-  timing attack can't learn anything from how many leading characters
-  matched. Fails closed if `ADMIN_PASSWORD` isn't set (503, not open access).
-  `/admin` was already in `robots.txt`'s disallow list from step 1;
-  `app/admin/layout.tsx` also sets `noindex` directly.
-- **Mobile-first, actually verified**: every control is sized for a thumb, one
-  column, no hover-only affordances. Checked at a 390px viewport via
-  Playwright screenshots, not just written to look that way.
-- **The publish gate**: `lib/radar/validation.ts`'s `itemFormSchema` requires
-  `sourceName` and `sourceUrl` — server-side, before the DB is ever touched,
-  not left to the NOT NULL columns alone. No item, from either origin, can be
-  published without both. Compose always creates `origin: 'manual'`,
-  `status: 'draft'` — composing isn't the same act as publishing, even for a
-  human typing it directly; the review screen's "Veröffentlichen" is the
-  actual gate.
-- **Own root layout**: `/admin` does not inherit the public site's Header and
-  Footer — see "Route structure" above. That was a real bug caught while
-  building this, not a design choice made from the start.
-
-Verified end to end (compose → validation error → success → edit → save →
-publish → shows in "Zuletzt veröffentlicht"; discard → removed from the draft
-list) against a temporary in-memory fake, since no live Neon project exists
-yet. That check caught a real bug: the deadline field's empty-string case
-transformed to `undefined` in the form schema, and Drizzle's `.set()` treats
-`undefined` as "leave this column alone" — so clearing a previously-set
-deadline on edit would have silently failed to clear it. Fixed to transform
-to `null`, which Drizzle does write; verified the set-then-clear round-trip
-directly.
-
-### Schema (`lib/db/schema.ts`)
-
-Four tables, migrations committed under `drizzle/`:
-
-- **`sources`** — registered feeds (bookkeeping: last fetch, active/inactive),
-  not what items display — items carry their own `sourceName`/`sourceUrl` so
-  the public page never needs a join.
-- **`items`** — `origin: 'feed' | 'manual'` is the load-bearing column
-  described above. `deadline` is nullable and only ever set when the source
-  states one explicitly — never inferred. `status: draft|published|rejected`
-  is the editorial gate: nothing reaches the public site without a human
-  approving it, regardless of origin. `classifierVersion` is nullable and
-  only ever set by the ingest script on machine-classified rows — null for
-  every manual item — so a prompt can be tuned against real published
-  history later instead of guesswork.
-- **`digest_subscribers`** — double opt-in; `confirmedAt` (not the initial
-  request) is the actual consent timestamp, since a bare subscribe request
-  isn't valid consent by itself. Unsubscribing is a hard delete of the row,
-  not a status flag — there's no reason to retain a withdrawn subscriber's
-  email at all. Disclosed on `/datenschutz` now, not after the feature ships.
-- **`ingest_runs`** — one row per ingest run: items fetched/classified,
-  prompt/completion tokens, estimated cost, and whether the run hit its hard
-  item cap. Exists so token spend is a number someone can look at, not a
-  surprise on the invoice.
-
-### Expected cost, before any cron is switched on
-
-Classification should use **Claude Haiku 4.5** ($1/MTok input, $5/MTok
-output as of this writing — verified against Anthropic's current pricing
-page, not memory) — this is straightforward structured-output classification,
-not a task that needs a larger model. Estimating generously (no prompt
-caching, ~1,500 input tokens and ~200 output tokens per item — system prompt,
-category rules, and the item's feed content in, headline/summary/action and
-metadata out):
-
-- Cost per item ≈ **$0.0025**
-- At 10–30 new items/day combined across offenbach.de and of-news.de (your
-  estimate): **300–900 items/month → roughly $0.75–$2.25/month**
-- Even a hard cap of, say, 50 items per run hit on every single run for a
-  month caps the ceiling at **~$3.75/month**
-
-Small either way, but the `ingest_runs` log means that's a checked fact after
-the first month, not an assumption. Prompt caching (the system prompt and
-category rules repeat across every item in a run) would push it lower still.
-
-### Environment
-
-Neon project must be created in the **EU (Frankfurt / eu-central-1) region.**
-This isn't a code-level setting — it's a choice made once, in the Neon
-console, when the project is created — but getting it wrong means personal
-data (digest subscriber emails, and potentially names that appear in
-classified item text) leaves the EU, which makes the Datenschutz page
-inaccurate. `lib/db/index.ts` has the same note next to the connection code.
-
-## Email and forms
-
-`/mitglied-werden` (and later `/kontakt`) send mail via [Resend](https://resend.com) —
-no database. Persistence arrives in Step 4 once the Neon schema exists; until
-then, a submission either becomes an email or it didn't happen.
-
-Anti-spam is a honeypot field (`website`, invisible to real visitors, `aria-hidden`)
-plus a minimum 4-second gap between when the form loaded and when it was
-submitted (`MIN_SUBMIT_MS` in `lib/forms.ts`). Both fail "successfully" — the
-submitter gets a normal-looking success response either way, so there's nothing
-for a bot to learn from a rejection. No Upstash, no third-party rate-limiting
-service: one more account for a volunteer board to maintain would cost more
-than the spam it'd prevent.
-
-### Environment variables
-
-```
-RESEND_API_KEY=        # required to actually send mail
-RESEND_FROM_EMAIL=     # optional, defaults to "Treffpunkt Offenbach <onboarding@resend.dev>"
-RESEND_TO_EMAIL=       # optional, defaults to VEREIN.email (info@treffpunkt-offenbach.com)
-NEXT_PUBLIC_SITE_URL=
-
-# Needed starting with OF-Radar (step 4), not yet:
-DATABASE_URL=          # Neon
-ANTHROPIC_API_KEY=     # news classification
-CRON_SECRET=           # protects /api/radar/ingest
-ADMIN_PASSWORD=        # /admin/radar login
-```
-
-Without `RESEND_API_KEY` set, form submissions fail with a clear (and safe —
-no internal details leaked) message asking people to email or call directly
-instead; the real error is logged server-side only.
-
-### Making mail actually deliver: DNS records
-
-Resend refuses to send as a domain it hasn't verified, and until it's
-verified, mail can only go **from** `onboarding@resend.dev` **to** the email
-address on the Resend account itself — fine for development, useless for a
-live contact form. To verify `treffpunkt-offenbach.com` (or whichever domain
-ends up canonical):
-
-1. Add the domain in the Resend dashboard → Domains.
-2. Resend generates the SPF and DKIM records **for that specific domain** —
-   copy them from the dashboard's **Records** tab and add them at the
-   registrar exactly as shown. These values are generated per domain and
-   change if the domain is re-added, so there's no fixed value to hand you
-   here; anything printed in advance would risk being wrong. (Resend has also
-   said domains added after August 2026 may get CNAME records instead of the
-   older TXT/MX pattern — another reason to always copy from the dashboard,
-   not from anything written down beforehand.)
-3. Add a DMARC record yourself — this one *is* a fixed, standard format, not
-   Resend-specific:
-
-   ```
-   Host: _dmarc.treffpunkt-offenbach.com
-   Type: TXT
-   Value: v=DMARC1; p=none; rua=mailto:info@treffpunkt-offenbach.com;
-   ```
-
-   Start with `p=none` (monitoring only, nothing gets rejected) and tighten to
-   `p=quarantine` and eventually `p=reject` once you've confirmed all
-   legitimate mail sources pass. Resend's own guide: https://resend.com/docs/dashboard/domains/dmarc
-4. Verification in the Resend dashboard can take a few minutes to a few hours
-   after the records propagate.
-5. Once verified, set `RESEND_FROM_EMAIL` to a real address at the domain
-   (e.g. `"Treffpunkt Offenbach <mitglied-werden@treffpunkt-offenbach.com>"`).
+**Publishing a real item is: edit `data/radar.json`, remove the `TODO-COPY`
+note once every entry is real, commit.** `/radar` will render it — deadline
+shown when present, source linked out, urgency-high items get the accent
+rule — without any other code change.
 
 ## Visual verification
 
@@ -410,22 +215,38 @@ entered the viewport — they show up blank, which looks like a bug but isn't
 one. `visual.spec.ts` scrolls through the page before capturing for exactly
 this reason; copy that pattern rather than dropping it.
 
+### Lighthouse
+
+Not part of the automated suite — run manually against a production build
+when it's worth checking:
+
+```bash
+npm run build && npm start   # in one terminal
+npx lighthouse http://localhost:3000/ --preset=desktop \
+  --only-categories=performance,accessibility,best-practices,seo \
+  --chrome-flags="--headless"
+```
+
+Needs a real Chrome/Chromium; set `CHROME_PATH` if `lighthouse` can't find
+one on its own. Last run against the production build: **100 / 100 / 100 /
+100** (performance / accessibility / best practices / SEO).
+
 ## From the board, still needed
 
 - The real member list and consent to publish it (see "Member data" above);
 - The real event calendar — dates for the next Offenbacher Woche, Lichterfest,
   verkaufsoffene Sonntage, and the Weihnachtsbeleuchtung period (see "Events
   and dates" above);
+- Real OF-Radar items to replace the specimens in `data/radar.json`;
 - Vereinsregister number and founding year, for the Impressum and `/verein`;
 - Membership fee amounts, for the open fee table on `/mitglied-werden`;
-- How long submitted form data should be kept — the consent text on both
-  forms has a `TODO-COPY` placeholder for this, and so does Datenschutz;
-- Confirmation that AVVs (data processing agreements) are in place with
-  Vercel, Resend, and Neon, and which Art. 44 DSGVO transfer basis applies to
-  each — all three are US companies (even though Neon's database itself will
-  live in the EU/Frankfurt region) — all flagged `TODO-COPY` on `/datenschutz`;
+- Confirmation that an AVV (data processing agreement) is in place with
+  Vercel, and which Art. 44 DSGVO transfer basis applies — flagged
+  `TODO-COPY` on `/datenschutz`;
+- Retention period for Vercel's access logs — also `TODO-COPY` on
+  `/datenschutz`;
 - Satzung and a fuller Vereinsgeschichte for `/verein`, if the board wants
   more there than the current Vorstand list;
 - Proofreading of the German copy — it's written as working drafts;
-- The old PDF membership application, if the board wants it kept as a
-  download alternative to the form (we don't have a copy of it).
+- The old PDF membership application, if the board wants it linked on
+  `/mitglied-werden` as a download — we don't have a copy of it.
