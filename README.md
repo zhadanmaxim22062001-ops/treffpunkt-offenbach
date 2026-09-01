@@ -148,6 +148,22 @@ local fonts: a live map embed would mean every visitor's browser calling a
 third party and handing over their IP, which is exactly the problem the site
 otherwise avoids.
 
+## Hero background
+
+The homepage hero and the inverted CTA strip have no photography — the site
+has no rights to any photo of Offenbach, and a Verein site running an
+unlicensed city photo is a real risk, not a theoretical one. Instead
+`components/BrandBackdrop.tsx` draws a soft token-based gradient plus a giant,
+very faint OF-Siegel bleeding off the frame, built from the same path data as
+the real logo (`MARK_PRIMARY_PATHS` in `components/Logo.tsx`) so it can never
+drift from the mark. Flat CSS only, `aria-hidden`, no layout impact.
+
+**If the association supplies their own photo** (Offenbacher Woche,
+Lichterfest, or similar), drop it at `public/hero/innenstadt.jpg` and rebuild
+— `lib/hero-image.ts` picks it up automatically and the hero switches to a
+`next/image` with a dark overlay for text contrast. No code change needed.
+Nothing currently exists at that path.
+
 ## Events and dates
 
 `data/content.ts` EVENTS entries only get `isoStart`/`isoEnd` once the board

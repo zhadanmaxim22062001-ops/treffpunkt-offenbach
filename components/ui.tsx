@@ -17,11 +17,14 @@ export function Section({
   className,
   id,
   tone = "paper",
+  backdrop,
 }: {
   children: ReactNode;
   className?: string;
   id?: string;
   tone?: "paper" | "paper-2" | "invert";
+  /** Decorative background layer (e.g. <BrandBackdrop />) — makes the section relative/overflow-hidden to contain it and lifts the content above it. */
+  backdrop?: ReactNode;
 }) {
   return (
     <section
@@ -31,11 +34,13 @@ export function Section({
         tone === "paper" && "bg-paper border-line",
         tone === "paper-2" && "bg-paper-2 border-line",
         tone === "invert" && "border-transparent",
+        backdrop && "relative overflow-hidden",
         className,
       )}
       style={tone === "invert" ? { backgroundColor: "var(--c-invert-bg)", color: "var(--c-invert-fg)" } : undefined}
     >
-      <Container>{children}</Container>
+      {backdrop}
+      <Container className={backdrop ? "relative z-10" : undefined}>{children}</Container>
     </section>
   );
 }

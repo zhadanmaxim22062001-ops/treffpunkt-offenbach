@@ -1,33 +1,53 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 import { LogoMark } from "@/components/Logo";
+import { BrandBackdrop } from "@/components/BrandBackdrop";
 import { CountUp, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
 import { LEISTUNGEN } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 import { getNextConfirmedEvent } from "@/lib/events";
 import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/lib/radar-content";
+import { getHeroImagePath } from "@/lib/hero-image";
 
 const members = getAllMembers();
 
 export default function Home() {
   const next = getNextConfirmedEvent();
   const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().slice(0, 3);
+  const heroImage = getHeroImagePath();
 
   return (
     <>
       {/* ---------------------------------------------------- 1. Hero */}
-      <header className="bg-paper">
-        <Container>
+      <header className="relative overflow-hidden bg-paper">
+        {heroImage ? (
+          <>
+            <Image
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-0" style={{ backgroundColor: "var(--c-ink)", opacity: 0.55 }} aria-hidden="true" />
+          </>
+        ) : (
+          <BrandBackdrop />
+        )}
+        <Container className="relative z-10">
           <div className="grid items-center gap-12 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
             <div>
               <Eyebrow className="mb-6">Gewerbeverein · Offenbach am Main</Eyebrow>
               <Heading level={1}>
-                Der Treffpunkt für alle, die in Offenbach etwas aufbauen.
+                Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach.
               </Heading>
               <Lead className="mt-7 max-w-[46ch]">
-                Über hundert Betriebe, die dieselbe Innenstadt teilen. Wir holen Menschen in die Stadt,
-                bringen Nachbarn zusammen und sortieren die Meldungen, die Ihr Geschäft wirklich betreffen.
+                Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
+                Stadt und Öffentlichkeit.
               </Lead>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button href="/mitglied-werden">Mitglied werden</Button>
@@ -229,7 +249,7 @@ export default function Home() {
       </Section>
 
       {/* ----------------------------------------------- 7. Schluss-CTA */}
-      <Section tone="invert">
+      <Section tone="invert" backdrop={<BrandBackdrop inverse />}>
         <div className="grid items-center gap-10 md:grid-cols-[1.2fr_auto]">
           <div>
             <Heading className="max-w-[18ch]" >Alleine ist die Innenstadt schwer zu bewegen.</Heading>

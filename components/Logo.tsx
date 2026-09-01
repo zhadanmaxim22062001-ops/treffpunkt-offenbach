@@ -9,6 +9,13 @@ import { clsx } from "clsx";
 
 const COMPACT_BELOW = 64;
 
+/** Primary (size >= 64) geometry, exported so decorative reuses (e.g. components/BrandBackdrop.tsx) draw the exact same mark instead of a hand-copied approximation. */
+export const MARK_PRIMARY_PATHS = {
+  ring: "M189.88 88.53a84 84 0 1 1-26.16-34.72",
+  f: "M80 170V72h138",
+  bar: "M80 116h72",
+};
+
 export function LogoMark({
   size = 96,
   animated = false,
@@ -45,16 +52,16 @@ export function LogoMark({
         {compact ? (
           <circle className="tpof-ring" cx="112" cy="120" r="84" stroke="var(--c-ink)" />
         ) : (
-          <path className="tpof-ring" d="M189.88 88.53a84 84 0 1 1-26.16-34.72" stroke="var(--c-ink)" />
+          <path className="tpof-ring" d={MARK_PRIMARY_PATHS.ring} stroke="var(--c-ink)" />
         )}
         <path
           className="tpof-f"
-          d={compact ? "M80 168V74h126" : "M80 170V72h138"}
+          d={compact ? "M80 168V74h126" : MARK_PRIMARY_PATHS.f}
           stroke="var(--c-accent)"
         />
         <path
           className="tpof-bar"
-          d={compact ? "M80 118h70" : "M80 116h72"}
+          d={compact ? "M80 118h70" : MARK_PRIMARY_PATHS.bar}
           stroke="var(--c-accent)"
         />
       </g>
