@@ -48,10 +48,12 @@ npm run build    # production build, must pass with zero errors
 
 ### What's left
 
-1. **OF-Radar**: schema in Postgres (Neon + Drizzle) → `/api/radar/ingest` on a
-   Vercel Cron → classification via the Anthropic API → editorial gate at
-   `/admin/radar` → public UI with filters, deadline countdowns, and a frequency
-   calendar. Currently runs on seed data in `data/content.ts`.
+1. **OF-Radar**: schema is designed and migrations are committed (see below) —
+   `/api/radar/ingest` on a Vercel Cron → classification via the Anthropic API
+   for the feed-fed categories, manual compose in `/admin/radar` for the other
+   two → editorial gate → public UI with filters, deadline countdowns, and a
+   frequency calendar are still to build. Currently shows an honest empty
+   state — see below.
 2. Accessibility (axe-core) and performance pass, OG images via `next/og`.
 3. Deploy.
 
@@ -130,6 +132,125 @@ not a floating local time or a UTC offset frozen at generation time. Current
 events are all date-only, which sidesteps DST entirely (an all-day
 iCalendar event carries no time zone), but the generator is ready for a real
 start *time* the moment one exists.
+
+## OF-Radar
+
+The seed items in `data/content.ts` were briefly rendering on the homepage
+attributed to real institutions — Stadt Offenbach, WIBank, IHK Offenbach am
+Main — that never published any of it. Fixed: `RADAR_ITEMS_ARE_PLACEHOLDER`
+gates every public render of the seed (same pattern as the member-list
+guard), and every seed item's `source` is now the unmistakably-fake
+`"BEISPIELQUELLE (Testdaten)"`. See `data/content.ts` for the full reasoning.
+This is why `/radar` currently shows "Der OF-Radar startet in Kürze" instead
+of anything from the seed.
+
+### Source audit
+
+Before writing any ingest code, we ran a throwaway script against every
+candidate source from the original plan: does a feed exist, does it return
+items, headline-only or with summaries, and what do robots.txt and the terms
+of use say about automated access. Result, and what it changed:
+
+- **offenbach.de** (city Meldungen feed) — real, working, 26 live items with
+  full summaries, `robots.txt: Allow: /`. The strongest possible source: it's
+  the Rathaus publishing about itself. Covers **rathaus, baustelle, frequenz,
+  stadt** well.
+- **of-news.de** — real, working WordPress feed, open `robots.txt`. Local
+  news, needs relevance filtering per item but mechanically solid.
+- **op-online.de** (Offenbach-Post) — **excluded.** `robots.txt` disallows
+  `/` for all agents except two unrelated paths, plus an explicit comment:
+  *"The use of robots or other automated means to access www.op-online.de or
+  collect or mine data without express permission is strictly prohibited."*
+  Unambiguous either way.
+- **hessenschau.de** — **excluded, on purpose, not for lack of a working
+  feed.** The feed works, but it's Hessen-wide and would need heavy filtering
+  for Offenbach relevance anyway, and ARD publishes a "Nutzungsvorbehalt"
+  naming AI bots (ClaudeBot among them) it doesn't want touching its content.
+  Classifying isn't training, but the association lobbies public
+  institutions — it doesn't need a defensible-but-arguable position against a
+  public broadcaster to gain a low-yield source. Don't re-add this without
+  re-litigating that reasoning.
+- **IHK Offenbach am Main** — a real RSS mechanism exists
+  (`offenbach.ihk.de/rss/?type=100...`, auto-discovered from their own
+  homepage) but currently returns zero items. Worth keeping registered and
+  marked fragile — it may simply start publishing through it later — but
+  nothing to ingest today.
+- **Handwerkskammer Frankfurt-Rhein-Main** and **foerderdatenbank.de** — no
+  feed found by either automated discovery or manual inspection of their
+  Presse/search pages. Would mean an HTML scraper, not a feed adapter.
+- **RMV Verkehrsmeldungen** — no public feed; the only automated path is
+  `rmv.de/hapi/`, a registered API requiring its own ToS acceptance. Deferred
+  — the city's own feed already covers road closures, and registering for a
+  separate API is its own project. Revisit only if Baustellen looks thin
+  after a month of real data.
+
+### Manual entry is a first-class feature, not a fallback
+
+The audit's real finding: what has no usable automated feed is exactly
+**foerderung** and **recht** — Förderdatenbank, WIBank, IHK, Handwerkskammer.
+Those two categories are also the slowest-moving (a handful of items a
+quarter, not a day) and the highest-liability: a wrong grant deadline or a
+wrong statement of legal obligation costs a member real money, not just an
+awkward correction.
+
+So the design inverts the usual shape: automate the fast-moving categories,
+hand-curate the slow and dangerous ones. **The classifier never authors
+`foerderung` or `recht` items — those are always `origin: 'manual'`,** typed
+into `/admin/radar` by a human with the same fields and the same publish gate
+as everything else. This takes the LLM out of the liability path entirely for
+the two categories where it mattered most, and it means the module is useful
+from day one even with zero feeds working.
+
+### Schema (`lib/db/schema.ts`)
+
+Four tables, migrations committed under `drizzle/`:
+
+- **`sources`** — registered feeds (bookkeeping: last fetch, active/inactive),
+  not what items display — items carry their own `sourceName`/`sourceUrl` so
+  the public page never needs a join.
+- **`items`** — `origin: 'feed' | 'manual'` is the load-bearing column
+  described above. `deadline` is nullable and only ever set when the source
+  states one explicitly — never inferred. `status: draft|published|rejected`
+  is the editorial gate: nothing reaches the public site without a human
+  approving it, regardless of origin.
+- **`digest_subscribers`** — double opt-in; `confirmedAt` (not the initial
+  request) is the actual consent timestamp, since a bare subscribe request
+  isn't valid consent by itself. Unsubscribing is a hard delete of the row,
+  not a status flag — there's no reason to retain a withdrawn subscriber's
+  email at all. Disclosed on `/datenschutz` now, not after the feature ships.
+- **`ingest_runs`** — one row per ingest run: items fetched/classified,
+  prompt/completion tokens, estimated cost, and whether the run hit its hard
+  item cap. Exists so token spend is a number someone can look at, not a
+  surprise on the invoice.
+
+### Expected cost, before any cron is switched on
+
+Classification should use **Claude Haiku 4.5** ($1/MTok input, $5/MTok
+output as of this writing — verified against Anthropic's current pricing
+page, not memory) — this is straightforward structured-output classification,
+not a task that needs a larger model. Estimating generously (no prompt
+caching, ~1,500 input tokens and ~200 output tokens per item — system prompt,
+category rules, and the item's feed content in, headline/summary/action and
+metadata out):
+
+- Cost per item ≈ **$0.0025**
+- At 10–30 new items/day combined across offenbach.de and of-news.de (your
+  estimate): **300–900 items/month → roughly $0.75–$2.25/month**
+- Even a hard cap of, say, 50 items per run hit on every single run for a
+  month caps the ceiling at **~$3.75/month**
+
+Small either way, but the `ingest_runs` log means that's a checked fact after
+the first month, not an assumption. Prompt caching (the system prompt and
+category rules repeat across every item in a run) would push it lower still.
+
+### Environment
+
+Neon project must be created in the **EU (Frankfurt / eu-central-1) region.**
+This isn't a code-level setting — it's a choice made once, in the Neon
+console, when the project is created — but getting it wrong means personal
+data (digest subscriber emails, and potentially names that appear in
+classified item text) leaves the EU, which makes the Datenschutz page
+inaccurate. `lib/db/index.ts` has the same note next to the connection code.
 
 ## Email and forms
 
@@ -229,8 +350,9 @@ this reason; copy that pattern rather than dropping it.
 - How long submitted form data should be kept — the consent text on both
   forms has a `TODO-COPY` placeholder for this, and so does Datenschutz;
 - Confirmation that AVVs (data processing agreements) are in place with
-  Vercel and Resend, and which Art. 44 DSGVO transfer basis applies to each —
-  both are US companies, both are flagged `TODO-COPY` on `/datenschutz`;
+  Vercel, Resend, and Neon, and which Art. 44 DSGVO transfer basis applies to
+  each — all three are US companies (even though Neon's database itself will
+  live in the EU/Frankfurt region) — all flagged `TODO-COPY` on `/datenschutz`;
 - Satzung and a fuller Vereinsgeschichte for `/verein`, if the board wants
   more there than the current Vorstand list;
 - Proofreading of the German copy — it's written as working drafts;
