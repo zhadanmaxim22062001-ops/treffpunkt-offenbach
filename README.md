@@ -42,20 +42,34 @@ npm run build    # production build, must pass with zero errors
   fields (name, email, message), plus the one map the site renders locally: the
   association's own address, fetched by `scripts/fetch-verein-map.mjs`.
 - 301 redirects from the old `.php` URLs in `next.config.ts`;
+- **`/admin/radar`** — the OF-Radar editorial screen: compose a manual item,
+  review/edit a draft, publish or discard. Basic-Auth protected, noindex,
+  mobile-first. See "OF-Radar" below.
 - `tests/visual.spec.ts` (Playwright) — screenshots every route in both themes
   at 1360px and 420px and fails on any console error. See "Visual verification"
   below.
 
+### Route structure
+
+Public pages live under `app/(site)/` (a route group — doesn't affect any
+URL), with their own root layout (`app/(site)/layout.tsx`: Header, Footer,
+SmoothScroll, Organization JSON-LD). `/admin` has a **separate** root layout
+(`app/admin/layout.tsx`) with none of that — see "OF-Radar" below for why
+that split exists; it wasn't there from the start and the reason is worth
+reading before adding a third area to the app.
+
 ### What's left
 
-1. **OF-Radar**: schema is designed and migrations are committed (see below) —
-   `/api/radar/ingest` on a Vercel Cron → classification via the Anthropic API
-   for the feed-fed categories, manual compose in `/admin/radar` for the other
-   two → editorial gate → public UI with filters, deadline countdowns, and a
-   frequency calendar are still to build. Currently shows an honest empty
-   state — see below.
-2. Accessibility (axe-core) and performance pass, OG images via `next/og`.
-3. Deploy.
+1. **OF-Radar ingest**: `/api/radar/ingest` on a Vercel Cron, classification
+   via the Anthropic API for the feed-fed categories only (`foerderung` and
+   `recht` stay manual-only — see "OF-Radar" below). Schema and the editorial
+   admin are both done; the classifier's first deliverable is a `--dry-run`
+   report on real offenbach.de items, not code merged sight unseen.
+2. **OF-Radar public UI**: filters, deadline countdowns, a frequency calendar,
+   `/radar/[slug]`, `/radar/feed.xml`, the weekly digest. Currently shows an
+   honest empty state — see "OF-Radar" below.
+3. Accessibility (axe-core) and performance pass, OG images via `next/og`.
+4. Deploy.
 
 ## Member data
 
@@ -201,6 +215,60 @@ as everything else. This takes the LLM out of the liability path entirely for
 the two categories where it mattered most, and it means the module is useful
 from day one even with zero feeds working.
 
+### Build order: admin before ingest
+
+4c (this admin) was built before 4b (ingest/classifier), deliberately out of
+the original step order. Manual entry needs nothing but the schema — no API
+key, no cron, no live feed — so building it first means the module is
+genuinely usable the day the database exists, gives a place to put real items
+to judge the public UI against, and gives the classifier a working review
+screen to land its drafts in once it exists, instead of judging it from a
+terminal.
+
+**When the classifier is built, its first deliverable is not code merged
+sight unseen — it's a `--dry-run` mode** that fetches the live offenbach.de
+feed, classifies real items, writes nothing to the database, and prints a
+table: headline in, relevant y/n, category, urgency, deadline, generated
+headline/summary/action. That table gets reviewed against real Offenbach
+items before a single row is written or a cron is armed.
+
+### Admin (`/admin/radar`)
+
+Compose a manual item, review a draft (feed-origin or manual, same screen),
+edit it, publish it, or discard it.
+
+- **Auth**: `proxy.ts` (Next 16 renamed `middleware.ts` → `proxy.ts`; this is
+  that file) gates the whole `/admin` path with Basic Auth against
+  `ADMIN_PASSWORD`. The comparison is constant-time — both the supplied and
+  expected password are hashed to a fixed-length SHA-256 digest first, so a
+  timing attack can't learn anything from how many leading characters
+  matched. Fails closed if `ADMIN_PASSWORD` isn't set (503, not open access).
+  `/admin` was already in `robots.txt`'s disallow list from step 1;
+  `app/admin/layout.tsx` also sets `noindex` directly.
+- **Mobile-first, actually verified**: every control is sized for a thumb, one
+  column, no hover-only affordances. Checked at a 390px viewport via
+  Playwright screenshots, not just written to look that way.
+- **The publish gate**: `lib/radar/validation.ts`'s `itemFormSchema` requires
+  `sourceName` and `sourceUrl` — server-side, before the DB is ever touched,
+  not left to the NOT NULL columns alone. No item, from either origin, can be
+  published without both. Compose always creates `origin: 'manual'`,
+  `status: 'draft'` — composing isn't the same act as publishing, even for a
+  human typing it directly; the review screen's "Veröffentlichen" is the
+  actual gate.
+- **Own root layout**: `/admin` does not inherit the public site's Header and
+  Footer — see "Route structure" above. That was a real bug caught while
+  building this, not a design choice made from the start.
+
+Verified end to end (compose → validation error → success → edit → save →
+publish → shows in "Zuletzt veröffentlicht"; discard → removed from the draft
+list) against a temporary in-memory fake, since no live Neon project exists
+yet. That check caught a real bug: the deadline field's empty-string case
+transformed to `undefined` in the form schema, and Drizzle's `.set()` treats
+`undefined` as "leave this column alone" — so clearing a previously-set
+deadline on edit would have silently failed to clear it. Fixed to transform
+to `null`, which Drizzle does write; verified the set-then-clear round-trip
+directly.
+
 ### Schema (`lib/db/schema.ts`)
 
 Four tables, migrations committed under `drizzle/`:
@@ -212,7 +280,10 @@ Four tables, migrations committed under `drizzle/`:
   described above. `deadline` is nullable and only ever set when the source
   states one explicitly — never inferred. `status: draft|published|rejected`
   is the editorial gate: nothing reaches the public site without a human
-  approving it, regardless of origin.
+  approving it, regardless of origin. `classifierVersion` is nullable and
+  only ever set by the ingest script on machine-classified rows — null for
+  every manual item — so a prompt can be tuned against real published
+  history later instead of guesswork.
 - **`digest_subscribers`** — double opt-in; `confirmedAt` (not the initial
   request) is the actual consent timestamp, since a bare subscribe request
   isn't valid consent by itself. Unsubscribing is a hard delete of the row,
