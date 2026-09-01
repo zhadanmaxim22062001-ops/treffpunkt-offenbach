@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SmoothScroll } from "@/components/motion";
 import { VEREIN } from "@/data/verein";
-import "./globals.css";
+import "../globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.treffpunkt-offenbach.com";
 
@@ -44,7 +44,7 @@ const JSON_LD = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={`${archivo.variable} ${newsreader.variable} ${plexMono.variable}`}>
       <head>
