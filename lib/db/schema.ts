@@ -83,6 +83,12 @@ export const items = pgTable(
     sourceUrl: text("source_url").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // Which prompt/classifier build produced this row — null for origin='manual'
+    // (nothing classified it) and for anything created before this column
+    // existed. Stamped by the ingest script (step 4b), never set by hand.
+    // Without this, tuning the classifier prompt later is guesswork: there'd
+    // be no way to tell which published items came from which prompt version.
+    classifierVersion: text("classifier_version"),
   },
   (table) => [
     index("items_status_idx").on(table.status),
