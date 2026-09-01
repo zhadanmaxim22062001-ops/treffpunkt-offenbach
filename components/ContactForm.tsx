@@ -140,7 +140,7 @@ export function ContactForm({
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="self-start bg-accent px-5 py-3 font-display text-[14px] font-semibold text-white transition-[filter] duration-[120ms] hover:brightness-110 disabled:opacity-60"
+        className="self-start bg-accent px-5 py-3 font-display text-[14px] font-semibold text-on-accent transition-[filter] duration-[120ms] hover:brightness-110 disabled:opacity-60"
       >
         {status === "submitting" ? "Wird gesendet …" : submitLabel}
       </button>

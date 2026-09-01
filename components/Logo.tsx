@@ -21,17 +21,26 @@ export function LogoMark({
   title?: string;
 }) {
   const compact = size < COMPACT_BELOW;
+  // An empty title (LogoLockup's case) means this mark is decorative — the
+  // accessible name comes from an adjacent sr-only span instead. role="img"
+  // with an empty aria-label would tell assistive tech this is a meaningful
+  // image with no alternative text, which is worse than not being an "img"
+  // at all: mark it aria-hidden and skip <title> rather than announce
+  // nothing where something was expected.
+  const decorative = !title;
+  const a11yProps = decorative
+    ? { "aria-hidden": true as const }
+    : { role: "img" as const, "aria-label": title };
   return (
     <svg
       viewBox="0 0 240 240"
-      role="img"
-      aria-label={title}
+      {...a11yProps}
       width={size}
       height={size}
       className={clsx(animated && !compact && "logo-draw", className)}
       style={{ overflow: "visible" }}
     >
-      <title>{title}</title>
+      {!decorative && <title>{title}</title>}
       <g fill="none" strokeWidth={compact ? 19 : 13} strokeLinecap="butt" strokeLinejoin="miter">
         {compact ? (
           <circle className="tpof-ring" cx="112" cy="120" r="84" stroke="var(--c-ink)" />

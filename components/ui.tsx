@@ -82,7 +82,7 @@ export function Button({ children, href, variant = "solid", className }: ButtonP
   const base =
     "inline-flex items-center gap-2 px-5 py-3 font-display text-[14px] font-semibold tracking-[-0.005em] transition-colors duration-[120ms]";
   const styles = {
-    solid: "bg-accent text-white hover:brightness-110",
+    solid: "bg-accent text-on-accent hover:brightness-110",
     outline: "border text-ink hover:bg-accent-soft",
     ghost: "text-ink hover:text-accent",
   }[variant];

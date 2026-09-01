@@ -25,7 +25,12 @@ export function Header() {
       style={{ borderColor: "var(--c-line)", backgroundColor: "color-mix(in srgb, var(--c-paper) 88%, transparent)" }}
     >
       <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6 py-3">
-        <Link href="/" aria-label="Startseite, Treffpunkt Offenbach">
+        {/* No aria-label here — LogoLockup already supplies an accessible
+            name (visible "TREFFPUNKT"/"OFFENBACH" text + an sr-only
+            expansion). A custom label on this link would override that and
+            risk not containing the visible text verbatim, which breaks
+            voice-control name matching (WCAG 2.5.3). */}
+        <Link href="/">
           <LogoLockup markSize={38} />
         </Link>
 
@@ -52,7 +57,7 @@ export function Header() {
           <ThemeToggle />
           <Link
             href="/mitglied-werden"
-            className="hidden bg-accent px-4 py-2 font-display text-[13px] font-semibold text-white transition-[filter] duration-[120ms] hover:brightness-110 sm:inline-block"
+            className="hidden bg-accent px-4 py-2 font-display text-[13px] font-semibold text-on-accent transition-[filter] duration-[120ms] hover:brightness-110 sm:inline-block"
           >
             Mitglied werden
           </Link>

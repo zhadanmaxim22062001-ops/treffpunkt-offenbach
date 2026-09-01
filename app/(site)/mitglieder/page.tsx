@@ -132,7 +132,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
 
         <button
           type="submit"
-          className="bg-accent px-4 py-2 font-display text-[13px] font-semibold text-white transition-[filter] duration-[120ms] hover:brightness-110"
+          className="bg-accent px-4 py-2 font-display text-[13px] font-semibold text-on-accent transition-[filter] duration-[120ms] hover:brightness-110"
         >
           Filtern
         </button>

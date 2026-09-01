@@ -49,19 +49,23 @@ export default function Home() {
 
       {/* ---------------------------------------------- 2. Kennzahlen */}
       <Section tone="paper-2">
-        <dl className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Not a <dl>: each item is a (number, label, note) triple, not a
+            term/definition pair, and axe's definition-list check is right
+            to reject that regardless of how it's marked up — plain divs
+            with visual styling are the honest structure here. */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {KENNZAHLEN.map((k, i) => (
             <Reveal key={k.label} delay={i * 0.06}>
               <div>
-                <dd className="font-display text-[clamp(40px,5vw,60px)] font-extrabold leading-none tracking-[-0.04em] text-accent">
+                <p className="font-display text-[clamp(40px,5vw,60px)] font-extrabold leading-none tracking-[-0.04em] text-accent">
                   <CountUp to={k.value} suffix={k.suffix} />
-                </dd>
-                <dt className="mt-3 font-display text-[15px] font-semibold">{k.label}</dt>
+                </p>
+                <p className="mt-3 font-display text-[15px] font-semibold">{k.label}</p>
                 <p className="mt-1 text-[14px] leading-snug text-muted">{k.note}</p>
               </div>
             </Reveal>
           ))}
-        </dl>
+        </div>
       </Section>
 
       {/* ------------------------------------------- 3. Was wir machen */}
