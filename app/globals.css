@@ -2,8 +2,12 @@
 
 /* ============================================================
    Treffpunkt Offenbach — design tokens
-   Colour ratio roughly 80 neutral / 15 river / 5 accent.
-   Accent never covers a large surface.
+   Colour ratio roughly 80 neutral / 15 blue / 5 signal.
+   Accent (blue) never covers a large surface. Signal is the ONLY warm
+   colour left in the system and marks exactly one thing: urgency and
+   deadlines (see the OF-Radar list). Not tags, not decoration, not
+   "positive states" — everything that used to reach for a secondary
+   colour for those now reads --c-accent-soft instead.
    ============================================================ */
 
 @theme {
@@ -16,8 +20,8 @@
   --color-accent: var(--c-accent);
   --color-accent-soft: var(--c-accent-soft);
   --color-on-accent: var(--c-on-accent);
-  --color-river: var(--c-river);
-  --color-river-soft: var(--c-river-soft);
+  --color-signal: var(--c-signal);
+  --color-signal-soft: var(--c-signal-soft);
   --color-invert: var(--c-invert-bg);
   --color-on-invert: var(--c-invert-fg);
 
@@ -30,68 +34,70 @@
   --ease-brand: cubic-bezier(0.4, 0, 0.15, 1);
 }
 
-/* Light theme is the base. Tokens get redefined below; components only ever read them. */
+/* Light theme is the base. Tokens get redefined below; components only ever read them.
+   Contrast against --c-paper unless noted, AA-checked: ink 15.4, ink-2 7.9,
+   muted 4.8, accent 6.2, signal 5.8. White-on-accent (the solid button) 6.5.
+   Don't "improve" these without re-running the numbers. */
 :root {
-  --c-ink: #101a1d;
-  --c-ink-2: #2c3a3e;
-  --c-paper: #e9ecea;
-  --c-paper-2: #f4f6f4;
-  --c-line: #c6cfcb;
-  --c-muted: #5c6b6c;
-  /* #e23d1f (the original brand red) is 4.27:1 against white — under the
-     4.5:1 AA floor for the solid button's white text. Darkened just enough
-     to clear it (4.73:1); still reads as the same signal red. */
-  --c-accent: #d6381d;
-  --c-accent-soft: #f6ded7;
-  --c-river: #1f6f6b;
-  --c-river-soft: #d9e7e4;
-  --c-invert-bg: #101a1d;
-  --c-invert-fg: #e9ecea;
+  --c-ink: #0b2138;
+  --c-ink-2: #33506b;
+  --c-paper: #f5f9fc;
+  --c-paper-2: #ffffff;
+  --c-line: #c9d8e5;
+  --c-muted: #56718c;
+  --c-accent: #0f5fa8;
+  --c-accent-soft: #e1edf9;
+  --c-signal: #a34515;
+  --c-signal-soft: #fae7dc;
+  --c-invert-bg: #0b2138;
+  --c-invert-fg: #f5f9fc;
   /* Text color for content sitting ON a solid --c-accent fill (the solid
      Button variant) — not the same thing as --c-accent itself, which also
      has to work as text/border color against --c-paper. One value can't
      satisfy both contrast requirements in the dark theme, where --c-accent
-     is deliberately bright for its own legibility: white text on #ff5a38 is
-     only 3.1:1, but dark ink on it is 5.7:1. See components/ui.tsx Button.
-     Light theme's darkened accent (above) works fine with white. */
+     is deliberately bright for its own legibility: white text on #5aa9e8 is
+     only 2.5:1, but --c-invert-fg (dark navy) on it is 6.4:1. See
+     components/ui.tsx Button. Light theme's accent works fine with white
+     (6.5:1) — don't assume the same text color works on both.
+  */
   --c-on-accent: #ffffff;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --c-ink: #e4eae7;
-    --c-ink-2: #b4c1be;
-    --c-paper: #0d1517;
-    --c-paper-2: #141f22;
-    --c-line: #2a3a3d;
-    --c-muted: #8a9b9a;
-    --c-accent: #ff5a38;
-    --c-accent-soft: #3a1810;
-    --c-river: #4fb3ab;
-    --c-river-soft: #12302e;
-    --c-invert-bg: #e9ecea;
-    --c-invert-fg: #101a1d;
-    /* Dark ink, not white — see the light theme's --c-on-accent comment. */
-    --c-on-accent: #101a1d;
+    --c-ink: #e4eff7;
+    --c-ink-2: #a9c2d4;
+    --c-paper: #08151f;
+    --c-paper-2: #0f2231;
+    --c-line: #25394b;
+    --c-muted: #7e9ab0;
+    --c-accent: #5aa9e8;
+    --c-accent-soft: #102f49;
+    --c-signal: #e88b5a;
+    --c-signal-soft: #2e1a10;
+    --c-invert-bg: #f5f9fc;
+    --c-invert-fg: #0b2138;
+    /* Dark navy, not white — see the light theme's --c-on-accent comment. */
+    --c-on-accent: #0b2138;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --c-ink: #e4eae7;
-  --c-ink-2: #b4c1be;
-  --c-paper: #0d1517;
-  --c-paper-2: #141f22;
-  --c-line: #2a3a3d;
-  --c-muted: #8a9b9a;
-  --c-accent: #ff5a38;
-  --c-accent-soft: #3a1810;
-  --c-river: #4fb3ab;
-  --c-river-soft: #12302e;
-  --c-invert-bg: #e9ecea;
-  --c-invert-fg: #101a1d;
-  --c-on-accent: #101a1d;
+  --c-ink: #e4eff7;
+  --c-ink-2: #a9c2d4;
+  --c-paper: #08151f;
+  --c-paper-2: #0f2231;
+  --c-line: #25394b;
+  --c-muted: #7e9ab0;
+  --c-accent: #5aa9e8;
+  --c-accent-soft: #102f49;
+  --c-signal: #e88b5a;
+  --c-signal-soft: #2e1a10;
+  --c-invert-bg: #f5f9fc;
+  --c-invert-fg: #0b2138;
+  --c-on-accent: #0b2138;
   color-scheme: dark;
 }
 
@@ -136,7 +142,7 @@
 
   ::selection {
     background: var(--c-accent);
-    color: #fff;
+    color: var(--c-on-accent);
   }
 
   /* numbers in columns and countdowns are always tabular */

@@ -67,8 +67,8 @@ export function ContactForm({
 
   if (status === "success") {
     return (
-      <div className="border p-6" style={{ borderColor: "var(--c-river)", backgroundColor: "var(--c-river-soft)" }}>
-        <p className="font-display text-[16px] font-semibold" style={{ color: "var(--c-river)" }}>
+      <div className="border p-6" style={{ borderColor: "var(--c-accent)", backgroundColor: "var(--c-accent-soft)" }}>
+        <p className="font-display text-[16px] font-semibold" style={{ color: "var(--c-accent)" }}>
           Danke, Ihre Nachricht ist angekommen.
         </p>
         <p className="mt-2 text-[14px] text-ink-2">Wir melden uns so bald wie möglich bei Ihnen.</p>

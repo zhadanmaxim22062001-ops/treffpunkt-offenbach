@@ -24,7 +24,6 @@ export type Event = {
   isoEnd?: string;
   place: string;
   summary: string;
-  tone: "accent" | "river";
 };
 
 export const EVENTS: Event[] = [
@@ -35,7 +34,6 @@ export const EVENTS: Event[] = [
     place: "Innenstadt",
     summary:
       "Vier Tage Musik, Marktstände und verkaufsoffener Sonntag. 2026 haben wir sie zum 28. Mal ausgerichtet, vom 28. bis 31. Mai — gemeinsam mit dem Einzelhandel der Innenstadt.",
-    tone: "accent",
   },
   {
     slug: "lichterfest-buesingpark",
@@ -44,7 +42,6 @@ export const EVENTS: Event[] = [
     place: "Büsingpark",
     summary:
       "Ein Abend im beleuchteten Park, getragen von Vereinen und Sponsoren aus der Stadt. Für Betriebe in der Innenstadt einer der stärksten Abende des Jahres.",
-    tone: "river",
   },
   {
     slug: "verkaufsoffene-sonntage",
@@ -53,7 +50,6 @@ export const EVENTS: Event[] = [
     place: "Innenstadt",
     summary:
       "Wir beantragen sie, stimmen die Termine ab und bewerben sie gebündelt — damit nicht jeder Betrieb einzeln um Aufmerksamkeit kämpfen muss.",
-    tone: "river",
   },
   {
     slug: "weihnachtsbeleuchtung",
@@ -62,7 +58,6 @@ export const EVENTS: Event[] = [
     place: "Innenstadt",
     summary:
       "Die Lichter in der Innenstadt hängen nicht von allein. Der Verein organisiert und finanziert sie mit — sichtbar für jeden, der im Advent in die Stadt kommt.",
-    tone: "accent",
   },
 ];
 

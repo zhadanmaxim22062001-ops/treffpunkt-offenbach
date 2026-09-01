@@ -60,7 +60,7 @@ export default function Page() {
                 <p className="prose-body mt-2 text-[15px]">{item.summary}</p>
                 <p
                   className="mt-3 inline-block px-3 py-2 text-[14px]"
-                  style={{ background: "var(--c-river-soft)", color: "var(--c-river)" }}
+                  style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
                 >
                   <span className="font-display font-semibold">Was das heißt: </span>
                   {item.action}

@@ -4,11 +4,11 @@ import { LogoLockup, LogoMark } from "@/components/Logo";
 export const metadata = { title: "Styleguide", robots: { index: false, follow: false } };
 
 const COLORS = [
-  ["Ink", "#101A1D", "Text, Zeichen, dunkle Sektionen"],
-  ["Signalrot", "#E23D1F", "F im Zeichen, CTA, Dringlichkeit"],
-  ["Main-Grün", "#1F6F6B", "Rubrik-Chips, Status „alles in Ordnung“"],
-  ["Kalkweiß", "#E9ECEA", "Grundfläche"],
-  ["Beton", "#C6CFCB", "Linien und Rahmen"],
+  ["Ink", "#0B2138", "Text, dunkle Sektionen"],
+  ["Blau", "#0F5FA8", "F im Zeichen, CTA, Links"],
+  ["Signal", "#A34515", "Nur Dringlichkeit und Fristen — sonst nichts"],
+  ["Kalkweiß", "#F5F9FC", "Grundfläche"],
+  ["Beton", "#C9D8E5", "Linien und Rahmen"],
 ];
 
 export default function Styleguide() {
@@ -67,8 +67,8 @@ export default function Styleguide() {
           <Button href="#" variant="outline">Outline</Button>
           <Button href="#" variant="ghost">Ghost</Button>
           <Chip>rathaus</Chip>
-          <Chip tone="river">frequenz</Chip>
           <Chip tone="neutral">recht</Chip>
+          <Chip tone="signal">noch 3 Tage</Chip>
         </div>
         <Rule className="my-10" />
         <div className="grid gap-5 md:grid-cols-3">

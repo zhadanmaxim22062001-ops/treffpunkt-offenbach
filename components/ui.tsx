@@ -122,13 +122,14 @@ export function Chip({
   as = "span",
 }: {
   children: ReactNode;
-  tone?: "accent" | "river" | "neutral";
+  tone?: "accent" | "signal" | "neutral";
   as?: "span" | "li";
 }) {
   const Tag = as;
   const styles = {
     accent: { background: "var(--c-accent-soft)", color: "var(--c-accent)" },
-    river: { background: "var(--c-river-soft)", color: "var(--c-river)" },
+    // Signal is reserved for urgency/deadlines — use this tone for that only, never as a generic second tag colour.
+    signal: { background: "var(--c-signal-soft)", color: "var(--c-signal)" },
     neutral: { background: "transparent", color: "var(--c-muted)", border: "1px solid var(--c-line)" },
   }[tone];
   return (

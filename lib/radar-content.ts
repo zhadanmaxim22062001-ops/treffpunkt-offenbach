@@ -29,12 +29,14 @@ export type RadarItem = {
   origin: "manual";
 };
 
-export const RADAR_CATEGORIES: Record<RadarCategory, { label: string; tone: "accent" | "river" | "neutral" }> = {
+// All six categories share one of two tones now — signal is reserved for
+// urgency/deadlines (see the item list), not for telling categories apart.
+export const RADAR_CATEGORIES: Record<RadarCategory, { label: string; tone: "accent" | "neutral" }> = {
   rathaus: { label: "Rathaus & Regeln", tone: "accent" },
   baustelle: { label: "Baustellen", tone: "accent" },
   foerderung: { label: "Förderung & Fristen", tone: "accent" },
-  frequenz: { label: "Frequenz-Kalender", tone: "river" },
-  stadt: { label: "Stadt entwickelt sich", tone: "river" },
+  frequenz: { label: "Frequenz-Kalender", tone: "accent" },
+  stadt: { label: "Stadt entwickelt sich", tone: "accent" },
   recht: { label: "Recht & Kosten", tone: "neutral" },
 };
 
