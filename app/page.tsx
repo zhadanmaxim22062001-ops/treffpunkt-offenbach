@@ -3,7 +3,7 @@ import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "
 import { LogoMark } from "@/components/Logo";
 import { CountUp, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
-import { LEISTUNGEN, RADAR_CATEGORIES, RADAR_SEED } from "@/data/content";
+import { LEISTUNGEN, RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, RADAR_SEED } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 import { getNextConfirmedEvent } from "@/lib/events";
 
@@ -11,7 +11,7 @@ const members = getAllMembers();
 
 export default function Home() {
   const next = getNextConfirmedEvent();
-  const radar = RADAR_SEED.slice(0, 3);
+  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : RADAR_SEED.slice(0, 3);
 
   return (
     <>
@@ -96,46 +96,53 @@ export default function Home() {
           </Button>
         </div>
 
-        <ul className="mt-12 flex flex-col">
-          {radar.map((item, i) => {
-            const cat = RADAR_CATEGORIES[item.category];
-            return (
-              <Reveal key={item.slug} delay={i * 0.06}>
-                <li
-                  className="border-t py-6"
-                  style={{
-                    borderColor: "var(--c-line)",
-                    borderLeft: item.urgency === "high" ? "3px solid var(--c-accent)" : undefined,
-                    paddingLeft: item.urgency === "high" ? "18px" : undefined,
-                  }}
-                >
-                  <div className="flex flex-wrap items-center gap-3">
-                    <time className="font-mono text-[11px] tracking-[0.08em] text-muted" dateTime={item.date}>
-                      {formatDate(item.date)}
-                    </time>
-                    <Chip tone={cat.tone}>{cat.label}</Chip>
-                  </div>
-                  <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
-                    <Link href={`/radar#${item.slug}`} className="link-underline">
-                      {item.headline}
-                    </Link>
-                  </h3>
-                  <p className="prose-body mt-2 text-[15px]">{item.summary}</p>
-                  <p
-                    className="mt-3 inline-block px-3 py-2 text-[14px]"
-                    style={{ background: "var(--c-river-soft)", color: "var(--c-river)" }}
+        {radar.length > 0 ? (
+          <ul className="mt-12 flex flex-col">
+            {radar.map((item, i) => {
+              const cat = RADAR_CATEGORIES[item.category];
+              return (
+                <Reveal key={item.slug} delay={i * 0.06}>
+                  <li
+                    className="border-t py-6"
+                    style={{
+                      borderColor: "var(--c-line)",
+                      borderLeft: item.urgency === "high" ? "3px solid var(--c-accent)" : undefined,
+                      paddingLeft: item.urgency === "high" ? "18px" : undefined,
+                    }}
                   >
-                    <span className="font-display font-semibold">Was das heißt: </span>
-                    {item.action}
-                  </p>
-                  <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                    Quelle: {item.source}
-                  </p>
-                </li>
-              </Reveal>
-            );
-          })}
-        </ul>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <time className="font-mono text-[11px] tracking-[0.08em] text-muted" dateTime={item.date}>
+                        {formatDate(item.date)}
+                      </time>
+                      <Chip tone={cat.tone}>{cat.label}</Chip>
+                    </div>
+                    <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
+                      <Link href={`/radar#${item.slug}`} className="link-underline">
+                        {item.headline}
+                      </Link>
+                    </h3>
+                    <p className="prose-body mt-2 text-[15px]">{item.summary}</p>
+                    <p
+                      className="mt-3 inline-block px-3 py-2 text-[14px]"
+                      style={{ background: "var(--c-river-soft)", color: "var(--c-river)" }}
+                    >
+                      <span className="font-display font-semibold">Was das heißt: </span>
+                      {item.action}
+                    </p>
+                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                      Quelle: {item.source}
+                    </p>
+                  </li>
+                </Reveal>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="prose-body mt-12 max-w-[52ch]">
+            Der OF-Radar startet in Kürze. Meldungen erscheinen hier erst nach redaktioneller Prüfung und Freigabe
+            im Vorstand — nichts wird automatisch veröffentlicht.
+          </p>
+        )}
       </Section>
 
       {/* ------------------------------------------ 5. Mitglieder-Marquee */}

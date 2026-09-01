@@ -108,9 +108,30 @@ export const RADAR_CATEGORIES: Record<
   recht: { label: "Recht & Kosten", tone: "neutral" },
 };
 
-// TODO-COPY: these are demo entries for judging the layout.
-// Real ones come from /api/radar/ingest and go live only after approval
-// in /admin/radar — nothing publishes automatically.
+/**
+ * True as long as RADAR_SEED is unverified specimen content, not real
+ * published items. Every place that renders radar items in public checks
+ * this and shows an honest empty state instead of the seed — see
+ * lib/members.ts for the same pattern on the member list, adopted here
+ * after RADAR_SEED's invented headlines were found rendering on the
+ * homepage attributed to real institutions (Stadt Offenbach, WIBank, IHK
+ * Offenbach am Main) that never published any of it. Fabricating a
+ * Gebührenordnung change or a road closure and sourcing it to the city an
+ * association lobbies is not a placeholder problem, it's a false-statement
+ * problem, and it doesn't get to sit behind a "demo data" comment.
+ *
+ * Unlike the member guard, this one isn't meant to be flipped to false by
+ * hand: RADAR_SEED and this flag both go away entirely once step 4's real
+ * ingest pipeline (Postgres + /api/radar/ingest + /admin/radar) replaces
+ * this file as the source of public items.
+ */
+export const RADAR_ITEMS_ARE_PLACEHOLDER = true;
+
+// Kept for judging the layout ONLY — every source field below is a
+// deliberately fake label so that even a future bug in a guard can't
+// surface a real institution's name over words it never wrote. Real items
+// come from /api/radar/ingest and go live only after approval in
+// /admin/radar — nothing publishes automatically.
 export const RADAR_SEED: RadarItem[] = [
   {
     slug: "sondernutzung-aussengastronomie",
@@ -119,7 +140,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Die Stadt hat die Sätze für Sondernutzung im öffentlichen Raum neu gefasst. Betroffen sind Tische, Stühle und Warenauslagen auf dem Gehweg.",
     action: "Wer Fläche vor dem Laden nutzt, sollte den Antrag vor Saisonbeginn neu stellen.",
-    source: "Stadt Offenbach, Pressemeldung",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-08-27",
     urgency: "mid",
   },
@@ -130,7 +151,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Wegen Leitungsarbeiten ist ein Abschnitt der Frankfurter Straße nur einspurig befahrbar. Die Zufahrt zu den Geschäften bleibt zu Fuß frei.",
     action: "Betriebe an der Strecke: Lieferzeiten verschieben und Kundschaft aktiv auf die Erreichbarkeit hinweisen.",
-    source: "Stadt Offenbach",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-08-25",
     urgency: "high",
   },
@@ -141,7 +162,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Zuschuss für Digitalisierungsvorhaben kleiner Betriebe. Antragsberechtigt sind Unternehmen mit Sitz oder Betriebsstätte in Hessen.",
     action: "Wer Kasse, Warenwirtschaft oder Shop erneuern will, sollte den Antrag jetzt vorbereiten.",
-    source: "WIBank",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-08-20",
     urgency: "mid",
     deadline: "2026-10-31",
@@ -153,7 +174,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Der Vorverkauf läuft, Vereine und Sponsoren tragen das Fest mit. Erfahrungsgemäß einer der stärksten Abende des Sommers in der Innenstadt.",
     action: "Personal und Warenbestand für den Abend und den Folgetag entsprechend planen.",
-    source: "Stadt Offenbach",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-07-31",
     urgency: "low",
   },
@@ -164,7 +185,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Am Kaiserlei entstehen weiter Büroflächen. Jeder neue Standort dort bedeutet zusätzliche Mittagsgäste und Laufkundschaft für die angrenzende Innenstadt.",
     action: "Mittagsangebot und Öffnungszeiten auf Bürorhythmus prüfen.",
-    source: "Stadt Offenbach",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-07-18",
     urgency: "low",
   },
@@ -175,7 +196,7 @@ export const RADAR_SEED: RadarItem[] = [
     summary:
       "Im Geschäftsverkehr zwischen Unternehmen gilt die Pflicht zum Empfang elektronischer Rechnungen. Die Fristen für das Versenden sind gestaffelt.",
     action: "Prüfen, ob die eigene Software das Format kann — und wer im Betrieb dafür zuständig ist.",
-    source: "IHK Offenbach am Main",
+    source: "BEISPIELQUELLE (Testdaten)",
     date: "2026-07-02",
     urgency: "mid",
   },
