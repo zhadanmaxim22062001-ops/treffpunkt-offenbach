@@ -36,9 +36,32 @@ export default function Page() {
         </p>
 
         <p>
+          <strong className="font-display">OF-Radar Wochendigest</strong><br />
+          Für den wöchentlichen E-Mail-Digest des OF-Radar speichern wir Ihre E-Mail-Adresse erst nach
+          Double-Opt-in: Nach der Anmeldung erhalten Sie eine Bestätigungs-E-Mail, gespeichert wird nur, wer den
+          darin enthaltenen Link tatsächlich anklickt — dieser Zeitpunkt wird als Einwilligungsdatum vermerkt. Jede
+          Digest-E-Mail enthält einen Abmeldelink, der ohne Login funktioniert; ein Klick darauf löscht Ihre
+          E-Mail-Adresse und das Einwilligungsdatum unwiderruflich aus unserer Datenbank — es gibt keinen
+          gesonderten "abgemeldet"-Zustand, in dem die Adresse weiter vorgehalten würde. Auch der Versand dieser
+          Digest-Mails läuft über Resend, siehe oben.
+        </p>
+
+        <p>
+          <strong className="font-display">Datenbank</strong><br />
+          Für das OF-Radar setzen wir eine Postgres-Datenbank bei Neon (Neon, Inc.) ein, betrieben in der
+          EU-Region Frankfurt — die Daten selbst verlassen die EU damit nicht. Neon, Inc. als Unternehmen hat
+          seinen Sitz in den USA.{" "}
+          <span className="font-mono text-[12px] text-muted">
+            [TODO-COPY: Abschluss eines Auftragsverarbeitungsvertrags (AVV) mit Neon bestätigen und hier
+            referenzieren.]
+          </span>
+        </p>
+
+        <p>
           <strong className="font-display">Datenübermittlung in Drittländer</strong><br />
-          Sowohl Vercel als auch Resend haben ihren Sitz in den USA, einem Land außerhalb der EU und des EWR. Die
-          Übermittlung personenbezogener Daten dorthin erfordert eine Rechtsgrundlage nach Art. 44 ff. DSGVO.{" "}
+          Vercel, Resend und Neon haben als Unternehmen ihren Sitz in den USA, auch wenn — wie bei Neon — die
+          Daten selbst in der EU gespeichert werden. Ob und in welchem Umfang dadurch eine Übermittlung in ein
+          Drittland im Sinne von Art. 44 ff. DSGVO vorliegt und welche Rechtsgrundlage jeweils greift, ist offen.{" "}
           <span className="font-mono text-[12px] text-muted">
             [TODO-COPY: Rechtsgrundlage je Anbieter bestätigen und konkret benennen — z. B. Zertifizierung nach dem
             EU-US Data Privacy Framework oder Standardvertragsklauseln (SCC) — bevor die Seite live geht.]
@@ -48,7 +71,8 @@ export default function Page() {
         <p>
           <strong className="font-display">Speicherdauer</strong><br />
           <span className="font-mono text-[12px] text-muted">
-            [TODO-COPY: Aufbewahrungsfristen für Formulardaten und Zugriffsprotokolle mit dem Vorstand festlegen.]
+            [TODO-COPY: Aufbewahrungsfristen für Formulardaten und Zugriffsprotokolle mit dem Vorstand festlegen.
+            Für den Wochendigest gilt: gespeichert wird, bis Sie sich abmelden — siehe oben.]
           </span>
         </p>
 
