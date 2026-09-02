@@ -7,20 +7,28 @@ export const metadata: Metadata = {
   description: "Vorteile der Mitgliedschaft im Gewerbeverein Treffpunkt Offenbach und wie Sie beitreten.",
 };
 
+// The association's own four benefits, taken from treffpunkt-of.de.
 const VORTEILE = [
   {
-    title: "Sichtbarkeit in der Innenstadt",
-    body: "Ihr Betrieb steht im Mitgliederverzeichnis der Seite — mit Adresse, Öffnungszeiten und Link zu Ihrer eigenen Website.",
+    title: "Schnelle umfassende Informationen",
+    body: "Was in der Innenstadt passiert und was es für Ihren Betrieb bedeutet, bevor es zum Problem wird — siehe auch den OF-Radar.",
   },
   {
-    title: "Mitreden bei den Formaten",
-    body: "Offenbacher Woche, Lichterfest, verkaufsoffene Sonntage: Mitglieder gestalten mit, statt nur zuzuschauen.",
+    title: "Mitglieder-Netzwerk",
+    body: "Über hundert Betriebe, die dieselben Straßen teilen. Nachbarn kennen heißt schneller einen Handwerker, einen Nachmieter oder eine Lösung finden.",
   },
   {
-    title: "OF-Radar zuerst",
-    body: "Meldungen, die Ihr Geschäft betreffen — Sondernutzung, Baustellen, Fristen — bevor sie zum Problem werden.",
+    title: "Kostenvorteile für Mitglieder bei Aktionen",
+    body: "Bei gemeinsamen Aktionen und Formaten wie der Offenbacher Woche profitieren Mitglieder von besseren Konditionen.",
   },
 ];
+
+// The most concrete, most persuasive benefit on the old site — never buried
+// fourth in a list. Its own card, its own room.
+const PROBLEMLOESUNGEN = {
+  title: "Problemlösungen",
+  body: "Konkrete Unterstützung bei Dingen, die ein einzelner Betrieb allein nur mühsam klärt — zum Beispiel bei der Beschaffung und Genehmigung von Werbeschildern.",
+};
 
 export default function Page() {
   return (
@@ -34,7 +42,17 @@ export default function Page() {
           Die Vorteile, eine offene Beitragstabelle und der direkte Weg zum Beitritt — eine Nachricht genügt.
         </Lead>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 max-w-[60ch]">
+          <p className="eyebrow mb-2">Der Verein über sich selbst</p>
+          <blockquote
+            className="border-l-2 pl-5 font-display text-[17px] italic leading-snug text-ink-2"
+            style={{ borderColor: "var(--c-accent)" }}
+          >
+            „In Offenbach sind alle relevanten Kaufhäuser und Gastronomen Mitglieder des Treffpunkt Offenbach.“
+          </blockquote>
+        </div>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {VORTEILE.map((v) => (
             <Card key={v.title} className="h-full">
               <h2 className="font-display text-[17px] font-semibold">{v.title}</h2>
@@ -42,6 +60,11 @@ export default function Page() {
             </Card>
           ))}
         </div>
+
+        <Card accent className="mt-5">
+          <h2 className="font-display text-[19px] font-semibold">{PROBLEMLOESUNGEN.title}</h2>
+          <p className="prose-body mt-3 max-w-[60ch] text-[15px]">{PROBLEMLOESUNGEN.body}</p>
+        </Card>
       </Section>
 
       <Section tone="paper-2">

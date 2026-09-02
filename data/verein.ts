@@ -18,12 +18,14 @@ export const VEREIN = {
   foundedYear: null as number | null,
 };
 
+// Roles verbatim from treffpunkt-of.de — "Kassierer" and "Schriftführer
+// stellv.", not the "Kassenwart"/"stellv. Schriftführer" this used to say.
 export const VORSTAND = [
   { name: "Stefan Becker", role: "1. Vorsitzender" },
   { name: "Klaus Kohlweyer", role: "2. Vorsitzender" },
-  { name: "Tobias Allmeroth", role: "Kassenwart" },
+  { name: "Tobias Allmeroth", role: "Kassierer" },
   { name: "Jürgen Proske", role: "Schriftführer" },
-  { name: "Roland Nowak", role: "stellv. Schriftführer" },
+  { name: "Roland Nowak", role: "Schriftführer stellv." },
   { name: "Birgitt Möbus", role: "Beisitzerin" },
   { name: "Ursula Ölcer", role: "Beisitzerin" },
   { name: "Matthias Roth", role: "Beisitzer" },

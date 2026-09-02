@@ -116,6 +116,17 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
+        <Reveal delay={0.1 + LEISTUNGEN.length * 0.06}>
+          <div className="mt-10 max-w-[52ch]">
+            <p className="eyebrow mb-2">Der Verein über sich selbst</p>
+            <blockquote
+              className="border-l-2 pl-5 font-display text-[17px] italic leading-snug text-ink-2"
+              style={{ borderColor: "var(--c-accent)" }}
+            >
+              „In Offenbach sind alle relevanten Kaufhäuser und Gastronomen Mitglieder des Treffpunkt Offenbach.“
+            </blockquote>
+          </div>
+        </Reveal>
       </Section>
 
       {/* ------------------------------------------- 4. OF-Radar teaser */}

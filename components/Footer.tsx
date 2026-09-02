@@ -38,6 +38,7 @@ export function Footer() {
           <ul className="flex flex-col gap-2 text-[15px] text-ink-2">
             {[
               { href: "/verein", label: "Der Verein" },
+              { href: "/verein#vorstand", label: "Vorstand" },
               { href: "/mitglieder", label: "Mitgliederverzeichnis" },
               { href: "/veranstaltungen", label: "Veranstaltungen" },
               { href: "/radar", label: "OF-Radar" },

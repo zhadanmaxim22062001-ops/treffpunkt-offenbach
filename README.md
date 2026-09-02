@@ -20,7 +20,11 @@ npm run build    # production build, must pass with zero errors
 
 ## What's built
 
-- Design system in tokens: `app/globals.css`, three themes (system / light / dark);
+- Design system in tokens: `app/globals.css`, three themes (system / light / dark).
+  Worth knowing for anyone presenting this to the board: the blue/white/navy
+  palette isn't a new direction — the association's own existing logo is
+  blue, so this is continuity with their identity, not a departure from it;
+
 - Archivo, Newsreader, IBM Plex Mono fonts — loaded **locally** via `next/font/local`;
   no requests to Google's servers at all, which matters for DSGVO;
 - The OF-Siegel mark: `components/Logo.tsx`, the 64px version-switch threshold is
