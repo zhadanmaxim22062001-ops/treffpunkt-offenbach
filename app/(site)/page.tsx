@@ -147,7 +147,7 @@ export default function Home() {
                     className="border-t py-6"
                     style={{
                       borderColor: "var(--c-line)",
-                      borderLeft: item.urgency === "high" ? "3px solid var(--c-accent)" : undefined,
+                      borderLeft: item.urgency === "high" ? "3px solid var(--c-signal)" : undefined,
                       paddingLeft: item.urgency === "high" ? "18px" : undefined,
                     }}
                   >
@@ -158,7 +158,7 @@ export default function Home() {
                       <Chip tone={cat.tone}>{cat.label}</Chip>
                     </div>
                     <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
-                      <Link href={`/radar#${item.slug}`} className="link-underline">
+                      <Link href={`/radar/${item.slug}`} className="link-underline">
                         {item.headline}
                       </Link>
                     </h3>
@@ -167,11 +167,11 @@ export default function Home() {
                       className="mt-3 inline-block px-3 py-2 text-[14px]"
                       style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
                     >
-                      <span className="font-display font-semibold">Was das heißt: </span>
+                      <span className="font-display font-semibold">Was das für Sie heißt: </span>
                       {item.action}
                     </p>
                     <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                      Quelle: {item.sourceName}
+                      Quelle: {item.sourceName} · {formatDate(item.date)}
                     </p>
                   </li>
                 </Reveal>

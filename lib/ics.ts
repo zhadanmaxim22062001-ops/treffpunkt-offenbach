@@ -1,4 +1,13 @@
-import type { Event } from "@/data/content";
+/** Minimal shape buildIcs needs — deliberately not tied to data/content.ts's Event, since OF-Radar deadlines (lib/radar-content.ts) use this too and have no venue. */
+export type IcsEvent = {
+  slug: string;
+  title: string;
+  summary: string;
+  /** Omit for anything without a physical venue (e.g. a Förderung deadline) — LOCATION is left out rather than guessing one. */
+  location?: string;
+  isoStart: string;
+  isoEnd?: string | null;
+};
 
 /**
  * The standard Europe/Berlin VTIMEZONE block: CEST from the last Sunday in
@@ -67,7 +76,7 @@ function foldLine(line: string): string {
  * set) become one all-day VEVENT spanning the range; single-day events
  * default to one all-day VEVENT for that day.
  */
-export function buildIcs(event: Event & { isoStart: string }): string {
+export function buildIcs(event: IcsEvent): string {
   const dtStart = isoDateToIcsDate(event.isoStart);
   const dtEnd = isoDateToIcsDate(dayAfter(event.isoEnd ?? event.isoStart));
   const now = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
@@ -86,7 +95,7 @@ export function buildIcs(event: Event & { isoStart: string }): string {
     `DTEND;VALUE=DATE:${dtEnd}`,
     foldLine(`SUMMARY:${escapeIcsText(event.title)}`),
     foldLine(`DESCRIPTION:${escapeIcsText(event.summary)}`),
-    foldLine(`LOCATION:${escapeIcsText(`${event.place}, Offenbach am Main`)}`),
+    ...(event.location ? [foldLine(`LOCATION:${escapeIcsText(event.location)}`)] : []),
     "END:VEVENT",
     "END:VCALENDAR",
   ];

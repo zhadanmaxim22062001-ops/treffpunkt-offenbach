@@ -46,9 +46,12 @@ npm run build    # production build, must pass with zero errors
   year or Satzung yet; the page says so rather than guessing or leaving a gap.
 - **`/kontakt`** — address, phone, mailto, and the one map the site renders
   locally: the association's own address, fetched by `scripts/fetch-verein-map.mjs`.
-- **`/radar`** — file-based, no database. Reads `data/radar.json` at build
-  time; shows an honest empty state while that file holds only specimens —
-  see "OF-Radar" below.
+- **`/radar`** and **`/radar/[slug]`** — file-based, no database. Reads
+  `data/radar.json` at build time; category filter chips, a "Für mich
+  relevant" local-only sort, a 12-week frequenz timeline, deadline
+  countdowns with `.ics` downloads, and an RSS feed at `/radar/feed.xml`.
+  Shows an honest empty state while the file holds only specimens — see
+  "OF-Radar" below.
 - 301 redirects from the old `.php` URLs in `next.config.ts`;
 - `tests/visual.spec.ts` (Playwright) — screenshots every route in both themes
   at 1360px and 420px and fails on any console error. See "Visual verification"
@@ -190,10 +193,9 @@ block in globals.css for CSS transitions) and keeps the `data-reveal` +
   stable 19.2.8 and don't export it. Bumping to canary on a site about to
   go to production is a real decision, not a drive-by add; parked until
   that's worth doing on purpose.
-- **Radar list stagger + chip fade-in.** `/radar`'s list is getting fully
-  rebuilt (filters, deadline countdown, timeline — see "OF-Radar" below),
-  so the per-item animation lands as part of that rebuild instead of
-  being written twice against a page about to be replaced.
+  (The radar list's per-item stagger and chip fade-in, also originally
+  listed here as deferred, landed as part of the OF-Radar rebuild below
+  instead of being written twice against a page that was about to change.)
 
 ## Hero background
 
@@ -246,17 +248,80 @@ always `"manual"`), read at build time by `lib/radar-content.ts`.
 
 `RADAR_ITEMS_ARE_PLACEHOLDER` (in `lib/radar-content.ts`, same pattern as the
 member-list guard) is `true` while `data/radar.json`'s `_note` field still
-says `TODO-COPY`. While true, `/radar` and the homepage teaser both show an
-honest "Der OF-Radar startet in Kürze" empty state and render nothing from
-the file. This exists because an earlier seed array briefly rendered
-fabricated headlines on the homepage attributed to real institutions (Stadt
-Offenbach, WIBank, IHK Offenbach am Main) that never published any of it —
-see the git history for the fix.
+says `TODO-COPY`. While true, `/radar`, `/radar/[slug]`, `/radar/feed.xml`,
+and the homepage teaser all show an honest "Der OF-Radar startet in Kürze"
+empty state and render nothing from the file.
 
-**Publishing a real item is: edit `data/radar.json`, remove the `TODO-COPY`
-note once every entry is real, commit.** `/radar` will render it — deadline
-shown when present, source linked out, urgency-high items get the accent
-rule — without any other code change.
+### What's on the page
+
+- **The list.** Dense, one item per entry: date, category chip, headline,
+  a plain-language summary, a tinted "Was das für Sie heißt" box (the one
+  sentence telling a business owner what to actually do), and a source
+  link with its own date. An item with `urgency: "high"` gets a left rule
+  in the site's one warm colour — reserved for exactly this.
+- **Category filter chips.** The six rubrics plus "Alle", as real links —
+  `/radar?kategorie=baustelle` is a page you can bookmark or send someone,
+  not just a UI state that resets on reload.
+- **"Für mich relevant."** A visitor can save their Branche and Straße —
+  stored only in their own browser (`localStorage`), never sent to us —
+  and the list re-sorts around it: matches float up, the rest dims but
+  never disappears. See `lib/radar-relevance.ts` for exactly how an item
+  is scored; it's a plain-text heuristic (does the item mention their
+  street, does the category usually matter to their Branche), not a claim
+  of precision.
+- **Deadlines.** An item with a `deadline` shows "noch N Tage", turning
+  the signal colour under two weeks out, plus a one-click `.ics` download
+  for the deadline date itself. The count is computed in the visitor's
+  own browser on page load — this page is prerendered at build time, so a
+  server-computed count would freeze at whatever it was on deploy day and
+  read wrong a week later.
+- **The frequenz timeline.** Every `frequenz`-category item due in the
+  next 12 weeks gets a marker on a horizontal timeline pinned above the
+  list, so "what's coming up" doesn't require reading every date in the
+  list below it.
+- **`/radar/feed.xml`.** A plain RSS 2.0 feed, built from the same file,
+  for anyone who'd rather subscribe than check back.
+
+### Publishing a real item (no coding required)
+
+1. Open `data/radar.json` in any text editor.
+2. Copy one of the existing entries inside `"items"` as a starting point
+   — everything between one `{` and its matching `}`.
+3. Fill in, in plain German:
+   - `category` — exactly one of: `rathaus`, `baustelle`, `foerderung`,
+     `frequenz`, `stadt`, `recht` (see the labels in
+     `lib/radar-content.ts` if you're unsure which fits).
+   - `headline` — short, specific, no clickbait.
+   - `summary` — two or three sentences of plain explanation.
+   - `action` — one sentence: what should a business actually *do* with
+     this? This is what shows in the blue "Was das für Sie heißt" box.
+   - `sourceName` and `sourceUrl` — where this came from, and a link to
+     it. Never publish something without a real source to point to.
+   - `date` — the day you're publishing it, as `YYYY-MM-DD`.
+   - `urgency` — `"low"`, `"mid"`, or `"high"`. Only use `"high"` for
+     something genuinely time-critical; it's the one item on the page
+     that gets a colour flag.
+   - `deadline` — a `YYYY-MM-DD` date if there's a real deadline attached
+     (a form due date, an application window closing), otherwise `null`.
+   - `slug` — a short, URL-safe, unique id (lowercase, hyphens, no
+     spaces) — this becomes the item's own address at `/radar/<slug>`.
+   - `origin` — leave as `"manual"`.
+4. Once **every** entry in the file is real (no more `BEISPIELQUELLE
+   (Testdaten)` placeholders left), delete the `_note` field at the very
+   top of the file — that's the switch that takes the whole page live.
+   Leaving it in place on purpose is fine while you're still filling in
+   real items; the page just keeps showing its "coming soon" message
+   until the note is gone.
+5. Save, commit, and redeploy. That's the entire publishing step — no
+   database, no admin panel, no build script to run first.
+
+This exists because an earlier seed array briefly rendered fabricated
+headlines on the homepage attributed to real institutions (Stadt
+Offenbach, WIBank, IHK Offenbach am Main) that never published any of it —
+see the git history for the fix. The guard above (`_note` /
+`RADAR_ITEMS_ARE_PLACEHOLDER`) is what makes that class of mistake
+structurally harder to repeat: the page simply won't show item content
+while the note says it's still specimens.
 
 ## Visual verification
 

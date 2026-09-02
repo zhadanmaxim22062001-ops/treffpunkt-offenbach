@@ -58,3 +58,9 @@ export const RADAR_ITEMS_ARE_PLACEHOLDER =
 export function getRadarItems(): RadarItem[] {
   return radarData.items as RadarItem[];
 }
+
+export function getRadarItemBySlug(slug: string): RadarItem | undefined {
+  return getRadarItems().find((item) => item.slug === slug);
+}
+
+export const RADAR_CATEGORY_LIST = Object.keys(RADAR_CATEGORIES) as RadarCategory[];

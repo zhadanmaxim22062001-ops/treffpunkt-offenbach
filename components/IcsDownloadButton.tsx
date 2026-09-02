@@ -1,9 +1,8 @@
 "use client";
 
-import type { Event } from "@/data/content";
-import { buildIcs } from "@/lib/ics";
+import { buildIcs, type IcsEvent } from "@/lib/ics";
 
-export function IcsDownloadButton({ event }: { event: Event & { isoStart: string } }) {
+export function IcsDownloadButton({ event, label = "Termin als .ics herunterladen" }: { event: IcsEvent; label?: string }) {
   function handleClick() {
     const blob = new Blob([buildIcs(event)], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -23,7 +22,7 @@ export function IcsDownloadButton({ event }: { event: Event & { isoStart: string
       className="border px-4 py-2 font-display text-[13px] font-semibold transition-colors duration-[120ms] hover:bg-accent-soft"
       style={{ borderColor: "var(--c-line)" }}
     >
-      Termin als .ics herunterladen
+      {label}
     </button>
   );
 }

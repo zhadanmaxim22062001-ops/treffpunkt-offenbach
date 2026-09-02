@@ -41,7 +41,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             {formatGermanDate(event.isoStart)}
             {event.isoEnd && ` – ${formatGermanDate(event.isoEnd)}`}
           </p>
-          <IcsDownloadButton event={event} />
+          <IcsDownloadButton
+            event={{
+              slug: event.slug,
+              title: event.title,
+              summary: event.summary,
+              location: `${event.place}, Offenbach am Main`,
+              isoStart: event.isoStart,
+              isoEnd: event.isoEnd,
+            }}
+          />
         </div>
       ) : (
         <p className="mt-8 inline-block px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em]" style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}>
