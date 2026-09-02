@@ -110,6 +110,16 @@ if it were real: `/mitglieder` shows an "under construction" message,
 `/mitglieder/[slug]` pages don't exist (`generateStaticParams` returns `[]`,
 `dynamicParams` is `false`), and the homepage marquee doesn't render.
 
+**The old site (`treffpunkt-of.de`) has no member list to migrate from.**
+Checked directly — five pages total (Startseite, Aktuell, Formulare, Vorstand,
+Impressum), none of them lists member businesses individually. The homepage
+does say, in its own words, that membership is broad ("In Offenbach sind alle
+relevanten Kaufhäuser und Gastronomen Mitglieder des Treffpunkt Offenbach" —
+see `/mitglied-werden` and the homepage, which now quote this directly), but
+that's a general claim, not a roster. The real list has to come from the
+board via the CSV template below — there is nothing to extract from the old
+site.
+
 ### Getting the real list live
 
 1. Send the board `data/member-template.csv` (German column headers, the current
