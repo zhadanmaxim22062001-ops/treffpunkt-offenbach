@@ -6,7 +6,9 @@ export const metadata = { title: "Styleguide", robots: { index: false, follow: f
 const COLORS = [
   ["Ink", "#0B2138", "Text, dunkle Sektionen"],
   ["Blau", "#0F5FA8", "F im Zeichen, CTA, Links"],
+  ["Blau, hell", "#E1EDF9", "Getönte Flächen — „Was das für Sie heißt“-Boxen"],
   ["Signal", "#A34515", "Nur Dringlichkeit und Fristen — sonst nichts"],
+  ["Signal, hell", "#FAE7DC", "Getönte Fläche für Signal, gleiche Regel"],
   ["Kalkweiß", "#F5F9FC", "Grundfläche"],
   ["Beton", "#C9D8E5", "Linien und Rahmen"],
 ];
@@ -70,6 +72,9 @@ export default function Styleguide() {
           <Chip tone="neutral">recht</Chip>
           <Chip tone="signal">noch 3 Tage</Chip>
         </div>
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+          Hover: Outline-Button zieht eine Linie unter dem Text, Card hebt sich 1px an und färbt den Rand Akzent.
+        </p>
         <Rule className="my-10" />
         <div className="grid gap-5 md:grid-cols-3">
           <Card><h3 className="font-display text-[17px] font-semibold">Card</h3>
