@@ -148,6 +148,53 @@ local fonts: a live map embed would mean every visitor's browser calling a
 third party and handing over their IP, which is exactly the problem the site
 otherwise avoids.
 
+## Animation
+
+One system, applied consistently, all in `components/motion.tsx` plus a
+handful of CSS classes in `app/globals.css`:
+
+- Hero headline: `LineReveal` masks each line in via `translateY` (never
+  `opacity`, so the h1 stays LCP-eligible from first paint), starting the
+  instant `.logo-draw`'s ring finishes (`HERO_TEXT_DELAY` in
+  `app/(site)/page.tsx` mirrors the 0.85s in globals.css by comment, not
+  by shared constant — if the ring's duration changes, update both).
+  Lead/buttons follow 150ms later via `MountReveal`.
+- `Header.tsx`'s active nav link gets a `layoutId`-based indicator that
+  slides between links on route change (Framer Motion shared layout).
+- Kennzahlen: `CountUp` now draws a thin accent rule under the number in
+  the same window it counts in — one `ref`/`inView` pair drives both, so
+  they can't drift apart.
+- `Card` gets a `.card-surface` hover treatment (border → accent, 1px
+  lift, no shadow/scale) via a CSS custom property, since the border
+  colour is also set per-instance (the `accent` prop) and a `:hover` rule
+  can't win against an inline `style.borderColor`.
+- The outline `Button` variant gets a growing 2px underline (`.btn-underline`,
+  same idea as `.link-underline` but without its text-specific padding).
+- Section headings reveal one beat (100ms) before the body content below
+  them, site-wide on the homepage.
+- `ScrollProgress` is a fixed 2px accent line at the top of the viewport,
+  bound directly to `useScroll()` — no spring, so it never moves except
+  in response to actual scrolling. The one ambient effect in the system.
+
+Everything above respects `prefers-reduced-motion` (component-level via
+`useReducedMotion`, plus the blanket `@media (prefers-reduced-motion: reduce)`
+block in globals.css for CSS transitions) and keeps the `data-reveal` +
+`<noscript>` fallback pattern already documented inline in
+`app/(site)/layout.tsx`.
+
+**Deliberately not done:**
+
+- **View Transitions API.** Next's own docs describe wrapping route
+  content in React's `<ViewTransition>`, but that component needs a
+  React canary build — the installed `react`/`react-dom` here are the
+  stable 19.2.8 and don't export it. Bumping to canary on a site about to
+  go to production is a real decision, not a drive-by add; parked until
+  that's worth doing on purpose.
+- **Radar list stagger + chip fade-in.** `/radar`'s list is getting fully
+  rebuilt (filters, deadline countdown, timeline — see "OF-Radar" below),
+  so the per-item animation lands as part of that rebuild instead of
+  being written twice against a page about to be replaced.
+
 ## Hero background
 
 The homepage hero and the inverted CTA strip have no photography — the site

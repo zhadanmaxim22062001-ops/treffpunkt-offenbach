@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { archivo, newsreader, plexMono } from "@/lib/fonts";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { SmoothScroll } from "@/components/motion";
+import { ScrollProgress, SmoothScroll } from "@/components/motion";
 import { VEREIN } from "@/data/verein";
 import "../globals.css";
 
@@ -61,6 +61,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           Zum Inhalt springen
         </a>
         <SmoothScroll />
+        <ScrollProgress />
         <Header />
         <main id="inhalt">{children}</main>
         <Footer />

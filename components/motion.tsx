@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { clsx } from "clsx";
+import { motion, useInView, useReducedMotion, useScroll } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /** Section reveal: 16px up + fade, once, ~60ms stagger. */
@@ -26,6 +27,94 @@ export function Reveal({
     >
       {children}
     </motion.div>
+  );
+}
+
+/**
+ * Hero headline reveal: each line masks in via translateY (never opacity),
+ * so the h1 stays LCP-eligible from first paint — only its clip position
+ * animates, nothing about "is this element rendered" changes. `lines` is a
+ * fixed, hand-chosen split (this wraps fixed brand copy, not dynamic data),
+ * each its own overflow-hidden mask. Pair with Heading's `ariaLabel` prop
+ * and mark this aria-hidden, since screen readers should get the sentence
+ * once, not line-by-line.
+ */
+export function LineReveal({
+  lines,
+  delay = 0,
+  stagger = 0.09,
+  className,
+}: {
+  lines: string[];
+  delay?: number;
+  stagger?: number;
+  className?: string;
+}) {
+  const reduce = useReducedMotion();
+  if (reduce) {
+    return (
+      <>
+        {lines.map((line, i) => (
+          <span key={i} className={clsx("block", className)}>
+            {line}
+          </span>
+        ))}
+      </>
+    );
+  }
+  return (
+    <>
+      {lines.map((line, i) => (
+        <span key={i} className="block overflow-hidden">
+          <motion.span
+            data-reveal
+            className={clsx("block", className)}
+            initial={{ y: "110%" }}
+            animate={{ y: "0%" }}
+            transition={{ duration: 0.6, delay: delay + i * stagger, ease: [0.4, 0, 0.15, 1] }}
+          >
+            {line}
+          </motion.span>
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** Fade+rise on mount rather than on scroll-into-view — for above-the-fold content (hero lead/buttons) that's visible immediately, so a scroll-triggered Reveal would never fire. */
+export function MountReveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const reduce = useReducedMotion();
+  if (reduce) return <div className={className}>{children}</div>;
+  return (
+    <motion.div
+      data-reveal
+      className={className}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: [0.4, 0, 0.15, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** 2px accent line at the top of the viewport tracking scroll position — the one ambient effect in the system. Bound directly to scroll, not a spring, so it never moves on its own. */
+export function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  return (
+    <motion.div
+      aria-hidden="true"
+      className="fixed left-0 top-0 z-[60] h-[2px] w-full origin-left bg-accent"
+      style={{ scaleX: scrollYProgress }}
+    />
   );
 }
 
@@ -63,9 +152,19 @@ export function CountUp({
   }, [inView, to, duration, reduce]);
 
   return (
-    <span ref={ref} className="tnum">
-      {value}
-      {suffix}
+    <span ref={ref} className="inline-block">
+      <span className="tnum">
+        {value}
+        {suffix}
+      </span>
+      {/* Thin rule draws left-to-right under the number in the same window it counts in — one motion value, one ref, so the two can't drift out of sync. */}
+      <motion.span
+        aria-hidden="true"
+        className="mt-2 block h-[2px] origin-left bg-accent"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: inView ? 1 : 0 }}
+        transition={{ duration: reduce ? 0 : duration / 1000, ease: [0.4, 0, 0.15, 1] }}
+      />
     </span>
   );
 }

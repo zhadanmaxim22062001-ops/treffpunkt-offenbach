@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 import { LogoMark } from "@/components/Logo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
-import { CountUp, Reveal } from "@/components/motion";
+import { CountUp, LineReveal, MountReveal, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
 import { LEISTUNGEN } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
@@ -12,6 +12,10 @@ import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/
 import { getHeroImagePath } from "@/lib/hero-image";
 
 const members = getAllMembers();
+
+// Matches .logo-draw .tpof-ring's 0.85s animation-duration in globals.css —
+// the headline starts revealing exactly as the ring closes, not before.
+const HERO_TEXT_DELAY = 0.85;
 
 export default function Home() {
   const next = getNextConfirmedEvent();
@@ -42,19 +46,27 @@ export default function Home() {
           <div className="grid items-center gap-12 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
             <div>
               <Eyebrow className="mb-6">Gewerbeverein · Offenbach am Main</Eyebrow>
-              <Heading level={1}>
-                Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach.
+              <Heading
+                level={1}
+                ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach."
+              >
+                <LineReveal
+                  delay={HERO_TEXT_DELAY}
+                  lines={["Der Gewerbeverein für Handel,", "Handwerk und Dienstleistung", "in Offenbach."]}
+                />
               </Heading>
-              <Lead className="mt-7 max-w-[46ch]">
-                Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
-                Stadt und Öffentlichkeit.
-              </Lead>
-              <div className="mt-9 flex flex-wrap gap-3">
-                <Button href="/mitglied-werden">Mitglied werden</Button>
-                <Button href="/radar" variant="outline">
-                  OF-Radar ansehen
-                </Button>
-              </div>
+              <MountReveal delay={HERO_TEXT_DELAY + 0.15}>
+                <Lead className="mt-7 max-w-[46ch]">
+                  Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
+                  Stadt und Öffentlichkeit.
+                </Lead>
+                <div className="mt-9 flex flex-wrap gap-3">
+                  <Button href="/mitglied-werden">Mitglied werden</Button>
+                  <Button href="/radar" variant="outline">
+                    OF-Radar ansehen
+                  </Button>
+                </div>
+              </MountReveal>
             </div>
 
             <div
@@ -90,11 +102,13 @@ export default function Home() {
 
       {/* ------------------------------------------- 3. Was wir machen */}
       <Section>
-        <Eyebrow className="mb-4">Was wir machen</Eyebrow>
-        <Heading className="max-w-[16ch]">Frequenz, Nachbarn, Einfluss.</Heading>
+        <Reveal>
+          <Eyebrow className="mb-4">Was wir machen</Eyebrow>
+          <Heading className="max-w-[16ch]">Frequenz, Nachbarn, Einfluss.</Heading>
+        </Reveal>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {LEISTUNGEN.map((l, i) => (
-            <Reveal key={l.title} delay={i * 0.06}>
+            <Reveal key={l.title} delay={0.1 + i * 0.06}>
               <Card className="h-full">
                 <h3 className="font-display text-[17px] font-semibold">{l.title}</h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-2">{l.body}</p>
@@ -106,27 +120,29 @@ export default function Home() {
 
       {/* ------------------------------------------- 4. OF-Radar teaser */}
       <Section tone="paper-2">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <Eyebrow className="mb-4">OF-Radar</Eyebrow>
-            <Heading className="max-w-[20ch]">Was diese Woche Ihr Geschäft betrifft.</Heading>
-            <p className="prose-body mt-5 text-[16px]">
-              Keine Stadtnachrichten, sondern ein Filter mit einer einzigen Frage: ändert das etwas für
-              einen Betrieb in Offenbach? Sechs Rubriken, jede Meldung mit Quelle, Datum und einem Satz
-              dazu, was jetzt zu tun ist.
-            </p>
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <Eyebrow className="mb-4">OF-Radar</Eyebrow>
+              <Heading className="max-w-[20ch]">Was diese Woche Ihr Geschäft betrifft.</Heading>
+              <p className="prose-body mt-5 text-[16px]">
+                Keine Stadtnachrichten, sondern ein Filter mit einer einzigen Frage: ändert das etwas für
+                einen Betrieb in Offenbach? Sechs Rubriken, jede Meldung mit Quelle, Datum und einem Satz
+                dazu, was jetzt zu tun ist.
+              </p>
+            </div>
+            <Button href="/radar" variant="outline">
+              Alle Meldungen
+            </Button>
           </div>
-          <Button href="/radar" variant="outline">
-            Alle Meldungen
-          </Button>
-        </div>
+        </Reveal>
 
         {radar.length > 0 ? (
           <ul className="mt-12 flex flex-col">
             {radar.map((item, i) => {
               const cat = RADAR_CATEGORIES[item.category];
               return (
-                <Reveal key={item.slug} delay={i * 0.06}>
+                <Reveal key={item.slug} delay={0.1 + i * 0.06}>
                   <li
                     className="border-t py-6"
                     style={{
@@ -207,8 +223,10 @@ export default function Home() {
       {/* --------------------------------------- 6. Nächste Veranstaltung */}
       {/* Only ever shows a specific date once lib/events.ts confirms one exists — see data/content.ts for why. */}
       <Section tone="paper-2">
-        <Eyebrow className="mb-4">Veranstaltungen</Eyebrow>
         <Reveal>
+          <Eyebrow className="mb-4">Veranstaltungen</Eyebrow>
+        </Reveal>
+        <Reveal delay={0.1}>
           {next ? (
             <article
               className="grid gap-8 border p-8 md:grid-cols-[auto_1fr] md:p-12"
@@ -252,13 +270,19 @@ export default function Home() {
       <Section tone="invert" backdrop={<BrandBackdrop inverse />}>
         <div className="grid items-center gap-10 md:grid-cols-[1.2fr_auto]">
           <div>
-            <Heading className="max-w-[18ch]" >Alleine ist die Innenstadt schwer zu bewegen.</Heading>
-            <p className="mt-5 max-w-[52ch] text-[17px] leading-relaxed" style={{ color: "var(--c-invert-fg)", opacity: 0.85 }}>
-              Mitglied werden heißt: bei den Formaten mitreden, die Frequenz bringen, die Nachbarn kennen
-              und die Meldungen bekommen, bevor sie zum Problem werden.
-            </p>
+            <Reveal>
+              <Heading className="max-w-[18ch]">Alleine ist die Innenstadt schwer zu bewegen.</Heading>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-5 max-w-[52ch] text-[17px] leading-relaxed" style={{ color: "var(--c-invert-fg)", opacity: 0.85 }}>
+                Mitglied werden heißt: bei den Formaten mitreden, die Frequenz bringen, die Nachbarn kennen
+                und die Meldungen bekommen, bevor sie zum Problem werden.
+              </p>
+            </Reveal>
           </div>
-          <Button href="/mitglied-werden">Jetzt Mitglied werden</Button>
+          <Reveal delay={0.1}>
+            <Button href="/mitglied-werden">Jetzt Mitglied werden</Button>
+          </Reveal>
         </div>
       </Section>
     </>

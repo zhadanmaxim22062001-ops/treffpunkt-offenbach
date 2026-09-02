@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { clsx } from "clsx";
+import { motion, useReducedMotion } from "motion/react";
 import { LogoLockup } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -18,6 +19,7 @@ const NAV = [
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
 
   return (
     <header
@@ -43,11 +45,21 @@ export function Header() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={clsx(
-                  "link-underline font-display text-[14px] font-medium transition-colors duration-[120ms]",
+                  "link-underline relative font-display text-[14px] font-medium transition-colors duration-[120ms]",
                   active ? "text-accent" : "text-ink-2 hover:text-ink",
                 )}
               >
                 {item.label}
+                {active &&
+                  (reduce ? (
+                    <span className="absolute inset-x-0 -bottom-[13px] h-[2px] bg-accent" />
+                  ) : (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-x-0 -bottom-[13px] h-[2px] bg-accent"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
+                  ))}
               </Link>
             );
           })}

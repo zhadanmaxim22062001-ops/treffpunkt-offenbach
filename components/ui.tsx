@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /* ------------------------------------------------------------------
    Shared primitives. Visual language is a printed spec sheet, not a
@@ -53,10 +53,13 @@ export function Heading({
   children,
   level = 2,
   className,
+  ariaLabel,
 }: {
   children: ReactNode;
   level?: 1 | 2 | 3;
   className?: string;
+  /** Set when children is a decorative animated split (e.g. per-line reveal) that shouldn't be read node-by-node. */
+  ariaLabel?: string;
 }) {
   const Tag = (["h1", "h2", "h3"] as const)[level - 1];
   const size =
@@ -65,7 +68,11 @@ export function Heading({
       : level === 2
         ? "text-[clamp(26px,3.4vw,40px)] leading-[1.05] tracking-[-0.03em] font-extrabold"
         : "text-[19px] leading-snug tracking-[-0.012em] font-semibold";
-  return <Tag className={clsx(size, className)}>{children}</Tag>;
+  return (
+    <Tag className={clsx(size, className)} aria-label={ariaLabel}>
+      {ariaLabel ? <span aria-hidden="true">{children}</span> : children}
+    </Tag>
+  );
 }
 
 export function Lead({ children, className }: { children: ReactNode; className?: string }) {
@@ -88,7 +95,7 @@ export function Button({ children, href, variant = "solid", className }: ButtonP
     "inline-flex items-center gap-2 px-5 py-3 font-display text-[14px] font-semibold tracking-[-0.005em] transition-colors duration-[120ms]";
   const styles = {
     solid: "bg-accent text-on-accent hover:brightness-110",
-    outline: "border text-ink hover:bg-accent-soft",
+    outline: "border text-ink hover:bg-accent-soft btn-underline",
     ghost: "text-ink hover:text-accent",
   }[variant];
   return (
@@ -113,8 +120,8 @@ export function Card({
 }) {
   return (
     <div
-      className={clsx("bg-paper-2 border p-5", className)}
-      style={{ borderColor: accent ? "var(--c-accent)" : "var(--c-line)" }}
+      className={clsx("card-surface bg-paper-2 border p-5", className)}
+      style={{ "--card-border": accent ? "var(--c-accent)" : "var(--c-line)" } as CSSProperties}
     >
       {children}
     </div>
