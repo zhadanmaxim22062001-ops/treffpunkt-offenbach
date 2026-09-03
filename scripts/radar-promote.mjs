@@ -54,7 +54,8 @@ async function main() {
     if (inbox.proposals?.length) {
       console.log("Offene Vorschläge in data/radar.inbox.json:");
       for (const p of inbox.proposals) {
-        console.log(`  ${p.id}  [${p.status}]  ${p.headlineSource}`);
+        const ready = p.headlineDe?.trim() ? "bereit" : "noch offen";
+        console.log(`  ${p.id}  [${ready}]  ${p.headlineSource}`);
       }
     } else {
       console.log("data/radar.inbox.json enthält aktuell keine Vorschläge.");
@@ -91,12 +92,7 @@ async function main() {
     return;
   }
   if (!p.headlineDe?.trim() || !p.summaryDe?.trim() || !p.actionDe?.trim()) {
-    const hint =
-      p.status === "needs_human"
-        ? " Diese Meldung ist als needs_human markiert (foerderung/recht) — der deutsche Text muss von Hand " +
-          "geschrieben werden, bevor sie veröffentlicht werden kann."
-        : "";
-    fail(`headlineDe, summaryDe und actionDe müssen alle drei ausgefüllt sein, bevor veröffentlicht wird.${hint}`);
+    fail("headlineDe, summaryDe und actionDe müssen alle drei von Hand ausgefüllt sein, bevor veröffentlicht wird.");
     return;
   }
 
