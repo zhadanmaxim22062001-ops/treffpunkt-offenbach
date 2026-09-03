@@ -8,10 +8,6 @@ export const metadata: Metadata = {
   description: "Der Vorstand des Gewerbevereins Treffpunkt Offenbach e. V. und wofür der Verein steht.",
 };
 
-const vorsitzende = VORSTAND.filter((v) => v.role.includes("Vorsitzende"));
-const kasseSchrift = VORSTAND.filter((v) => v.role.includes("Kassierer") || v.role.includes("Schriftführer"));
-const beisitzer = VORSTAND.filter((v) => v.role.includes("Beisitzer"));
-
 export default function Page() {
   return (
     <>
@@ -36,32 +32,15 @@ export default function Page() {
           Der Vorstand des Gewerbevereins Treffpunkt Offenbach e. V.
         </p>
 
-        {/* Vorsitzende: two, first and largest. */}
-        <ul className="mt-10 grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          {vorsitzende.map((v) => (
-            <li key={v.name} className="border-t pt-5" style={{ borderColor: "var(--c-line)" }}>
+        {/* One plain list, in the order the association itself uses — nine
+            rows, which is odd, so a single column stays even; a two-column
+            grid would leave one row stranded. Space, not rules, separates
+            them. */}
+        <ul className="mt-10 flex flex-col gap-7 max-w-[28ch]">
+          {VORSTAND.map((v) => (
+            <li key={v.name}>
               <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{v.role}</p>
-              <p className="mt-1 font-display text-[24px] font-semibold tracking-[-0.01em]">{v.name}</p>
-            </li>
-          ))}
-        </ul>
-
-        {/* Kassierer und Schriftführer. */}
-        <ul className="mt-8 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-          {kasseSchrift.map((v) => (
-            <li key={v.name} className="border-t pt-4" style={{ borderColor: "var(--c-line)" }}>
-              <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{v.role}</p>
-              <p className="mt-1 font-display text-[17px] font-semibold">{v.name}</p>
-            </li>
-          ))}
-        </ul>
-
-        {/* Beisitzer: quieter grid. */}
-        <ul className="mt-8 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
-          {beisitzer.map((v) => (
-            <li key={v.name} className="border-t pt-3" style={{ borderColor: "var(--c-line)" }}>
-              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">{v.role}</p>
-              <p className="mt-1 font-display text-[14px] font-semibold">{v.name}</p>
+              <p className="mt-1 font-display text-[19px] font-semibold">{v.name}</p>
             </li>
           ))}
         </ul>
@@ -99,8 +78,7 @@ export default function Page() {
           </a>
         </address>
         <p className="mt-8 font-mono text-[12px] text-muted">
-          TODO-COPY: Satzung und eine ausführlichere Vereinsgeschichte stellen wir hier bereit, sobald sie uns
-          vorliegen.
+          Satzung und eine ausführlichere Vereinsgeschichte folgen an dieser Stelle.
         </p>
       </Section>
     </>
