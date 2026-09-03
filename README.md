@@ -80,8 +80,9 @@ identity, not a recurring issue.
   see "OF-Radar" below for the full intake and visibility design.
 - 301 redirects from the old `.php` URLs in `next.config.ts`;
 - `tests/visual.spec.ts` (Playwright) — screenshots every route in both themes
-  at 1360px and 420px and fails on any console error. See "Visual verification"
-  below.
+  at 1360/900/420/360px and fails on any console error or warning, plus checks
+  for horizontal overflow and images missing explicit dimensions. See "Visual
+  verification" below.
 
 ### What's left
 
@@ -235,19 +236,48 @@ block in globals.css for CSS transitions) and keeps the `data-reveal` +
 
 ## Hero background
 
-The homepage hero and the inverted CTA strip have no photography — the site
-has no rights to any photo of Offenbach, and a Verein site running an
-unlicensed city photo is a real risk, not a theoretical one. Instead
-`components/BrandBackdrop.tsx` draws a soft token-based gradient plus a giant,
-very faint OF-Siegel bleeding off the frame, built from the same path data as
-the real logo (`MARK_PRIMARY_PATHS` in `components/Logo.tsx`) so it can never
-drift from the mark. Flat CSS only, `aria-hidden`, no layout impact.
+The homepage hero now renders a real photo of Offenbach
+(`public/hero/offenbach-innenstadt.jpg`, a Wikimedia Commons aerial), full-bleed
+via `next/image`, with a navy scrim (left-to-right, strongest under the
+headline) so the text stays readable and the brand mark draws on over the
+skyline. The inverted CTA strip still has no photography and uses the flat
+gradient below.
 
-**If the association supplies their own photo** (Offenbacher Woche,
-Lichterfest, or similar), drop it at `public/hero/innenstadt.jpg` and rebuild
-— `lib/hero-image.ts` picks it up automatically and the hero switches to a
-`next/image` with a dark overlay for text contrast. No code change needed.
-Nothing currently exists at that path.
+**The photo only renders when it's fully credited.** `data/media.ts` defines
+`HERO_PHOTO_CREDIT` (author, licence name + URL, source file-page URL, and a
+required note on what was changed) and an `isMediaCreditComplete()` guard;
+`lib/hero-image.ts` returns the image path only when every field is filled in
+*and* the file exists on disk. If either is missing, the hero silently falls
+back to `components/BrandBackdrop.tsx` — the same soft token-based gradient
+plus giant, very faint OF-Siegel (built from `MARK_PRIMARY_PATHS`) it always
+used. Same guard pattern as `MEMBERS_ARE_PLACEHOLDER` /
+`RADAR_ITEMS_ARE_PLACEHOLDER`: a copyrighted image can't ship uncredited by
+accident, on purpose or otherwise.
+
+A small credit line renders beneath the hero (author, licence linked to the
+deed, a link to the file page), and every image on the site is listed in full
+under "Bildnachweise" on `/impressum` — including the `/kontakt` map's
+OpenStreetMap attribution, which `components/StaticMap.tsx`'s colour
+filtering deliberately leaves untouched and legible.
+
+**Licensing scope — read this before touching the hero photo again.** The
+current photo is CC BY-SA 4.0 (Adrianflamind, via Wikimedia Commons), and it
+was cropped/recompressed for this site, which is a "change" the licence
+requires disclosing (done — see the credit line and Bildnachweise entry).
+**ShareAlike attaches to the adapted image file, not to the website.** Our
+resized, recompressed copy of that photo is itself available under
+CC BY-SA 4.0 to anyone who takes it from here — but the site's own code and
+text are a separate work and are not put under CC BY-SA by sitting next to
+it. Don't let "ShareAlike" get read as "the whole repo is now CC BY-SA
+licensed"; it isn't, and nothing here changes that. If a future photo swap
+uses a differently-licensed image, update this note to match that licence's
+actual terms rather than copying this paragraph forward unchanged.
+
+**Swapping the photo:** replace the file, update every field in
+`HERO_PHOTO_CREDIT` in `data/media.ts` to match the new image's real licence
+and source, and rebuild. Leaving any field blank (or leaving the old data
+pointing at a file that no longer exists) drops the hero back to the
+geometric fallback automatically — that's the safe failure mode, not a bug.
 
 ## Events and dates
 
@@ -480,8 +510,9 @@ npx playwright test                           # runs tests/visual.spec.ts
 ```
 
 Screenshots land in `test-results/visual/` (gitignored) — every route, both
-themes, 1360px and 420px, and the run fails on any console error. Read the
-PNGs afterwards; a passing run only proves nothing crashed, not that the
+themes, 1360/900/420/360px, and the run fails on any console error or
+warning, horizontal overflow, or an image missing explicit dimensions. Read
+the PNGs afterwards; a passing run only proves nothing crashed, not that the
 layout looks right.
 
 One thing worth knowing if you add new full-page screenshots elsewhere:
