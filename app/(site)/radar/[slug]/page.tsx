@@ -72,13 +72,19 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         <p className="prose-body mt-6 max-w-[60ch] text-[17px]">{item.summary}</p>
 
-        <p
-          className="mt-6 inline-block max-w-[60ch] px-4 py-3 text-[15px]"
-          style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
-        >
-          <span className="font-display font-semibold">Was das für Sie heißt: </span>
-          {item.action}
-        </p>
+        {item.place && (
+          <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.1em] text-muted">Ort: {item.place}</p>
+        )}
+
+        {item.action && (
+          <p
+            className="mt-6 inline-block max-w-[60ch] px-4 py-3 text-[15px]"
+            style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
+          >
+            <span className="font-display font-semibold">Was das für Sie heißt: </span>
+            {item.action}
+          </p>
+        )}
 
         {item.deadline && (
           <RadarDeadline slug={item.slug} headline={item.headline} summary={item.summary} deadline={item.deadline} />
@@ -89,6 +95,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <a href={item.sourceUrl} className="link-underline" target="_blank" rel="noopener noreferrer">
             {item.sourceName} · {formatDate(item.date)}
           </a>
+          {item.origin === "auto" && " · Automatisch aus der Quelle übernommen"}
         </p>
       </div>
 

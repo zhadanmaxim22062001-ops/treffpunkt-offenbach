@@ -20,13 +20,22 @@ export type RadarItem = {
   category: RadarCategory;
   headline: string;
   summary: string;
-  action: string;
+  /** Omitted for automatically published frequenz entries — a "Was das für
+   *  Sie heißt" line is interpretation, and a machine doesn't write those.
+   *  Always present on hand-published items. */
+  action?: string;
+  /** Where, for calendar entries — one of the four source-stated facts an
+   *  automated frequenz entry is allowed to carry (title, date, place, link). */
+  place?: string;
   sourceName: string;
   sourceUrl: string;
   date: string;
   urgency: RadarUrgency;
   deadline?: string | null;
-  origin: "manual";
+  /** "manual": a human wrote the German copy. "auto": published by the
+   *  GitHub Actions workflow (frequenz only) straight from source-stated
+   *  facts, no interpretation — see scripts/radar-auto-calendar.mjs. */
+  origin: "manual" | "auto";
   /** Stays visible regardless of age or event date — an override for items
    *  (like a delayed committee session) that remain relevant longer than the
    *  usual window can know. See isRadarItemVisible below. */

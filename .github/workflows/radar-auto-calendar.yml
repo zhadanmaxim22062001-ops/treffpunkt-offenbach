@@ -1,0 +1,80 @@
+name: OF-Radar Kalender
+
+# Proposes CALENDAR (frequenz) entries only, straight facts from the source
+# (title, date, place, link — no interpretation), via a pull request. Never
+# touches the business list (rathaus/baustelle/foerderung/stadt/recht) —
+# those stay hand-written, always, and never run through this workflow.
+# Never pushes to master directly; only ever opens or updates one PR.
+# See scripts/radar-auto-calendar.mjs and README's OF-Radar section.
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily, 06:00 UTC
+  workflow_dispatch: {} # for a manual run — see README for how to trigger one
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Only one run at a time, and never cancel a run that's mid-way through
+# writing/pushing — a cancelled push could leave the branch half-updated.
+concurrency:
+  group: radar-auto-calendar
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # No secrets used here — this step only reads two public RSS feeds and
+      # writes local files. The GITHUB_TOKEN below is only for the git push
+      # and PR steps that follow, not for this one.
+      - name: Fetch and classify calendar candidates
+        id: fetch
+        run: node scripts/radar-auto-calendar.mjs
+
+      - name: Commit changes to the radar branch
+        id: commit
+        if: steps.fetch.outputs.has_changes == 'true'
+        run: |
+          if git diff --quiet -- data/radar.json data/radar.seen.json; then
+            echo "No file changes to commit (everything today was dropped as non-event noise)."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B radar/auto-calendar
+          git add data/radar.json data/radar.seen.json
+          git commit -m "OF-Radar: neue Termine (automatisch)"
+          git push --force origin radar/auto-calendar
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the pull request
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh pr view radar/auto-calendar --json state --jq .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit radar/auto-calendar \
+              --title "OF-Radar: neue Termine" \
+              --body-file "${{ steps.fetch.outputs.pr_body_path }}"
+          else
+            gh pr create \
+              --base master \
+              --head radar/auto-calendar \
+              --title "OF-Radar: neue Termine" \
+              --body-file "${{ steps.fetch.outputs.pr_body_path }}"
+          fi
