@@ -8,7 +8,11 @@ email service, no AI API, no login screen. Every route needs nothing but the
 files in this repo; the only environment variable v1 uses at all is
 `NEXT_PUBLIC_SITE_URL`. That was a deliberate scope cut for the first
 deploy, not the original plan — see "v2, parked" below for what was built
-and set aside, and why.
+and set aside, and why. The one piece of automation in the whole project is
+a GitHub Actions workflow that proposes OF-Radar calendar entries via a
+pull request (see "OF-Radar" below) — it needs no secret beyond the
+built-in `GITHUB_TOKEN` and never touches the business list, so it doesn't
+change that "zero external services" story for anything a visitor sees.
 
 ## Running locally
 
@@ -17,6 +21,22 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build    # production build, must pass with zero errors
 ```
+
+## Deploying
+
+The repo lives at `github.com/<owner>/treffpunkt-offenbach` and is
+connected to a Vercel project of the same name — **a push to `master`
+deploys automatically**, same as any other Vercel Git integration. Merging
+a pull request (including the OF-Radar bot's) is a deploy. There's no CLI
+step in the normal loop: edit, commit, push (or merge), done.
+
+The `npx vercel --prod --token …` flow from before the repo existed still
+works — `.env.deploy` still holds a token for it — but it's a fallback for
+a one-off manual deploy, not the routine path anymore. A first-time push
+from a GitHub identity Vercel hasn't seen before on this team can land in
+a `BLOCKED` state pending a one-click approval in the Vercel dashboard
+(`vercel.com/<team>/<project>/<deployment-id>`) — a one-time thing per
+identity, not a recurring issue.
 
 ## What's built
 
@@ -51,11 +71,13 @@ npm run build    # production build, must pass with zero errors
 - **`/kontakt`** — address, phone, mailto, and the one map the site renders
   locally: the association's own address, fetched by `scripts/fetch-verein-map.mjs`.
 - **`/radar`** and **`/radar/[slug]`** — file-based, no database. Reads
-  `data/radar.json` at build time; category filter chips, a "Für mich
-  relevant" local-only sort, a 12-week frequenz timeline, deadline
-  countdowns with `.ics` downloads, and an RSS feed at `/radar/feed.xml`.
-  Shows an honest empty state while the file holds only specimens — see
-  "OF-Radar" below.
+  `data/radar.json`; a 12-week Innenstadt calendar (association events +
+  `frequenz` items) leads the page, a strict, hand-written business list
+  with category filter chips and a "Für mich relevant" local-only sort
+  follows, deadline countdowns get `.ics` downloads, and there's an RSS
+  feed at `/radar/feed.xml`. Items age out of lists on a relevance window
+  (30 days by default, with exceptions) but their own pages never break —
+  see "OF-Radar" below for the full intake and visibility design.
 - 301 redirects from the old `.php` URLs in `next.config.ts`;
 - `tests/visual.spec.ts` (Playwright) — screenshots every route in both themes
   at 1360px and 420px and fails on any console error. See "Visual verification"
@@ -256,12 +278,14 @@ start *time* the moment one exists.
 
 File-based, no database (the earlier Neon/cron/admin design stays parked,
 see "v2, parked" above — this isn't a stepping stone toward it, it's a
-deliberately different, simpler approach: a local script proposes items,
-a human writes two sentences, a commit publishes them). `data/radar.json`
-holds the same field shape the parked Drizzle schema used (`category`,
-`headline`, `summary`, `action`, `sourceName`, `sourceUrl`, `date`,
-`urgency`, optional `deadline`, `origin` always `"manual"`), read at build
-time by `lib/radar-content.ts`.
+deliberately different, simpler approach). Two intake paths feed one file,
+`data/radar.json`, which holds the same field shape the parked Drizzle
+schema used (`category`, `headline`, `summary`, optional `action`,
+`sourceName`, `sourceUrl`, `date`, `urgency`, optional `deadline`, optional
+`place`, `origin` — `"manual"` or `"auto"`), read at build time by
+`lib/radar-content.ts`. Git is the editorial gate for both paths: nothing
+reaches the site without a commit, and nothing reaches `master` without
+either a human running a script locally or a human merging a pull request.
 
 `RADAR_ITEMS_ARE_PLACEHOLDER` (in `lib/radar-content.ts`, same pattern as the
 member-list guard) is `true` while `data/radar.json`'s `_note` field still
@@ -302,13 +326,93 @@ static, unlike the rest of the site. Still zero external services — no
 database, no API call — just server-rendered per request instead of
 served as a static file.
 
+### Two intake paths — one strict, one automatic
+
+**Local, for the business list (`npm run radar:fetch`).** Runs on your own
+machine, never in CI. Fetches both sources (see "Sources" below), applies
+the Offenbach filter, dedupes against `data/radar.seen.json`, and writes
+unclassified proposals to `data/radar.inbox.json` — headline, source,
+date, link, nothing else. You write the German (`category`, `headlineDe`,
+`summaryDe`, `actionDe`, `urgency`, optional `deadline`) directly into that
+file, by hand, for whichever proposals are actually worth publishing. Then:
+
+```bash
+npm run radar:fetch              # writes/updates data/radar.inbox.json
+# ...edit data/radar.inbox.json, fill in the German fields for one item...
+npm run radar:promote -- <id>    # moves it into data/radar.json, strips inbox-only fields
+```
+
+`radar:promote` refuses to publish anything missing `sourceName`,
+`sourceUrl`, a valid `date`, a real `category`/`urgency`, or any of the
+three German fields — there's no way to accidentally publish a stub.
+Editing `data/radar.json` directly, with no script at all, works exactly
+as well; the scripts are a convenience, not a gate.
+
+**Automatic, for the calendar only (GitHub Actions, `.github/workflows/radar-auto-calendar.yml`).**
+Runs daily (and on demand — see below), and can *only* ever produce
+`frequenz` calendar entries. It cannot write a business-list item; the
+script it runs (`scripts/radar-auto-calendar.mjs`) doesn't even attempt to
+classify one. An item is auto-published only when its own title states all
+three of: an event word (Markt, Fest, Führung, Wanderung, …) with no
+cancellation/notice word alongside it, an explicit "am DD. Monat" date, and
+a recognized Innenstadt place name — no interpretation, no inference. Every
+auto-published item is stamped `origin: "auto"` and gets a small
+"Automatisch aus der Quelle übernommen" note on its own page. Anything that
+looked event-ish but was missing a date or a recognizable place lands as a
+link under "Zur Prüfung" in the pull request instead — genuinely mundane
+items (office closures, drills, meetings) are silently dropped, not listed,
+so the review section stays short instead of recreating the classifier's
+noise problem in a different shape.
+
+The workflow **never pushes to `master`.** It force-pushes a single
+`radar/auto-calendar` branch and opens or updates one pull request titled
+**"OF-Radar: neue Termine"**. Merging that PR is the entire publishing
+step — Vercel deploys on merge, same as any other commit. No secret beyond
+the built-in `GITHUB_TOKEN` is used; the workflow only reads two public
+feeds and writes to the repo it already runs in.
+
+**Running it by hand:** GitHub → **Actions** tab → **OF-Radar Kalender** →
+**Run workflow**. Same as `gh workflow run "OF-Radar Kalender"` from the
+CLI. Useful for testing changes to the script, or just checking early.
+
+**Sources**, kept in `scripts/lib/radar-sources.mjs` and shared by both
+paths — offenbach.de's own Meldungen feed (official, unfiltered — see the
+comment there for why) and OF-News.de (regional, so it gets the real
+Offenbach-term filter). hessenschau.de and op-online.de are deliberately
+excluded, with the reasons recorded right there so nobody re-adds them
+without re-reading why.
+
+### Staying relevant — and stopping being relevant
+
+Nothing sits on `/radar` forever just because it was published once.
+`isRadarItemVisible` (`lib/radar-content.ts`) decides, checked fresh
+against the actual request date every time (never baked into a static
+build — see the note on `/radar` being dynamic above; the homepage and
+`/radar/feed.xml` are static but revalidate hourly for the same reason):
+
+1. `pinned: true` always wins — for something like a delayed committee
+   session that stays relevant on its own timeline, not a generic one.
+2. `frequenz` items stay in the calendar through their own event date,
+   then drop off — a market that already happened isn't upcoming.
+3. An item with a `deadline` stays visible until that deadline passes,
+   however old it otherwise looks.
+4. Everything else: 30 days from `date`.
+
+This only ever governs whether an item shows up in a list or the
+calendar. An item's own `/radar/<slug>` page keeps resolving forever
+regardless — a link someone bookmarked or shared never 404s just because
+the item aged out of the list.
+
 ### What's on the page
 
 - **The list.** Dense, one item per entry: date, category chip, headline,
   a plain-language summary, a tinted "Was das für Sie heißt" box (the one
   sentence telling a business owner what to actually do), and a source
   link with its own date. An item with `urgency: "high"` gets a left rule
-  in the site's one warm colour — reserved for exactly this.
+  in the site's one warm colour — reserved for exactly this. The "Was das
+  für Sie heißt" box only appears when `action` is set — every hand-
+  published item has one, an automatically published calendar entry never
+  does (that line is interpretation; see "Two intake paths" above).
 - **Category filter chips.** The five business rubrics plus "Alle", as real
   links — `/radar?kategorie=baustelle` is a page you can bookmark or send
   someone, not just a UI state that resets on reload. `frequenz` isn't a
@@ -333,46 +437,40 @@ served as a static file.
 - **`/radar/feed.xml`.** A plain RSS 2.0 feed, built from the same file,
   for anyone who'd rather subscribe than check back.
 
-### Publishing a real item (no coding required)
+### Publishing a real item without either script
 
-1. Open `data/radar.json` in any text editor.
-2. Copy one of the existing entries inside `"items"` as a starting point
-   — everything between one `{` and its matching `}`.
-3. Fill in, in plain German:
-   - `category` — exactly one of: `rathaus`, `baustelle`, `foerderung`,
-     `frequenz`, `stadt`, `recht` (see the labels in
-     `lib/radar-content.ts` if you're unsure which fits).
-   - `headline` — short, specific, no clickbait.
-   - `summary` — two or three sentences of plain explanation.
-   - `action` — one sentence: what should a business actually *do* with
-     this? This is what shows in the blue "Was das für Sie heißt" box.
-   - `sourceName` and `sourceUrl` — where this came from, and a link to
-     it. Never publish something without a real source to point to.
-   - `date` — the day you're publishing it, as `YYYY-MM-DD`.
-   - `urgency` — `"low"`, `"mid"`, or `"high"`. Only use `"high"` for
-     something genuinely time-critical; it's the one item on the page
-     that gets a colour flag.
-   - `deadline` — a `YYYY-MM-DD` date if there's a real deadline attached
-     (a form due date, an application window closing), otherwise `null`.
-   - `slug` — a short, URL-safe, unique id (lowercase, hyphens, no
-     spaces) — this becomes the item's own address at `/radar/<slug>`.
-   - `origin` — leave as `"manual"`.
-4. Once **every** entry in the file is real (no more `BEISPIELQUELLE
-   (Testdaten)` placeholders left), delete the `_note` field at the very
-   top of the file — that's the switch that takes the whole page live.
-   Leaving it in place on purpose is fine while you're still filling in
-   real items; the page just keeps showing its "coming soon" message
-   until the note is gone.
-5. Save, commit, and redeploy. That's the entire publishing step — no
-   database, no admin panel, no build script to run first.
+The fetch/promote scripts (see "Two intake paths" above) are the normal
+path, but nothing about the format requires them. `data/radar.json` is
+plain JSON: open it, copy one existing entry inside `"items"` as a
+template, fill in `category` (one of `rathaus`, `baustelle`, `foerderung`,
+`frequenz`, `stadt`, `recht`), `headline`, `summary`, optionally `action`
+(the "Was das für Sie heißt" line — required for every business category,
+never write one for a `frequenz` item you didn't personally verify),
+`sourceName` + `sourceUrl` (never publish without a real source),
+`date` (`YYYY-MM-DD`), `urgency` (`"low"`/`"mid"`/`"high"` — `"high"` only
+for something genuinely time-critical), `deadline` (a real date or `null`,
+never invented), a unique `slug`, and `origin: "manual"`. Save, commit,
+deploy — no database, no admin panel, no build script required first.
 
-This exists because an earlier seed array briefly rendered fabricated
-headlines on the homepage attributed to real institutions (Stadt
-Offenbach, WIBank, IHK Offenbach am Main) that never published any of it —
-see the git history for the fix. The guard above (`_note` /
-`RADAR_ITEMS_ARE_PLACEHOLDER`) is what makes that class of mistake
-structurally harder to repeat: the page simply won't show item content
-while the note says it's still specimens.
+If `data/radar.json` still carries its `_note` field (only true before the
+very first real item is published), delete that field once every entry is
+real — that's the switch `RADAR_ITEMS_ARE_PLACEHOLDER` reads. This exists
+because an earlier seed array briefly rendered fabricated headlines on the
+homepage attributed to real institutions (Stadt Offenbach, WIBank, IHK
+Offenbach am Main) that never published any of it — see the git history
+for the fix.
+
+### What the first live sample found
+
+Running `radar:fetch` against both feeds for real (no classifier — see
+"Two intake paths" above for why that was removed) surfaced 40 candidate
+items. Four were genuinely worth publishing. That 10% hit rate is the
+expected shape of this module, not a shortfall to optimize away — the
+whole design (a strict business list, a low-bar calendar, an automatic
+path that only ever touches the calendar) is built around most feed
+volume being noise for a business owner. A month that produces three
+business-list items and a handful of calendar entries is this module
+working correctly, not underperforming.
 
 ## Visual verification
 
@@ -416,7 +514,10 @@ one on its own. Last run against the production build: **100 / 100 / 100 /
 - The real event calendar — dates for the next Offenbacher Woche, Lichterfest,
   verkaufsoffene Sonntage, and the Weihnachtsbeleuchtung period (see "Events
   and dates" above);
-- Real OF-Radar items to replace the specimens in `data/radar.json`;
+- More OF-Radar business-list items as they come up — run `npm run
+  radar:fetch` periodically and check `data/radar.inbox.json`, or just
+  watch for the "OF-Radar: neue Termine" pull request the GitHub Actions
+  workflow opens for calendar entries;
 - Vereinsregister number and founding year, for the Impressum and `/verein`;
 - Membership fee amounts, for the open fee table on `/mitglied-werden`;
 - Confirmation that an AVV (data processing agreement) is in place with
