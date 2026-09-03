@@ -61,6 +61,15 @@
      (6.5:1) — don't assume the same text color works on both.
   */
   --c-on-accent: #ffffff;
+  /* Deliberately declared ONLY here, never redefined in the dark-theme
+     blocks below — a photograph doesn't re-theme itself, so its overlay and
+     the mark drawn over it can't use --c-ink/--c-paper (which flip per
+     theme and would invert the overlay and hide the mark in dark mode).
+     With no dark-mode override, these two stay fixed at the light theme's
+     ink/paper values regardless of the active theme — see the homepage
+     hero in app/(site)/page.tsx. */
+  --c-hero-scrim: #0b2138;
+  --c-hero-ink: #f5f9fc;
   color-scheme: light;
 }
 
@@ -244,6 +253,38 @@
 @keyframes tpof-marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+/* StaticMap tile grid — raw OSM tiles are full-colour and clash with the
+   token palette. Grayscale + a contrast lift make them read as part of the
+   site in light theme; dark theme inverts and darkens instead, which is
+   the standard trick for keeping map tiles legible against a dark ground.
+   Scoped to the tile grid only (not the marker, not the attribution text)
+   so both stay unaffected and legible. */
+.map-tiles {
+  filter: grayscale(1) contrast(1.15);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .map-tiles {
+    filter: grayscale(1) contrast(1.15) invert(0.92) brightness(0.85);
+  }
+}
+:root[data-theme="dark"] .map-tiles {
+  filter: grayscale(1) contrast(1.15) invert(0.92) brightness(0.85);
+}
+
+/* Light-only accent tint over the (already grayscale) tiles — dark theme's
+   invert+darken above stands in for it instead. */
+.map-tint {
+  opacity: 0.14;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .map-tint {
+    opacity: 0;
+  }
+}
+:root[data-theme="dark"] .map-tint {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

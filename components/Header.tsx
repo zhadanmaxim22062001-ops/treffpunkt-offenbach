@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { motion, useReducedMotion } from "motion/react";
 import { LogoLockup } from "./Logo";
@@ -20,6 +20,30 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
+
+  // Not a modal overlay — it's an in-flow disclosure that pushes the rest of
+  // the page down, so Tab is deliberately never hard-trapped inside it (that
+  // would itself be an accessibility bug here: everything after it in
+  // reading order is still visible, just scrolled below, and a keyboard
+  // user should be able to reach it). What IS expected of any disclosure
+  // like this: Escape closes it and returns focus to the button that opened
+  // it, and opening it moves focus to the first item inside.
+  useEffect(() => {
+    if (!open) return;
+    const firstLink = mobileNavRef.current?.querySelector("a");
+    (firstLink as HTMLElement | null)?.focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
 
   return (
     <header
@@ -33,7 +57,7 @@ export function Header() {
             risk not containing the visible text verbatim, which breaks
             voice-control name matching (WCAG 2.5.3). */}
         <Link href="/">
-          <LogoLockup markSize={38} />
+          <LogoLockup markSize={40} />
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex" aria-label="Hauptnavigation">
@@ -74,6 +98,7 @@ export function Header() {
             Mitglied werden
           </Link>
           <button
+            ref={toggleRef}
             type="button"
             className="md:hidden"
             aria-expanded={open}
@@ -88,6 +113,7 @@ export function Header() {
       </div>
 
       <nav
+        ref={mobileNavRef}
         id="mobile-nav"
         hidden={!open}
         aria-label="Hauptnavigation, mobil"

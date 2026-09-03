@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { clsx } from "clsx";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 import { LogoMark } from "@/components/Logo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
@@ -12,6 +13,7 @@ import { RADAR_ITEMS_ARE_PLACEHOLDER, RADAR_CATEGORIES, getVisibleBusinessItems 
 import { getCalendarEntries } from "@/lib/calendar";
 import { CalendarPreview } from "@/components/CalendarPreview";
 import { getHeroImagePath } from "@/lib/hero-image";
+import { HERO_PHOTO_CREDIT, isMediaCreditComplete } from "@/data/media";
 
 const members = getAllMembers();
 
@@ -36,30 +38,66 @@ export default function Home() {
   return (
     <>
       {/* ---------------------------------------------------- 1. Hero */}
-      <header className="relative overflow-hidden bg-paper">
+      <header
+        className={clsx(
+          "relative overflow-hidden",
+          heroImage ? "min-h-[560px] md:min-h-[680px]" : "bg-paper",
+        )}
+      >
         {heroImage ? (
           <>
+            {/* Full-bleed photo. Cropped to bias toward the top on narrow
+                viewports (object-position) so the skyline stays in frame —
+                the river, which sits lower in the source photo, is what
+                gets cropped away first, not the towers. */}
             <Image
               src={heroImage}
               alt=""
               fill
               priority
               sizes="100vw"
-              className="object-cover"
+              className="object-cover object-[center_20%] md:object-[center_42%]"
               aria-hidden="true"
             />
-            <div className="absolute inset-0" style={{ backgroundColor: "var(--c-ink)", opacity: 0.55 }} aria-hidden="true" />
+            {/* Left-to-right navy gradient so the headline holds contrast on
+                the left; thins toward the right, where the mark sits over a
+                brighter part of the photo instead of type. */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to right, color-mix(in srgb, var(--c-hero-scrim) 90%, transparent) 0%, color-mix(in srgb, var(--c-hero-scrim) 90%, transparent) 48%, color-mix(in srgb, var(--c-hero-scrim) 30%, transparent) 100%)",
+              }}
+              aria-hidden="true"
+            />
+            {/* The mark, drawn large enough that its ring overlaps the
+                photo's skyline/river band — the "play" between the F
+                breaking out of the ring and the towers breaking the
+                horizon. That composition needs the wide two-column layout
+                to have room; below md the text stacks full-width and a
+                mark this size would sit on top of the buttons, so it's
+                hidden rather than fought into a cramped corner. */}
+            <div
+              className="pointer-events-none absolute hidden md:block"
+              style={{ right: "2%", bottom: "4%", width: "clamp(260px, 32vw, 480px)" }}
+              aria-hidden="true"
+            >
+              <LogoMark size={480} animated color="var(--c-hero-ink)" className="h-auto w-full" />
+            </div>
           </>
         ) : (
           <BrandBackdrop />
         )}
         <Container className="relative z-10">
-          <div className="grid items-center gap-12 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-            <div>
-              <Eyebrow className="mb-6">Gewerbeverein · Offenbach am Main</Eyebrow>
+          <div className={clsx("grid items-center gap-12 py-16 md:py-24", !heroImage && "md:grid-cols-[1.1fr_0.9fr]")}>
+            <div className={heroImage ? "max-w-[540px]" : undefined}>
+              <Eyebrow className="mb-6" style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.9 } : undefined}>
+                Gewerbeverein · Offenbach am Main
+              </Eyebrow>
               <Heading
                 level={1}
                 ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach."
+                style={heroImage ? { color: "var(--c-hero-ink)" } : undefined}
               >
                 <LineReveal
                   delay={HERO_TEXT_DELAY}
@@ -67,7 +105,10 @@ export default function Home() {
                 />
               </Heading>
               <MountReveal delay={HERO_TEXT_DELAY + 0.15}>
-                <Lead className="mt-7 max-w-[46ch]">
+                <Lead
+                  className="mt-7 max-w-[46ch]"
+                  style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.95 } : undefined}
+                >
                   Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
                   Stadt und Öffentlichkeit.
                 </Lead>
@@ -80,15 +121,44 @@ export default function Home() {
               </MountReveal>
             </div>
 
-            <div
-              className="flex aspect-square w-full max-w-[400px] items-center justify-center justify-self-center border"
-              style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
-            >
-              <LogoMark size={230} animated />
-            </div>
+            {!heroImage && (
+              <div
+                className="flex aspect-square w-full max-w-[400px] items-center justify-center justify-self-center border"
+                style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
+              >
+                <LogoMark size={230} animated />
+              </div>
+            )}
           </div>
         </Container>
       </header>
+      {heroImage && isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
+        <div className="bg-paper py-2">
+          <Container>
+            <p className="font-mono text-[11px]" style={{ color: "var(--c-muted)" }}>
+              Foto: {HERO_PHOTO_CREDIT.author},{" "}
+              <a
+                className="link-underline"
+                href={HERO_PHOTO_CREDIT.licenceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {HERO_PHOTO_CREDIT.licenceName}
+              </a>
+              , via{" "}
+              <a
+                className="link-underline"
+                href={HERO_PHOTO_CREDIT.filePageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Wikimedia Commons
+              </a>{" "}
+              — {HERO_PHOTO_CREDIT.modifications}
+            </p>
+          </Container>
+        </div>
+      )}
 
       {/* ---------------------------------------------- 2. Kennzahlen */}
       <Section tone="paper-2">
@@ -171,38 +241,39 @@ export default function Home() {
             {radar.map((item, i) => {
               const cat = RADAR_CATEGORIES[item.category];
               return (
-                <Reveal key={item.slug} delay={0.1 + i * 0.06}>
-                  <li
-                    className="border-t py-6"
-                    style={{
-                      borderColor: "var(--c-line)",
-                      borderLeft: item.urgency === "high" ? "3px solid var(--c-signal)" : undefined,
-                      paddingLeft: item.urgency === "high" ? "18px" : undefined,
-                    }}
+                <Reveal
+                  as="li"
+                  key={item.slug}
+                  delay={0.1 + i * 0.06}
+                  className="block border-t py-6"
+                  style={{
+                    borderColor: "var(--c-line)",
+                    borderLeft: item.urgency === "high" ? "3px solid var(--c-signal)" : undefined,
+                    paddingLeft: item.urgency === "high" ? "18px" : undefined,
+                  }}
+                >
+                  <div className="flex flex-wrap items-center gap-3">
+                    <time className="font-mono text-[11px] tracking-[0.08em] text-muted" dateTime={item.date}>
+                      {formatDate(item.date)}
+                    </time>
+                    <Chip tone={cat.tone}>{cat.label}</Chip>
+                  </div>
+                  <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
+                    <Link href={`/radar/${item.slug}`} className="link-underline">
+                      {item.headline}
+                    </Link>
+                  </h3>
+                  <p className="prose-body mt-2 text-[15px]">{item.summary}</p>
+                  <p
+                    className="mt-3 inline-block px-3 py-2 text-[14px]"
+                    style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
                   >
-                    <div className="flex flex-wrap items-center gap-3">
-                      <time className="font-mono text-[11px] tracking-[0.08em] text-muted" dateTime={item.date}>
-                        {formatDate(item.date)}
-                      </time>
-                      <Chip tone={cat.tone}>{cat.label}</Chip>
-                    </div>
-                    <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
-                      <Link href={`/radar/${item.slug}`} className="link-underline">
-                        {item.headline}
-                      </Link>
-                    </h3>
-                    <p className="prose-body mt-2 text-[15px]">{item.summary}</p>
-                    <p
-                      className="mt-3 inline-block px-3 py-2 text-[14px]"
-                      style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}
-                    >
-                      <span className="font-display font-semibold">Was das für Sie heißt: </span>
-                      {item.action}
-                    </p>
-                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                      Quelle: {item.sourceName} · {formatDate(item.date)}
-                    </p>
-                  </li>
+                    <span className="font-display font-semibold">Was das für Sie heißt: </span>
+                    {item.action}
+                  </p>
+                  <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                    Quelle: {item.sourceName} · {formatDate(item.date)}
+                  </p>
                 </Reveal>
               );
             })}

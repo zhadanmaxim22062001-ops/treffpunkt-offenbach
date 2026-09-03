@@ -24,11 +24,18 @@ export default function Styleguide() {
 
       <Section tone="paper-2">
         <Eyebrow className="mb-6">Marke</Eyebrow>
+        <p className="prose-body mb-8 max-w-[60ch] text-[14px] text-muted">
+          Drei Zeichnungen, nicht eine skalierte: <strong>Primär</strong> ab 64px (offener Ring, Stärke 13),{" "}
+          <strong>Header</strong> von 28–63px, für den Bereich, in dem der offene Ring sonst optisch zulaufen würde
+          (gleicher Ring, aber Stärke 16, breitere Lücke, kürzerer Arm — Wiedererkennung schlägt hier die optische
+          Regel), <strong>Kompakt</strong> unter 28px (geschlossener Ring, Stärke 19).
+        </p>
         <div className="flex flex-wrap items-end gap-12">
-          <figure className="m-0"><LogoMark size={120} /><figcaption className="eyebrow mt-3">Mark 120</figcaption></figure>
-          <figure className="m-0"><LogoMark size={64} /><figcaption className="eyebrow mt-3">Mark 64</figcaption></figure>
-          <figure className="m-0"><LogoMark size={40} /><figcaption className="eyebrow mt-3">Compact 40</figcaption></figure>
-          <figure className="m-0"><LogoMark size={24} /><figcaption className="eyebrow mt-3">Compact 24</figcaption></figure>
+          <figure className="m-0"><LogoMark size={120} /><figcaption className="eyebrow mt-3">Primär · ab 64px</figcaption></figure>
+          <figure className="m-0"><LogoMark size={64} /><figcaption className="eyebrow mt-3">Primär · 64px</figcaption></figure>
+          <figure className="m-0"><LogoMark size={48} /><figcaption className="eyebrow mt-3">Header · 28–63px</figcaption></figure>
+          <figure className="m-0"><LogoMark size={40} /><figcaption className="eyebrow mt-3">Header · 40px (Navigation)</figcaption></figure>
+          <figure className="m-0"><LogoMark size={24} /><figcaption className="eyebrow mt-3">Kompakt · unter 28px</figcaption></figure>
           <figure className="m-0"><LogoLockup markSize={56} /><figcaption className="eyebrow mt-3">Lockup</figcaption></figure>
         </div>
       </Section>
