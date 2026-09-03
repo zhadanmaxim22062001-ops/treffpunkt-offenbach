@@ -254,17 +254,53 @@ start *time* the moment one exists.
 
 ## OF-Radar
 
-File-based in v1 — no database, no ingest, no classifier (all parked, see
-"v2, parked" above). `data/radar.json` holds the same field shape the parked
-Drizzle schema uses (`category`, `headline`, `summary`, `action`,
-`sourceName`, `sourceUrl`, `date`, `urgency`, optional `deadline`, `origin`
-always `"manual"`), read at build time by `lib/radar-content.ts`.
+File-based, no database (the earlier Neon/cron/admin design stays parked,
+see "v2, parked" above — this isn't a stepping stone toward it, it's a
+deliberately different, simpler approach: a local script proposes items,
+a human writes two sentences, a commit publishes them). `data/radar.json`
+holds the same field shape the parked Drizzle schema used (`category`,
+`headline`, `summary`, `action`, `sourceName`, `sourceUrl`, `date`,
+`urgency`, optional `deadline`, `origin` always `"manual"`), read at build
+time by `lib/radar-content.ts`.
 
 `RADAR_ITEMS_ARE_PLACEHOLDER` (in `lib/radar-content.ts`, same pattern as the
 member-list guard) is `true` while `data/radar.json`'s `_note` field still
-says `TODO-COPY`. While true, `/radar`, `/radar/[slug]`, `/radar/feed.xml`,
-and the homepage teaser all show an honest "Der OF-Radar startet in Kürze"
-empty state and render nothing from the file.
+says `TODO-COPY`. While true, the business list (see below), `/radar/[slug]`,
+`/radar/feed.xml`, and the homepage teaser's business items all show an
+honest empty state instead of rendering specimen content.
+
+### A hybrid module, two different intake standards
+
+The page is not one list with one bar for entry — it's two, and they stay
+visually and editorially separate:
+
+- **Calendar (`frequenz`)** — low bar, high volume. Anything that puts
+  people on the street where members' shops are qualifies: markets,
+  festivals, guided tours, verkaufsoffene Sonntage, Weihnachtsmarkt, OFC
+  home games, Messen. The test is just "does this bring foot traffic to
+  the Innenstadt" — an event in another district or another town doesn't
+  qualify, no matter how big.
+- **Business list (`rathaus`, `baustelle`, `foerderung`, `stadt`,
+  `recht`)** — strict. The test stays "does this change something for a
+  business owner." A handful of items a month is the expected volume, not
+  a shortfall to fix — a short honest list beats a padded one.
+
+`lib/calendar.ts` merges the calendar half with the association's own
+confirmed events (`data/content.ts`, `hasConfirmedDate` — the same guard
+`/veranstaltungen` uses) into one 12-week timeline, independent of
+`RADAR_ITEMS_ARE_PLACEHOLDER`: the association's real events don't stop
+being real just because no radar item has been published yet, and that
+calendar is the one part of this module reliable enough to lead the page
+with. `/radar` and the homepage teaser both lead with it, then "und was
+sonst Ihr Geschäft betrifft" for the business list.
+
+One consequence worth knowing: `/radar` reads `searchParams` for its
+category filter (`/radar?kategorie=rathaus` needs to be a real,
+shareable, indexable URL — a static file can't serve different content
+per query string), so that one route builds as dynamic (`ƒ`) rather than
+static, unlike the rest of the site. Still zero external services — no
+database, no API call — just server-rendered per request instead of
+served as a static file.
 
 ### What's on the page
 
@@ -273,9 +309,10 @@ empty state and render nothing from the file.
   sentence telling a business owner what to actually do), and a source
   link with its own date. An item with `urgency: "high"` gets a left rule
   in the site's one warm colour — reserved for exactly this.
-- **Category filter chips.** The six rubrics plus "Alle", as real links —
-  `/radar?kategorie=baustelle` is a page you can bookmark or send someone,
-  not just a UI state that resets on reload.
+- **Category filter chips.** The five business rubrics plus "Alle", as real
+  links — `/radar?kategorie=baustelle` is a page you can bookmark or send
+  someone, not just a UI state that resets on reload. `frequenz` isn't a
+  filter chip here; it lives in the calendar instead (see above).
 - **"Für mich relevant."** A visitor can save their Branche and Straße —
   stored only in their own browser (`localStorage`), never sent to us —
   and the list re-sorts around it: matches float up, the rest dims but
@@ -289,10 +326,10 @@ empty state and render nothing from the file.
   own browser on page load — this page is prerendered at build time, so a
   server-computed count would freeze at whatever it was on deploy day and
   read wrong a week later.
-- **The frequenz timeline.** Every `frequenz`-category item due in the
-  next 12 weeks gets a marker on a horizontal timeline pinned above the
-  list, so "what's coming up" doesn't require reading every date in the
-  list below it.
+- **The Innenstadt calendar.** Every `frequenz`-category item and every
+  confirmed association event due in the next 12 weeks gets a marker on a
+  horizontal timeline pinned above the business list — one view for "what's
+  coming up", not two half-overlapping ones.
 - **`/radar/feed.xml`.** A plain RSS 2.0 feed, built from the same file,
   for anyone who'd rather subscribe than check back.
 
