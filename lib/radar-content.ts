@@ -64,3 +64,13 @@ export function getRadarItemBySlug(slug: string): RadarItem | undefined {
 }
 
 export const RADAR_CATEGORY_LIST = Object.keys(RADAR_CATEGORIES) as RadarCategory[];
+
+/**
+ * The filterable business list excludes frequenz — those items live in the
+ * Innenstadt calendar (lib/calendar.ts) instead, merged with the
+ * association's own events. Two different intake standards, not one list:
+ * frequenz is low-bar/high-volume ("does this put people on the street"),
+ * the other five stay strict ("does this change something for a business
+ * owner") — see README's OF-Radar section.
+ */
+export const RADAR_BUSINESS_CATEGORY_LIST: RadarCategory[] = RADAR_CATEGORY_LIST.filter((c) => c !== "frequenz");

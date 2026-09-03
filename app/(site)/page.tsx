@@ -9,6 +9,8 @@ import { LEISTUNGEN } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 import { getNextConfirmedEvent } from "@/lib/events";
 import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/lib/radar-content";
+import { getCalendarEntries } from "@/lib/calendar";
+import { CalendarPreview } from "@/components/CalendarPreview";
 import { getHeroImagePath } from "@/lib/hero-image";
 
 const members = getAllMembers();
@@ -19,7 +21,8 @@ const HERO_TEXT_DELAY = 0.85;
 
 export default function Home() {
   const next = getNextConfirmedEvent();
-  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().slice(0, 3);
+  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().filter((item) => item.category !== "frequenz").slice(0, 3);
+  const calendarEntries = getCalendarEntries();
   const heroImage = getHeroImagePath();
 
   return (
@@ -135,21 +138,28 @@ export default function Home() {
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <Eyebrow className="mb-4">OF-Radar</Eyebrow>
-              <Heading className="max-w-[20ch]">Was diese Woche Ihr Geschäft betrifft.</Heading>
+              <Heading className="max-w-[24ch]">Was in der Stadt los ist.</Heading>
               <p className="prose-body mt-5 text-[16px]">
-                Keine Stadtnachrichten, sondern ein Filter mit einer einzigen Frage: ändert das etwas für
-                einen Betrieb in Offenbach? Sechs Rubriken, jede Meldung mit Quelle, Datum und einem Satz
-                dazu, was jetzt zu tun ist.
+                Zuerst der Kalender: alles, was Menschen in die Innenstadt bringt. Und was sonst Ihr
+                Geschäft betrifft — geprüft, mit Quelle und Datum.
               </p>
             </div>
             <Button href="/radar" variant="outline">
-              Alle Meldungen
+              Zum OF-Radar
             </Button>
           </div>
         </Reveal>
 
+        <CalendarPreview entries={calendarEntries} limit={4} />
+
+        {radar.length > 0 && (
+          <Reveal delay={0.12}>
+            <p className="eyebrow mt-12">Und was sonst Ihr Geschäft betrifft</p>
+          </Reveal>
+        )}
+
         {radar.length > 0 ? (
-          <ul className="mt-12 flex flex-col">
+          <ul className="mt-6 flex flex-col">
             {radar.map((item, i) => {
               const cat = RADAR_CATEGORIES[item.category];
               return (
@@ -191,8 +201,9 @@ export default function Home() {
           </ul>
         ) : (
           <p className="prose-body mt-12 max-w-[52ch]">
-            Der OF-Radar startet in Kürze. Meldungen erscheinen hier erst nach redaktioneller Prüfung und Freigabe
-            im Vorstand — nichts wird automatisch veröffentlicht.
+            {calendarEntries.length > 0
+              ? "Über den Kalender hinaus zeigt der OF-Radar noch keine geprüften Meldungen zu Rathaus, Baustellen, Förderung, Stadtentwicklung oder Recht."
+              : "Der OF-Radar startet in Kürze. Meldungen erscheinen hier erst nach redaktioneller Prüfung und Freigabe im Vorstand — nichts wird automatisch veröffentlicht."}
           </p>
         )}
       </Section>
