@@ -38,12 +38,17 @@ export function StaticMap({ slug, meta, label }: { slug: string; meta: MapMeta |
   return (
     <figure className="m-0">
       <div className="relative aspect-square overflow-hidden border" style={{ borderColor: "var(--c-line)" }}>
-        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+        <div className="map-tiles absolute inset-0 grid grid-cols-3 grid-rows-3">
           {tiles.map(({ row, col }) => (
             // eslint-disable-next-line @next/next/no-img-element -- locally cached tile, not an optimizable next/image candidate (already a fixed 256px raster)
             <img key={`${row}-${col}`} src={`/maps/${slug}/${row}-${col}.png`} alt="" width={256} height={256} loading="lazy" className="block h-full w-full" />
           ))}
         </div>
+        <div
+          aria-hidden="true"
+          className="map-tint pointer-events-none absolute inset-0"
+          style={{ backgroundColor: "var(--c-accent)", mixBlendMode: "multiply" }}
+        />
         <span
           aria-hidden
           className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
