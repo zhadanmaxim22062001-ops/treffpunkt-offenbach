@@ -59,22 +59,25 @@ export function Calendar({ entries }: { entries: CalendarEntry[] }) {
             style={{ left: `${(w / WINDOW_WEEKS) * 100}%`, backgroundColor: "var(--c-line)" }}
           />
         ))}
+        {/* Decorative markers, not links: on a 12-week timeline two entries
+            can fall a single day apart, so any WCAG-2.5.8-sized (24px) tap
+            target here would overlap its neighbour — a dense timeline and a
+            minimum target size are fundamentally in tension. Every entry
+            already has a properly sized, properly spaced link in the plain
+            list below (the "equivalent control" WCAG 2.5.8 itself allows
+            for), so these stay visual-only rather than a second, cramped
+            set of tap targets. */}
         {upcoming.map((entry) => {
           const t = new Date(`${entry.date}T00:00:00`).getTime();
           const pct = ((t - today) / (windowEnd - today)) * 100;
           return (
-            <Link
+            <span
               key={entry.key}
-              href={entry.href}
-              className="group absolute top-0 -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${pct}%` }}
-              aria-label={`${entry.title}, ${formatDate(entry.date)}`}
-            >
-              <span
-                className="block h-3 w-3 border-2 bg-paper-2 transition-colors duration-[120ms] group-hover:bg-accent"
-                style={{ borderColor: "var(--c-accent)", borderRadius: "999px" }}
-              />
-            </Link>
+              aria-hidden="true"
+              title={`${entry.title}, ${formatDate(entry.date)}`}
+              className="absolute top-0 block h-3 w-3 -translate-x-1/2 -translate-y-1/2 border-2 bg-paper-2"
+              style={{ left: `${pct}%`, borderColor: "var(--c-accent)", borderRadius: "999px" }}
+            />
           );
         })}
       </div>

@@ -2,31 +2,48 @@
 
 import { clsx } from "clsx";
 import { motion, useInView, useReducedMotion, useScroll } from "motion/react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
-/** Section reveal: 16px up + fade, once, ~60ms stagger. */
+/**
+ * Section reveal: 16px up + fade, once, ~60ms stagger.
+ * `as="li"` when this wraps a list row directly inside a <ul>/<ol> — a plain
+ * `motion.div` there breaks list semantics (Lighthouse's "list"/"listitem"
+ * audits: a <ul> must contain only <li>, and every <li> needs a <ul>/<ol>
+ * parent, neither true if a <div> sits in between).
+ */
 export function Reveal({
   children,
   delay = 0,
   className,
+  style,
+  as = "div",
 }: {
   children: ReactNode;
   delay?: number;
   className?: string;
+  style?: CSSProperties;
+  as?: "div" | "li";
 }) {
   const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
+  const Tag = as === "li" ? "li" : "div";
+  if (reduce) return (
+    <Tag className={className} style={style}>
+      {children}
+    </Tag>
+  );
+  const MotionTag = as === "li" ? motion.li : motion.div;
   return (
-    <motion.div
+    <MotionTag
       data-reveal
       className={className}
+      style={style}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.05, margin: "0px 0px -10% 0px" }}
       transition={{ duration: 0.5, delay, ease: [0.4, 0, 0.15, 1] }}
     >
       {children}
-    </motion.div>
+    </MotionTag>
   );
 }
 
