@@ -45,8 +45,20 @@ export function Section({
   );
 }
 
-export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={clsx("eyebrow", className)}>{children}</p>;
+export function Eyebrow({
+  children,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <p className={clsx("eyebrow", className)} style={style}>
+      {children}
+    </p>
+  );
 }
 
 export function Heading({
@@ -54,30 +66,49 @@ export function Heading({
   level = 2,
   className,
   ariaLabel,
+  style,
 }: {
   children: ReactNode;
   level?: 1 | 2 | 3;
   className?: string;
   /** Set when children is a decorative animated split (e.g. per-line reveal) that shouldn't be read node-by-node. */
   ariaLabel?: string;
+  style?: CSSProperties;
 }) {
   const Tag = (["h1", "h2", "h3"] as const)[level - 1];
   const size =
     level === 1
-      ? "text-[clamp(38px,6.2vw,74px)] leading-[0.96] tracking-[-0.035em] font-extrabold"
+      ? "text-[clamp(38px,6.2vw,68px)] leading-[0.96] tracking-[-0.035em] font-extrabold"
       : level === 2
         ? "text-[clamp(26px,3.4vw,40px)] leading-[1.05] tracking-[-0.03em] font-extrabold"
         : "text-[19px] leading-snug tracking-[-0.012em] font-semibold";
+  // "Gewerbeverein" must never hyphenate — it's the single most important
+  // word on the page (h1 only; body text keeps the default `hyphens: auto`
+  // in globals.css, which German compounds still need there). If a line
+  // overflows on a narrow viewport as a result, the fix is lowering the
+  // clamp's max above, not turning hyphenation back on.
+  const noHyphens: CSSProperties | undefined = level === 1 ? { hyphens: "manual" } : undefined;
   return (
-    <Tag className={clsx(size, className)} aria-label={ariaLabel}>
+    <Tag className={clsx(size, className)} aria-label={ariaLabel} style={{ ...noHyphens, ...style }}>
       {ariaLabel ? <span aria-hidden="true">{children}</span> : children}
     </Tag>
   );
 }
 
-export function Lead({ children, className }: { children: ReactNode; className?: string }) {
+export function Lead({
+  children,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <p className={clsx("text-[clamp(19px,2.1vw,23px)] font-light leading-[1.45] text-ink-2", className)}>
+    <p
+      className={clsx("text-[clamp(19px,2.1vw,23px)] font-light leading-[1.45] text-ink-2", className)}
+      style={style}
+    >
       {children}
     </p>
   );
