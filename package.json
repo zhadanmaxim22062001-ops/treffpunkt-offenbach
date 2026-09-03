@@ -8,6 +8,7 @@
     "start": "next start",
     "geocode": "node scripts/geocode-members.mjs",
     "radar:fetch": "node scripts/radar-fetch.mjs",
+    "radar:promote": "node scripts/radar-promote.mjs",
     "csv:import": "node scripts/csv-to-members.mjs",
     "map:verein": "node scripts/fetch-verein-map.mjs"
   },
