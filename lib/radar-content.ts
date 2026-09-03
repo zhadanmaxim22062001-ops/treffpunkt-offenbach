@@ -27,6 +27,10 @@ export type RadarItem = {
   urgency: RadarUrgency;
   deadline?: string | null;
   origin: "manual";
+  /** Stays visible regardless of age or event date — an override for items
+   *  (like a delayed committee session) that remain relevant longer than the
+   *  usual window can know. See isRadarItemVisible below. */
+  pinned?: boolean;
 };
 
 // All six categories share one of two tones now — signal is reserved for
@@ -74,3 +78,42 @@ export const RADAR_CATEGORY_LIST = Object.keys(RADAR_CATEGORIES) as RadarCategor
  * owner") — see README's OF-Radar section.
  */
 export const RADAR_BUSINESS_CATEGORY_LIST: RadarCategory[] = RADAR_CATEGORY_LIST.filter((c) => c !== "frequenz");
+
+const VISIBILITY_WINDOW_DAYS = 30;
+
+/**
+ * Whether an item still belongs in a list or the calendar, evaluated against
+ * `todayIso` — always the actual request date, computed by the caller, never
+ * baked in at build time (a calendar that silently stops advancing because
+ * it was frozen into a static build is worse than no calendar). A blanket
+ * 30-day cutoff would delete things that are still true, so three
+ * exceptions come first:
+ *
+ * 1. `pinned: true` always wins — for something like a delayed committee
+ *    session that stays relevant on its own timeline, not a generic one.
+ * 2. `frequenz` items stay visible through their own event date, then drop
+ *    off — a market that already happened isn't upcoming anymore.
+ * 3. An item with a `deadline` stays visible until that deadline passes,
+ *    however old it is — a funding window open for three months stays up
+ *    for three months.
+ *
+ * Everything else: 30 days from `date`.
+ *
+ * This only governs list/calendar membership. `getRadarItemBySlug` never
+ * calls this — an item's own `/radar/[slug]` page keeps resolving forever,
+ * so a shared link never breaks just because the item aged out of the list.
+ */
+export function isRadarItemVisible(item: RadarItem, todayIso: string): boolean {
+  if (item.pinned) return true;
+  if (item.category === "frequenz") return item.date >= todayIso;
+  if (item.deadline) return item.deadline >= todayIso;
+  const ageDays = (Date.parse(todayIso) - Date.parse(item.date)) / 86_400_000;
+  return ageDays <= VISIBILITY_WINDOW_DAYS;
+}
+
+/** The business list (frequenz excluded — see RADAR_BUSINESS_CATEGORY_LIST), filtered to what's still current as of `todayIso`. */
+export function getVisibleBusinessItems(todayIso: string): RadarItem[] {
+  return getRadarItems()
+    .filter((item) => item.category !== "frequenz")
+    .filter((item) => isRadarItemVisible(item, todayIso));
+}

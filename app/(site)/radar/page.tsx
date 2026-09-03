@@ -7,7 +7,7 @@ import {
   RADAR_CATEGORIES,
   RADAR_BUSINESS_CATEGORY_LIST,
   RADAR_ITEMS_ARE_PLACEHOLDER,
-  getRadarItems,
+  getVisibleBusinessItems,
   type RadarCategory,
 } from "@/lib/radar-content";
 import { getCalendarEntries } from "@/lib/calendar";
@@ -33,9 +33,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
 
   const calendarEntries = getCalendarEntries();
 
-  const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER
-    ? []
-    : getRadarItems().filter((item) => item.category !== "frequenz");
+  // Computed fresh per request — this route is already dynamic (the
+  // searchParams-driven filter forces that), so "today" here is never
+  // baked into a static build.
+  const today = new Date().toISOString().slice(0, 10);
+  const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(today);
   const items = activeCategory ? allBusinessItems.filter((item) => item.category === activeCategory) : allBusinessItems;
 
   return (

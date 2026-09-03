@@ -119,6 +119,12 @@ async function main() {
     urgency: p.urgency,
     deadline: p.deadline ?? null,
     origin: "manual",
+    // Optional: set `"pinned": true` on the inbox proposal by hand before
+    // promoting, for something that stays relevant past the usual 30-day/
+    // deadline/event-date window (see isRadarItemVisible in
+    // lib/radar-content.ts). Omitted entirely when not set, rather than
+    // written as `false`, to keep untouched items in data/radar.json unchanged.
+    ...(p.pinned ? { pinned: true } : {}),
   };
 
   if (isPlaceholder) {

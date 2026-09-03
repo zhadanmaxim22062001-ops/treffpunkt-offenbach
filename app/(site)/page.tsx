@@ -8,7 +8,7 @@ import { KENNZAHLEN } from "@/data/verein";
 import { LEISTUNGEN } from "@/data/content";
 import { MEMBERS_ARE_PLACEHOLDER, getAllMembers } from "@/lib/members";
 import { getNextConfirmedEvent } from "@/lib/events";
-import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/lib/radar-content";
+import { RADAR_ITEMS_ARE_PLACEHOLDER, RADAR_CATEGORIES, getVisibleBusinessItems } from "@/lib/radar-content";
 import { getCalendarEntries } from "@/lib/calendar";
 import { CalendarPreview } from "@/components/CalendarPreview";
 import { getHeroImagePath } from "@/lib/hero-image";
@@ -19,9 +19,17 @@ const members = getAllMembers();
 // the headline starts revealing exactly as the ring closes, not before.
 const HERO_TEXT_DELAY = 0.85;
 
+// This page is otherwise fully static, but the radar teaser and calendar
+// preview both depend on "today" (item aging, event dates) — an hourly
+// revalidation keeps that honest without making the whole homepage
+// server-rendered per request. See lib/radar-content.ts's
+// isRadarItemVisible for why this can't just be baked in at build time.
+export const revalidate = 3600;
+
 export default function Home() {
   const next = getNextConfirmedEvent();
-  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().filter((item) => item.category !== "frequenz").slice(0, 3);
+  const today = new Date().toISOString().slice(0, 10);
+  const radar = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(today).slice(0, 3);
   const calendarEntries = getCalendarEntries();
   const heroImage = getHeroImagePath();
 

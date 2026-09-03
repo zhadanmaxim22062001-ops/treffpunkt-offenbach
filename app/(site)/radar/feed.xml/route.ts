@@ -1,10 +1,12 @@
-import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems } from "@/lib/radar-content";
+import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, isRadarItemVisible } from "@/lib/radar-content";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.treffpunkt-offenbach.com";
 
-// Built entirely from data/radar.json at build time, same as /radar itself —
-// nothing here depends on the request, so it can be a static, cached file.
-export const dynamic = "force-static";
+// Same hourly revalidation as the homepage, and for the same reason: which
+// items are current depends on "today" (30-day window, frequenz event
+// dates, deadlines — see lib/radar-content.ts's isRadarItemVisible), so this
+// can't be force-static the way a feed with no aging logic could be.
+export const revalidate = 3600;
 
 function escapeXml(text: string): string {
   return text
@@ -20,13 +22,14 @@ function toRfc822(iso: string): string {
 }
 
 /**
- * Plain RSS 2.0 for the OF-Radar — file-based, built from data/radar.json at
- * build time, no different from how /radar itself reads it. Empty but valid
- * while RADAR_ITEMS_ARE_PLACEHOLDER is true, so a feed reader that already
+ * Plain RSS 2.0 for the OF-Radar — file-based, from data/radar.json, only
+ * items still current as of the request (see isRadarItemVisible). Empty but
+ * valid while RADAR_ITEMS_ARE_PLACEHOLDER is true, so a feed reader that already
  * subscribed doesn't see an error, just nothing to show yet.
  */
 export function GET() {
-  const items = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems();
+  const today = new Date().toISOString().slice(0, 10);
+  const items = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getRadarItems().filter((item) => isRadarItemVisible(item, today));
   const sorted = [...items].sort((a, b) => b.date.localeCompare(a.date));
 
   const channelDescription = RADAR_ITEMS_ARE_PLACEHOLDER
