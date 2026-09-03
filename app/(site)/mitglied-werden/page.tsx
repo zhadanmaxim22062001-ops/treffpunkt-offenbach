@@ -81,7 +81,8 @@ export default function Page() {
             <tbody>
               <tr>
                 <td className="p-4 text-ink-2">Jahresbeitrag</td>
-                <td className="p-4 font-mono text-[13px] text-muted">TODO-COPY: beim Vorstand erfragen</td>
+                {/* TODO-COPY: exact fee amount, ask the Vorstand */}
+                <td className="p-4 font-mono text-[13px] text-muted">auf Anfrage</td>
               </tr>
             </tbody>
           </table>
@@ -106,10 +107,9 @@ export default function Page() {
             {VEREIN.phone}
           </a>
         </address>
-        <p className="mt-6 font-mono text-[12px] text-muted">
-          TODO-COPY: Das bisherige PDF-Beitrittsformular soll hier zusätzlich als Download stehen — das Dokument
-          liegt uns aktuell nicht vor. Sobald der Vorstand es bereitstellt, verlinken wir es an dieser Stelle.
-        </p>
+        {/* TODO-COPY: the board's old PDF Beitrittsformular isn't available yet —
+            link it here once the Vorstand provides it. No placeholder paragraph
+            until then; visitors already have email/phone above. */}
       </Section>
     </>
   );
