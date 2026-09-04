@@ -113,8 +113,10 @@ export default function Home() {
                   Stadt und Öffentlichkeit.
                 </Lead>
                 <div className="mt-9 flex flex-wrap gap-3">
-                  <Button href="/mitglied-werden">Mitglied werden</Button>
-                  <Button href="/radar" variant="outline">
+                  <Button href="/mitglied-werden" onPhoto={!!heroImage}>
+                    Mitglied werden
+                  </Button>
+                  <Button href="/radar" variant="outline" onPhoto={!!heroImage}>
                     OF-Radar ansehen
                   </Button>
                 </div>

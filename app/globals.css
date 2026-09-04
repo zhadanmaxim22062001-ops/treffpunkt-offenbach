@@ -210,6 +210,31 @@
   .btn-underline:focus-visible {
     background-size: 100% 2px;
   }
+
+  /* Outline Button rendered directly on the hero photo (Button's onPhoto
+     prop) — built from the theme-invariant --c-hero-ink token instead of
+     --c-ink/--c-line/--c-accent, all of which flip per theme and would (in
+     light theme) paint dark navy text and a pale hairline onto a dark
+     photo. Border and hover-fill alphas via color-mix rather than a second
+     literal colour. Verified by pixel-sampling the rendered button against
+     the actual photo — see the commit that introduced this class for the
+     measured ratios. */
+  .btn-outline-onphoto {
+    border: 1px solid color-mix(in srgb, var(--c-hero-ink) 55%, transparent);
+    color: var(--c-hero-ink);
+    background-image: linear-gradient(var(--c-hero-ink), var(--c-hero-ink));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 2px;
+    transition:
+      background-color 160ms var(--ease-brand),
+      background-size 180ms var(--ease-brand);
+  }
+  .btn-outline-onphoto:hover,
+  .btn-outline-onphoto:focus-visible {
+    background-color: color-mix(in srgb, var(--c-hero-ink) 12%, transparent);
+    background-size: 100% 2px;
+  }
 }
 
 /* Mark: three elements with tpof-* classes, drawn in sequence */

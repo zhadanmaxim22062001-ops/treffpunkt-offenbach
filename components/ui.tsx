@@ -118,12 +118,29 @@ type ButtonProps = {
   children: ReactNode;
   href: string;
   variant?: "solid" | "outline" | "ghost";
+  /** Set only when this button renders directly on the hero photo's scrim.
+   *  That scrim is theme-invariant (--c-hero-* in globals.css, never
+   *  redefined in the dark blocks — a photograph doesn't re-theme itself),
+   *  so the outline variant's normal theme-relative --c-ink/--c-line goes
+   *  near-invisible in light theme: dark navy text and a pale hairline on a
+   *  dark image. onPhoto swaps it for the .btn-outline-onphoto treatment,
+   *  built from the same invariant tokens as the scrim and the mark. The
+   *  solid variant is untouched by this prop — white-on-accent already
+   *  reads fine against the photo in both themes. */
+  onPhoto?: boolean;
   className?: string;
 };
 
-export function Button({ children, href, variant = "solid", className }: ButtonProps) {
+export function Button({ children, href, variant = "solid", onPhoto = false, className }: ButtonProps) {
   const base =
     "inline-flex items-center gap-2 px-5 py-3 font-display text-[14px] font-semibold tracking-[-0.005em] transition-colors duration-[120ms]";
+  if (variant === "outline" && onPhoto) {
+    return (
+      <Link href={href} className={clsx(base, "btn-outline-onphoto", className)}>
+        {children}
+      </Link>
+    );
+  }
   const styles = {
     solid: "bg-accent text-on-accent hover:brightness-110",
     outline: "border text-ink hover:bg-accent-soft btn-underline",
