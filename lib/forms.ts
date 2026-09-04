@@ -8,7 +8,7 @@ import { BRANCHEN } from "@/lib/members";
  * point of view (see the route handlers) — a bot that trips either one gets
  * a normal-looking success response, not a signal to try harder.
  */
-export const MIN_SUBMIT_MS = 4000;
+export const MIN_SUBMIT_MS = 3000;
 
 // Deliberately NOT constrained to an empty string here: a bot that fills
 // this field must still pass schema validation so looksLikeSpam() below can
@@ -16,6 +16,17 @@ export const MIN_SUBMIT_MS = 4000;
 // that would tell it exactly which field gave it away.
 const honeypot = z.string().optional().or(z.literal(""));
 const startedAt = z.coerce.number();
+
+// Both the JSON path (FormData → Object.fromEntries in ContactForm) and the
+// native no-JS form POST serialize a checked checkbox as the STRING "true"
+// (or omit the key entirely when unchecked) — HTML forms have no concept of
+// an actual boolean. z.literal(true) alone rejects that string and treats
+// every real submission as missing consent; this preprocesses both a real
+// boolean and the string form before the literal check runs.
+const consent = z.preprocess(
+  (v) => v === true || v === "true",
+  z.literal(true, { message: "Bitte bestätigen Sie die Einwilligung zur Verarbeitung." }),
+);
 
 export const membershipSchema = z.object({
   name: z.string().trim().min(2, "Bitte geben Sie Ihren Namen an.").max(200),
@@ -25,16 +36,22 @@ export const membershipSchema = z.object({
   email: z.string().trim().email("Bitte geben Sie eine gültige E-Mail-Adresse an."),
   telefon: z.string().trim().max(50).optional().or(z.literal("")),
   nachricht: z.string().trim().max(2000).optional().or(z.literal("")),
-  consent: z.literal(true, { message: "Bitte bestätigen Sie die Einwilligung zur Verarbeitung." }),
+  consent,
   website: honeypot,
   startedAt,
 });
 
 export const contactSchema = z.object({
-  name: z.string().trim().min(2, "Bitte geben Sie Ihren Namen an.").max(200),
+  name: z.string().trim().min(2, "Bitte geben Sie Ihren Namen an.").max(100),
   email: z.string().trim().email("Bitte geben Sie eine gültige E-Mail-Adresse an."),
-  nachricht: z.string().trim().min(5, "Bitte geben Sie eine Nachricht ein.").max(2000),
-  consent: z.literal(true, { message: "Bitte bestätigen Sie die Einwilligung zur Verarbeitung." }),
+  telefon: z.string().trim().max(50).optional().or(z.literal("")),
+  unternehmen: z.string().trim().max(200).optional().or(z.literal("")),
+  nachricht: z
+    .string()
+    .trim()
+    .min(10, "Bitte schreiben Sie uns ein paar Worte mehr — mindestens 10 Zeichen.")
+    .max(3000, "Die Nachricht ist zu lang (maximal 3000 Zeichen)."),
+  consent,
   website: honeypot,
   startedAt,
 });

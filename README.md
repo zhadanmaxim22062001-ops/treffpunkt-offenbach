@@ -3,16 +3,21 @@
 Website for Gewerbeverein Treffpunkt Offenbach e. V. Next.js 16 (App Router),
 TypeScript, Tailwind v4, motion, lenis. Deploys to Vercel, region fra1.
 
-**v1 is a fully static site — zero external services.** No database, no
-email service, no AI API, no login screen. Every route needs nothing but the
-files in this repo; the only environment variable v1 uses at all is
-`NEXT_PUBLIC_SITE_URL`. That was a deliberate scope cut for the first
-deploy, not the original plan — see "v2, parked" below for what was built
-and set aside, and why. The one piece of automation in the whole project is
-a GitHub Actions workflow that proposes OF-Radar calendar entries via a
-pull request (see "OF-Radar" below) — it needs no secret beyond the
-built-in `GITHUB_TOKEN` and never touches the business list, so it doesn't
-change that "zero external services" story for anything a visitor sees.
+**v1 is almost entirely static — zero external services — with one
+deliberate exception: `/kontakt`'s contact form sends real email.** It does
+that through the association's own existing mailbox (SMTP, via nodemailer),
+not a third-party email API — see "Kontaktformular" below for exactly why
+that's the DSGVO-preferred option and how it's wired up. No database, no AI
+API, no login screen, and still no third-party *service* in the "adds a new
+processor" sense. Environment variables: `NEXT_PUBLIC_SITE_URL` (used
+throughout) plus `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` /
+`MAIL_TO` (used only by `/api/kontakt`, see "Kontaktformular"). That's a
+deliberate, narrow exception to the original "no external services" scope
+cut for the first deploy, not a reversal of it — see "v2, parked" below for
+everything that's still cut and why. The one piece of automation in the
+whole project is a GitHub Actions workflow that proposes OF-Radar calendar
+entries via a pull request (see "OF-Radar" below) — it needs no secret
+beyond the built-in `GITHUB_TOKEN` and never touches the business list.
 
 ## Running locally
 
@@ -68,8 +73,10 @@ identity, not a recurring issue.
   actually having a confirmed date — see "Events and dates" below.
 - **`/verein`** — the real Vorstand from `data/verein.ts`, with roles. No founding
   year or Satzung yet; the page says so rather than guessing or leaving a gap.
-- **`/kontakt`** — address, phone, mailto, and the one map the site renders
-  locally: the association's own address, fetched by `scripts/fetch-verein-map.mjs`.
+- **`/kontakt`** — a real contact form that sends real email (see
+  "Kontaktformular" below), address/phone direct underneath it, and the one
+  map the site renders locally: the association's own address, fetched by
+  `scripts/fetch-verein-map.mjs`.
 - **`/radar`** and **`/radar/[slug]`** — file-based, no database. Reads
   `data/radar.json`; a 12-week Innenstadt calendar (association events +
   `frequenz` items) leads the page, a strict, hand-written business list
@@ -94,19 +101,17 @@ identity, not a recurring issue.
 ## v2, parked
 
 A database-backed OF-Radar (Postgres/Neon + Drizzle, an Anthropic-classified
-ingest pipeline, a Basic-Auth editorial admin at `/admin/radar`) and a
-Resend-backed contact/membership form were built and working before v1's
-scope was deliberately cut to "no external services" for the first deploy.
-**Nothing was deleted.** It's all still in the repo:
+ingest pipeline, a Basic-Auth editorial admin at `/admin/radar`) was built
+and working before v1's scope was deliberately cut to "no external
+services" for the first deploy. **Nothing was deleted.** It's all still in
+the repo:
 
 - `lib/db/`, `drizzle/`, `drizzle.config.ts` — the Postgres schema, untouched;
-- `lib/mail.ts`, `lib/forms.ts`, `components/ContactForm.tsx` — the Resend
-  wrapper and form validation, untouched;
 - `_v2-parked/` — the admin route, its components, its query/validation
-  layer, and both Resend-backed API routes, moved here (not deleted) because
-  they cross-reference each other and `tsconfig.json` now excludes this
-  directory from type-checking. `_v2-parked/README.md` has the exact restore
-  path for every file.
+  layer, and the still-parked `/api/mitglied-werden` route, moved here (not
+  deleted) because they cross-reference each other and `tsconfig.json` now
+  excludes this directory from type-checking. `_v2-parked/README.md` has
+  the exact restore path for every file.
 - `proxy.ts` stays at the project root with its real Basic-Auth logic intact,
   but its matcher is deliberately pointed at a path nothing can request —
   see the comment in that file for why (short version: with `/admin/radar`
@@ -114,9 +119,8 @@ scope was deliberately cut to "no external services" for the first deploy.
 
 None of this is reachable from the v1 build. Verified two ways after cutting
 it: grepped the build output and the compiled `.next` bundles for
-`DATABASE_URL`, `RESEND_API_KEY`, `ANTHROPIC_API_KEY`, and `ADMIN_PASSWORD` —
-clean, except `ADMIN_PASSWORD` inside `proxy.ts`'s own bundled (but inert)
-code.
+`DATABASE_URL`, `ANTHROPIC_API_KEY`, and `ADMIN_PASSWORD` — clean, except
+`ADMIN_PASSWORD` inside `proxy.ts`'s own bundled (but inert) code.
 
 Also parked, from before the scope cut: a full source audit of OF-Radar
 candidate feeds (offenbach.de and of-news.de work; op-online.de and
@@ -126,6 +130,85 @@ and a computed cost estimate for the classifier (~$1–3/month at Haiku 4.5
 rates). All of that reasoning is preserved in the git history — see the
 commits titled around "step 4a" through "step 4c" — and applies unchanged
 whenever v2 happens.
+
+**The contact form itself is no longer part of this list.** It was
+originally built Resend-backed, cut along with everything else above, and
+then un-parked and rebuilt directly into v1 — SMTP instead of Resend, so it
+doesn't add a new processor. See "Kontaktformular" below for how it works;
+`resend` and `RESEND_API_KEY` are gone from the repo entirely. What's still
+parked is only the *membership* form on `/mitglied-werden`, which needs the
+same `ContactForm` component wired up with its `betrieb`/`branche`/`adresse`
+fields — a smaller job than it was before, now that the SMTP plumbing
+already exists and works.
+
+## Kontaktformular
+
+`/kontakt`'s form sends real email through the association's own existing
+mailbox — `info@treffpunkt-offenbach.com`, hosted at IONOS — rather than
+through a transactional-email service like Resend or a third-party form
+backend (Formspree, Web3Forms, Getform, …). That's the DSGVO-preferred
+choice here: routing mail through the mailbox the association already has a
+relationship with introduces no new processor and needs no new
+Auftragsverarbeitungsvertrag, unlike handing form submissions to a service
+the association has never contracted with.
+
+**Environment variables** (Vercel, not committed): `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASS`, `MAIL_TO`. `SMTP_HOST` (`smtp.ionos.de`) and
+`SMTP_PORT` (`465`) were determined from the domain's own public DNS — its
+MX records point at `mx00`/`mx01.ionos.de`, and its SPF record reads
+`v=spf1 include:_spf-eu.ionos.com ~all`, both consistent with IONOS's
+standard mail hosting, whose documented submission host for every mailbox
+they host is `smtp.ionos.de:465`. `SMTP_USER`/`SMTP_PASS` are the real
+mailbox credentials and `MAIL_TO` is where mail should land if that's ever
+a different address than the sending mailbox — none of the three can be
+determined from outside and must be set by whoever holds those credentials.
+
+**How a submission is handled**, in `app/api/kontakt/route.ts`:
+
+1. Validated server-side with zod (`lib/forms.ts`'s `contactSchema`) — name,
+   email, optional phone, optional company, a message (10–3000 characters),
+   and a required (never pre-checked) consent checkbox. Client-side
+   validation in `components/ContactForm.tsx` is only ever a head start on
+   the same rules, never the actual gate.
+2. Checked for spam, entirely server-side, with no CAPTCHA (a CAPTCHA needs
+   a third party and — for reCAPTCHA/hCaptcha — the cookie banner this site
+   is deliberately built to avoid): a CSS-hidden honeypot field a real
+   visitor never reaches, and a minimum 3-second gap between when the page
+   rendered and when the form was submitted (`lib/forms.ts`'s
+   `looksLikeSpam`). Either one fails "successfully" — a normal-looking
+   success response, so a bot learns nothing from retrying.
+3. Rate-limited in-memory (`lib/rate-limit.ts`) at 5 submissions per IP per
+   10 minutes. Deliberately not Redis-backed — it's scoped to a single warm
+   serverless instance, which is the honest limit of "simple" here, not a
+   defense against a distributed sender.
+4. Sent via `lib/mail.ts` (nodemailer): `From` is always the association's
+   own authenticated mailbox (a visitor's address in `From` fails SPF/DKIM
+   at the receiving end and lands in spam), `Reply-To` is the visitor's
+   address so the board can just hit reply, `Subject` is "Kontaktanfrage
+   über treffpunkt-offenbach.com — {name}".
+5. Nothing is persisted anywhere in this flow — no database write — and the
+   error path deliberately never logs the message body or the sender's
+   address, only enough to see in the Vercel function logs that a send
+   failed and roughly why.
+
+**Works without JavaScript, as far as it reasonably can.** The `<form>`
+always carries a real `action="/api/kontakt" method="post"`, and the
+honeypot/timing fields are real form fields rather than ones JavaScript
+injects at submit time, so a browser with JS disabled still does a normal,
+working POST. The route handler tells the two cases apart by request
+`Content-Type` (`application/json` from `ContactForm`'s fetch call vs.
+`application/x-www-form-urlencoded` from a native submit) and responds
+accordingly — JSON back to `ContactForm`, or a 303 redirect to
+`/kontakt?gesendet=1` / `/kontakt?fehler=1` for the no-JS case, which
+`/kontakt`'s own server component reads and renders as a real, server-
+rendered confirmation or error state. The one real trade-off: that redirect
+carries only a status flag, never the submitted values (putting a
+visitor's name/email/message into a URL would land them in Vercel's own
+request logs, which is exactly what the "no log line with the message
+body" guarantee above is for) — so a no-JS visitor whose submission fails
+validation has to retype it. A JS-enabled visitor doesn't hit this at all;
+`ContactForm` keeps what they typed in place and shows the real per-field
+errors instead.
 
 ## Member data
 
