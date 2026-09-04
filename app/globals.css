@@ -235,6 +235,30 @@
     background-color: color-mix(in srgb, var(--c-hero-ink) 12%, transparent);
     background-size: 100% 2px;
   }
+
+  /* Hero photo credit — deliberately quiet: no bar, no background, just
+     text sitting on the scrim at low opacity via the theme-invariant
+     --c-hero-ink token (the same reasoning as .btn-outline-onphoto above —
+     the scrim doesn't re-theme, so neither can anything printed on it).
+     Each link brightens to full opacity and underlines on its own
+     hover/focus, independent of its neighbour and of the static "Foto:"/
+     "·" text, which always stays dim. */
+  .hero-credit {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--c-hero-ink) 55%, transparent);
+  }
+  .hero-credit a {
+    color: inherit;
+    transition: color 160ms var(--ease-brand);
+  }
+  .hero-credit a:hover,
+  .hero-credit a:focus-visible {
+    color: var(--c-hero-ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 /* Mark: three elements with tpof-* classes, drawn in sequence */

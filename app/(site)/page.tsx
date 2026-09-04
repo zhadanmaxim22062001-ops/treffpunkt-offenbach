@@ -132,35 +132,34 @@ export default function Home() {
               </div>
             )}
           </div>
-        </Container>
-      </header>
-      {heroImage && isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
-        <div className="bg-paper py-2">
-          <Container>
-            <p className="font-mono text-[11px]" style={{ color: "var(--c-muted)" }}>
-              Foto: {HERO_PHOTO_CREDIT.author},{" "}
-              <a
-                className="link-underline"
-                href={HERO_PHOTO_CREDIT.licenceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+          {/* Quiet by design — a line nobody is meant to read, not a
+              caption. Still carries every element CC BY-SA 4.0 requires
+              (author, licence, a link, in this "reasonable manner for the
+              medium"): the author's name links to the Commons file page,
+              the licence name links to the deed. The full record —
+              including the required note on what was changed — lives in
+              /impressum's Bildnachweise; this line doesn't repeat it. Sits
+              in normal flow after the grid (not absolutely positioned), so
+              it can never overlap the buttons above it — it just pushes
+              the header a little taller, which the photo/gradient/mark
+              behind it (all absolute inset-0 / positioned off explicit
+              percentages) stretch to cover automatically. Gated on the
+              same isMediaCreditComplete() as the photo itself — that guard
+              doesn't move; only the styling got quieter. */}
+          {heroImage && isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
+            <p className="hero-credit pb-6 text-right md:pb-8">
+              Foto:{" "}
+              <a href={HERO_PHOTO_CREDIT.filePageUrl} target="_blank" rel="noopener noreferrer">
+                {HERO_PHOTO_CREDIT.author}
+              </a>
+              {" · "}
+              <a href={HERO_PHOTO_CREDIT.licenceUrl} target="_blank" rel="noopener noreferrer">
                 {HERO_PHOTO_CREDIT.licenceName}
               </a>
-              , via{" "}
-              <a
-                className="link-underline"
-                href={HERO_PHOTO_CREDIT.filePageUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Wikimedia Commons
-              </a>{" "}
-              — {HERO_PHOTO_CREDIT.modifications}
             </p>
-          </Container>
-        </div>
-      )}
+          )}
+        </Container>
+      </header>
 
       {/* ---------------------------------------------- 2. Kennzahlen */}
       <Section tone="paper-2">
