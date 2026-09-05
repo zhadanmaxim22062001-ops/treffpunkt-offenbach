@@ -100,14 +100,14 @@ export default function Home() {
               <Heading
                 level={1}
                 ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach."
-                // The shared Heading clamp (up to 68px) was sized for a wider
-                // column than this hero's 540px cap gives it — at that size
-                // each of the three authored lines below wraps a second
-                // time, five/six visual lines instead of three. Overridden
-                // here only (not in components/ui.tsx, which every other
-                // page's h1 still uses unmodified): a smaller max keeps
-                // each authored line on one physical row within 540px.
-                style={heroImage ? { color: "var(--c-hero-ink)", fontSize: "clamp(28px, 4vw, 36px)" } : undefined}
+                // Back to the shared Heading clamp (clamp(38px,6.2vw,68px),
+                // components/ui.tsx) — no hero-specific override. A three-
+                // line cap once shrank this to clamp(28px,4vw,36px); four
+                // lines at desktop is fine, so that override is gone. The
+                // vertical-fit requirement (eyebrow/h1/lead/buttons visible
+                // at 1360x900 without scrolling) is met by the hero's own
+                // padding instead — see the reduced py-14/md:py-20 below.
+                style={heroImage ? { color: "var(--c-hero-ink)" } : undefined}
               >
                 <LineReveal
                   delay={HERO_TEXT_DELAY}
@@ -148,16 +148,21 @@ export default function Home() {
               medium"): the author's name links to the Commons file page,
               the licence name links to the deed. The full record —
               including the required note on what was changed — lives in
-              /impressum's Bildnachweise; this line doesn't repeat it. Sits
-              in normal flow after the grid (not absolutely positioned), so
-              it can never overlap the buttons above it — it just pushes
-              the header a little taller, which the photo/gradient/mark
-              behind it (all absolute inset-0 / positioned off explicit
-              percentages) stretch to cover automatically. Gated on the
-              same isMediaCreditComplete() as the photo itself — that guard
-              doesn't move; only the styling got quieter. */}
+              /impressum's Bildnachweise; this line doesn't repeat it.
+              Bottom LEFT now (was bottom-right, where it sat on top of the
+              mark — ugly and, post gradient-pull-in, unreadable): same
+              gutter as the headline/buttons above it, no extra alignment
+              class needed since it's a direct Container child same as
+              that column. Sits in normal flow after the grid (not
+              absolutely positioned), so it can never collide with the
+              buttons above it at any width, wrapped or not — it just
+              pushes the header a little taller, which the photo/gradient/
+              mark behind it (all absolute inset-0 / positioned off
+              explicit percentages) stretch to cover automatically. Gated
+              on the same isMediaCreditComplete() as the photo itself —
+              that guard doesn't move; only the position did. */}
           {heroImage && isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
-            <p className="hero-credit pb-6 text-right md:pb-8">
+            <p className="hero-credit pb-6 md:pb-8">
               Foto:{" "}
               <a href={HERO_PHOTO_CREDIT.filePageUrl} target="_blank" rel="noopener noreferrer">
                 {HERO_PHOTO_CREDIT.author}

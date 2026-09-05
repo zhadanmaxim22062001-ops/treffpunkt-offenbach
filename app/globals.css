@@ -293,13 +293,22 @@
     position: absolute;
     inset: 0;
   }
+  /* Pulled in from the previous 0/35/62/100%-at-88/74/34/16 spread: that
+     carried real darkness past the halfway point, when only the left
+     column (which stops well short of it) ever needed to be readable.
+     Now the weight sits entirely in the left 40%; from 70% on it's flat
+     at 5% — just enough to tie the sky to the palette, not perceptible
+     as darkening — so the mark's ring/F sit on an essentially untouched
+     photo (see .hero-mark-glow below for how their own contrast holds
+     up against that). ::after's bottom strip is unchanged. */
   .hero-scrim::before {
     background: linear-gradient(
       to right,
-      color-mix(in srgb, var(--c-hero-scrim) 88%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 74%, transparent) 35%,
-      color-mix(in srgb, var(--c-hero-scrim) 34%, transparent) 62%,
-      color-mix(in srgb, var(--c-hero-scrim) 16%, transparent) 100%
+      color-mix(in srgb, var(--c-hero-scrim) 80%, transparent) 0%,
+      color-mix(in srgb, var(--c-hero-scrim) 60%, transparent) 30%,
+      color-mix(in srgb, var(--c-hero-scrim) 18%, transparent) 55%,
+      color-mix(in srgb, var(--c-hero-scrim) 5%, transparent) 70%,
+      color-mix(in srgb, var(--c-hero-scrim) 5%, transparent) 100%
     );
   }
   @media (max-width: 899px) {
