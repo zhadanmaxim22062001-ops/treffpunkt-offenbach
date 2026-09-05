@@ -16,7 +16,10 @@ export default function Page() {
         <p><strong className="font-display">{VEREIN.name}</strong><br />
           {VEREIN.street}, {VEREIN.addressNote}<br />{VEREIN.zip} {VEREIN.city}</p>
         <p>Telefon: {VEREIN.phone}<br />E-Mail: {VEREIN.email}</p>
-        <p>Inhaltlich verantwortlich: {VEREIN.responsible}</p>
+        <p>
+          Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:<br />
+          {VEREIN.responsible}, Anschrift wie oben
+        </p>
         <p><strong className="font-display">Vorstand</strong><br />
           {VORSTAND.join(" · ")}</p>
         {/* TODO-COPY: Registergericht und Vereinsregisternummer ergänzen, sobald

@@ -20,7 +20,10 @@ export const VEREIN = {
   // getting relitigated at every call site.
   phoneE164: "+491712707607",
   email: "info@treffpunkt-offenbach.com",
-  responsible: "Klaus Kohlweyer",
+  // Petra Klein is "inhaltlich verantwortlich" (§ 18 Abs. 2 MStV) but is
+  // deliberately NOT one of the seven VORSTAND names above — confirmed with
+  // the board, not a mismatch to reconcile.
+  responsible: "Petra Klein",
   // TODO-COPY: Vereinsregister number and founding year — ask the board
   registerNumber: null as string | null,
   foundedYear: null as number | null,
