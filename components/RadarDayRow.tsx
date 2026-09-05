@@ -248,6 +248,25 @@ export function RadarDayRow({
             const isWeekend = weekday >= 5;
             const dotCount = Math.min(count, 2);
             const showMonthLabel = i === 0 || day.m !== days[i - 1].m;
+            // Three independent signals, each meaning exactly one thing, so
+            // they can combine without turning ambiguous: RING (today) is a
+            // 2px border with no fill; FILL (selected) is a solid circle;
+            // DOT (has entries) sits below the circle regardless of the
+            // other two. A plain day with none of these draws no circle at
+            // all — just a number, same as before this rewrite. Today AND
+            // selected together still show both: the ring just switches to
+            // --c-paper so it reads against the accent fill instead of
+            // disappearing into it.
+            const ringColor = isSelected ? "var(--c-paper)" : "var(--c-accent)";
+            const numberColor = isSelected
+              ? "var(--c-paper)"
+              : isToday
+                ? "var(--c-accent)"
+                : count > 0
+                  ? "var(--c-accent)"
+                  : isWeekend
+                    ? "var(--c-muted)"
+                    : "var(--c-ink)";
             return (
               <div
                 key={iso}
@@ -265,40 +284,25 @@ export function RadarDayRow({
                     : `${fullGermanDateWithWeekday(day)}, ${count} ${count === 1 ? "Termin" : "Termine"}`
                 }
                 onClick={() => selectDay(day)}
-                className="flex min-w-[54px] flex-1 shrink-0 snap-start flex-col items-center gap-1 pt-2 pb-3 outline-none min-[900px]:min-w-0"
-                style={{
-                  backgroundColor: isSelected ? "var(--c-accent)" : "transparent",
-                  boxShadow: isToday
-                    ? `inset 0 0 0 1px ${isSelected ? "var(--c-paper)" : "var(--c-accent)"}`
-                    : "none",
-                  cursor: "pointer",
-                }}
+                className="flex min-w-[54px] flex-1 shrink-0 snap-start cursor-pointer flex-col items-center gap-1.5 py-2 outline-none min-[900px]:min-w-0"
               >
                 <span
-                  className="h-[13px] font-mono text-[10px] uppercase tracking-[0.06em]"
-                  style={{ color: isSelected ? "var(--c-paper)" : "var(--c-muted)", opacity: showMonthLabel ? 1 : 0 }}
+                  className="h-[13px] font-mono text-[10px] uppercase tracking-[0.06em] text-muted"
+                  style={{ opacity: showMonthLabel ? 1 : 0 }}
                   aria-hidden="true"
                 >
                   {showMonthLabel ? monthShortLabel(day) : "–"}
                 </span>
-                <span
-                  className="font-mono text-[10px] uppercase tracking-[0.08em]"
-                  style={{ color: isSelected ? "var(--c-paper)" : "var(--c-muted)" }}
-                  aria-hidden="true"
-                >
+                <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted" aria-hidden="true">
                   {weekdayShortLabels()[weekday]}
                 </span>
                 <span
-                  className="font-mono text-[16px] tnum"
+                  className="flex h-11 w-11 items-center justify-center rounded-full font-mono text-[16px] tnum"
                   style={{
-                    color: isSelected
-                      ? "var(--c-paper)"
-                      : count > 0
-                        ? "var(--c-accent)"
-                        : isWeekend
-                          ? "var(--c-muted)"
-                          : "var(--c-ink)",
-                    fontWeight: count > 0 ? 600 : 400,
+                    backgroundColor: isSelected ? "var(--c-accent)" : "transparent",
+                    boxShadow: isToday ? `inset 0 0 0 2px ${ringColor}` : "none",
+                    color: numberColor,
+                    fontWeight: count > 0 || isToday || isSelected ? 600 : 400,
                   }}
                   aria-hidden="true"
                 >
@@ -309,7 +313,7 @@ export function RadarDayRow({
                     <span
                       key={dotIndex}
                       className="block h-[4px] w-[4px] rounded-full"
-                      style={{ backgroundColor: isSelected ? "var(--c-paper)" : "var(--c-accent)" }}
+                      style={{ backgroundColor: "var(--c-accent)" }}
                     />
                   ))}
                 </span>

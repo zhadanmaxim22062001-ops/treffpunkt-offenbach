@@ -38,163 +38,137 @@ export default function Home() {
   return (
     <>
       {/* ---------------------------------------------------- 1. Hero */}
-      {/* Split hero, not text-over-photo: three attempts at making an
-          overlay both readable and light enough all failed the same way
-          (this photo has detail edge to edge, no calm dark area to carry
-          type), so the text and the photo stop sharing pixels entirely.
-          ≥1024px: two columns, 46% navy --c-invert-bg panel / 54% photo,
-          full brightness, no scrim at all. Below that: photo on top
-          (4:3), panel below, full width — never text over the photo at
-          any size. --c-invert-fg on --c-invert-bg is ~15:1 in both
-          themes, so this is the one hero version where contrast isn't a
-          per-pixel measurement problem any more. */}
-      <header className={clsx("relative overflow-hidden", !heroImage && "bg-paper")}>
+      {/* Reverted to the full-bleed-photo-plus-directional-gradient
+          version — the split navy-panel/photo layout that briefly
+          replaced it was wrong (and, on the deployed build, the photo
+          column wasn't rendering at all). Photo across the whole hero,
+          headline over it, darkness concentrated behind the text and
+          fading open toward the right so the city shows through — no
+          hard edges anywhere, one soft transition. See .hero-scrim in
+          globals.css. */}
+      <header
+        className={clsx(
+          "relative overflow-hidden",
+          heroImage ? "min-h-[560px] md:min-h-[680px]" : "bg-paper",
+        )}
+      >
         {heroImage ? (
-          <div className="grid lg:min-h-[min(78vh,760px)] lg:grid-cols-[46fr_54fr]">
-            {/* Text panel — always the navy invert pairing, never the
-                photo-invariant --c-hero-* tokens: this is a real
-                background colour, not pixels of a photograph, so the
-                normal theme-relative --c-invert-fg already contrasts
-                correctly in both themes without needing an invariant
-                token. order-2/lg:order-1 stacks it BELOW the photo on
-                mobile/tablet and to its LEFT from 1024px up. z-0 (default)
-                keeps it behind the photo column at their shared seam, so
-                the mark's deliberate ~15% overlap (see below) paints on
-                top of the panel's flat colour, not the other way round. */}
-            <div className="relative order-2 grid bg-invert px-6 py-14 sm:px-10 lg:order-1 lg:grid-rows-[1fr_auto] lg:px-14 lg:py-16">
-              <div className="flex flex-col justify-center">
-                <div>
-                  <Eyebrow className="mb-6" style={{ color: "var(--c-invert-fg)", opacity: 0.85 }}>
-                    Gewerbeverein · Offenbach am Main
-                  </Eyebrow>
-                  <Heading
-                    level={1}
-                    ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach."
-                    className="max-w-[25ch]"
-                    style={{ color: "var(--c-invert-fg)", fontSize: "clamp(23px, calc(3.1vw - 7.5px), 38px)" }}
-                  >
-                    <LineReveal
-                      delay={HERO_TEXT_DELAY}
-                      lines={["Der Gewerbeverein für Handel,", "Handwerk und Dienstleistung", "in Offenbach."]}
-                    />
-                  </Heading>
-                  <MountReveal delay={HERO_TEXT_DELAY + 0.15}>
-                    <Lead className="mt-7 max-w-[38ch]" style={{ color: "var(--c-invert-fg)", opacity: 0.9 }}>
-                      Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
-                      Stadt und Öffentlichkeit.
-                    </Lead>
-                    <div className="mt-9 flex flex-wrap gap-3">
-                      <Button href="/mitglied-werden">Mitglied werden</Button>
-                      <Button href="/radar" variant="outline" onInvert>
-                        OF-Radar ansehen
-                      </Button>
-                    </div>
-                  </MountReveal>
+          <>
+            {/* Full-bleed photo. Cropped to bias toward the top on narrow
+                viewports (object-position) so the skyline stays in frame —
+                the river, which sits lower in the source photo, is what
+                gets cropped away first, not the towers. */}
+            <Image
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-[center_20%] md:object-[center_42%]"
+              aria-hidden="true"
+            />
+            {/* Directional scrim, not a flat overlay — see .hero-scrim in
+                globals.css. Darkness sits where the headline/lead/buttons
+                and the credit line actually are; the rest of the photo (the
+                skyline, the river) opens up instead of sitting under a flat
+                dark wash. */}
+            <div className="hero-scrim absolute inset-0" aria-hidden="true" />
+            {/* The mark, drawn large enough that its ring overlaps the
+                photo's skyline/river band — the "play" between the F
+                breaking out of the ring and the towers breaking the
+                horizon. That composition needs the wide two-column layout
+                to have room; below md the text stacks full-width and a
+                mark this size would sit on top of the buttons, so it's
+                hidden rather than fought into a cramped corner. */}
+            <div
+              className="hero-mark-glow pointer-events-none absolute hidden md:block"
+              style={{ right: "2%", bottom: "4%", width: "clamp(260px, 32vw, 480px)" }}
+              aria-hidden="true"
+            >
+              <HeroMark size={480} animated className="h-auto w-full" />
+            </div>
+          </>
+        ) : (
+          <BrandBackdrop />
+        )}
+        <Container className="relative z-10">
+          <div className={clsx("grid items-center gap-12 py-16 md:py-24", !heroImage && "md:grid-cols-[1.1fr_0.9fr]")}>
+            <div className={heroImage ? "max-w-[540px]" : undefined}>
+              <Eyebrow className="mb-6" style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.9 } : undefined}>
+                Gewerbeverein · Offenbach am Main
+              </Eyebrow>
+              <Heading
+                level={1}
+                ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach."
+                // The shared Heading clamp (up to 68px) was sized for a wider
+                // column than this hero's 540px cap gives it — at that size
+                // each of the three authored lines below wraps a second
+                // time, five/six visual lines instead of three. Overridden
+                // here only (not in components/ui.tsx, which every other
+                // page's h1 still uses unmodified): a smaller max keeps
+                // each authored line on one physical row within 540px.
+                style={heroImage ? { color: "var(--c-hero-ink)", fontSize: "clamp(28px, 4vw, 36px)" } : undefined}
+              >
+                <LineReveal
+                  delay={HERO_TEXT_DELAY}
+                  lines={["Der Gewerbeverein für Handel,", "Handwerk und Dienstleistung", "in Offenbach."]}
+                />
+              </Heading>
+              <MountReveal delay={HERO_TEXT_DELAY + 0.15}>
+                <Lead
+                  className="mt-7 max-w-[46ch]"
+                  style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.95 } : undefined}
+                >
+                  Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
+                  Stadt und Öffentlichkeit.
+                </Lead>
+                <div className="mt-9 flex flex-wrap gap-3">
+                  <Button href="/mitglied-werden" onPhoto={!!heroImage}>
+                    Mitglied werden
+                  </Button>
+                  <Button href="/radar" variant="outline" onPhoto={!!heroImage}>
+                    OF-Radar ansehen
+                  </Button>
                 </div>
-              </div>
-              {/* Credit line moved here from the photo — there's no scrim
-                  left for it to sit on, and it's still "adjacent to the
-                  image it credits" (CC BY-SA's requirement) sitting at the
-                  foot of the panel that borders that image directly. Same
-                  guard, same two links, quieter styling only. */}
-              {isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
-                <p className="hero-credit relative z-10 mt-10 text-right lg:mt-0 lg:self-end">
-                  Foto:{" "}
-                  <a href={HERO_PHOTO_CREDIT.filePageUrl} target="_blank" rel="noopener noreferrer">
-                    {HERO_PHOTO_CREDIT.author}
-                  </a>
-                  {" · "}
-                  <a href={HERO_PHOTO_CREDIT.licenceUrl} target="_blank" rel="noopener noreferrer">
-                    {HERO_PHOTO_CREDIT.licenceName}
-                  </a>
-                </p>
-              )}
+              </MountReveal>
             </div>
 
-            {/* Photo panel — full brightness, no scrim, not overflow-hidden
-                itself (only the outer <header> is): the mark below is
-                allowed to spill across the seam onto the panel to its
-                left by design, and only gets clipped where it would
-                otherwise truly overflow the page at the header's own
-                right/bottom edges. z-[1] wins the seam overlap against
-                the panel's z-0. */}
-            <div className="relative z-[1] order-1 aspect-[4/3] lg:order-2 lg:aspect-auto">
-              <Image
-                src={heroImage}
-                alt=""
-                fill
-                priority
-                sizes="(min-width: 1024px) 54vw, 100vw"
-                className="object-cover object-[center_30%] lg:object-[center_38%]"
-                aria-hidden="true"
-              />
-              {/* Same drawing as before — paper ring, --c-hero-accent F,
-                  the halo underneath (baked into HeroMark's own SVG, see
-                  components/Logo.tsx), the draw-on animation, and close to
-                  its old size: a corner accent, not a mark that dominates
-                  the photo. "Up to about 15%" seam overlap is a ceiling on
-                  what's allowed, not a target to hit — at this ~46/54
-                  split, a mark wide enough to actually touch the seam has
-                  to span nearly the whole photo column, and because its
-                  viewBox is square that made it just as much TALLER,
-                  overwhelming the photo (tried at both ~58vw and ~38vw;
-                  even the smaller of those still crept past proportionate).
-                  Kept at its original size instead: it stays comfortably
-                  clear of the text column and the button at every width —
-                  the two hard requirements — without forcing an overlap
-                  that the brief only ever offered as a "may". */}
+            {!heroImage && (
               <div
-                className="pointer-events-none absolute hidden lg:block"
-                style={{ right: "-2%", bottom: "-3%", width: "clamp(240px, 30vw, 420px)" }}
-                aria-hidden="true"
+                className="flex aspect-square w-full max-w-[400px] items-center justify-center justify-self-center border"
+                style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
               >
-                <HeroMark size={420} animated className="h-auto w-full" />
+                <LogoMark size={230} animated />
               </div>
-              <div
-                className="pointer-events-none absolute lg:hidden"
-                style={{ right: "-3%", bottom: "-6%", width: "clamp(120px, 30vw, 220px)" }}
-                aria-hidden="true"
-              >
-                <HeroMark size={220} animated className="h-auto w-full" />
-              </div>
-            </div>
+            )}
           </div>
-        ) : (
-          <>
-            <BrandBackdrop />
-            <Container className="relative z-10">
-              <div className="grid items-center gap-12 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-                <div>
-                  <Eyebrow className="mb-6">Gewerbeverein · Offenbach am Main</Eyebrow>
-                  <Heading level={1} ariaLabel="Der Gewerbeverein für Handel, Handwerk und Dienstleistung in Offenbach.">
-                    <LineReveal
-                      delay={HERO_TEXT_DELAY}
-                      lines={["Der Gewerbeverein für Handel,", "Handwerk und Dienstleistung", "in Offenbach."]}
-                    />
-                  </Heading>
-                  <MountReveal delay={HERO_TEXT_DELAY + 0.15}>
-                    <Lead className="mt-7 max-w-[46ch]">
-                      Gemeinsam für eine lebendige Innenstadt — seit vielen Jahren die Stimme der Betriebe gegenüber
-                      Stadt und Öffentlichkeit.
-                    </Lead>
-                    <div className="mt-9 flex flex-wrap gap-3">
-                      <Button href="/mitglied-werden">Mitglied werden</Button>
-                      <Button href="/radar" variant="outline">
-                        OF-Radar ansehen
-                      </Button>
-                    </div>
-                  </MountReveal>
-                </div>
-                <div
-                  className="flex aspect-square w-full max-w-[400px] items-center justify-center justify-self-center border"
-                  style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
-                >
-                  <LogoMark size={230} animated />
-                </div>
-              </div>
-            </Container>
-          </>
-        )}
+          {/* Quiet by design — a line nobody is meant to read, not a
+              caption. Still carries every element CC BY-SA 4.0 requires
+              (author, licence, a link, in this "reasonable manner for the
+              medium"): the author's name links to the Commons file page,
+              the licence name links to the deed. The full record —
+              including the required note on what was changed — lives in
+              /impressum's Bildnachweise; this line doesn't repeat it. Sits
+              in normal flow after the grid (not absolutely positioned), so
+              it can never overlap the buttons above it — it just pushes
+              the header a little taller, which the photo/gradient/mark
+              behind it (all absolute inset-0 / positioned off explicit
+              percentages) stretch to cover automatically. Gated on the
+              same isMediaCreditComplete() as the photo itself — that guard
+              doesn't move; only the styling got quieter. */}
+          {heroImage && isMediaCreditComplete(HERO_PHOTO_CREDIT) && (
+            <p className="hero-credit pb-6 text-right md:pb-8">
+              Foto:{" "}
+              <a href={HERO_PHOTO_CREDIT.filePageUrl} target="_blank" rel="noopener noreferrer">
+                {HERO_PHOTO_CREDIT.author}
+              </a>
+              {" · "}
+              <a href={HERO_PHOTO_CREDIT.licenceUrl} target="_blank" rel="noopener noreferrer">
+                {HERO_PHOTO_CREDIT.licenceName}
+              </a>
+            </p>
+          )}
+        </Container>
       </header>
 
       {/* ---------------------------------------------- 2. Kennzahlen */}

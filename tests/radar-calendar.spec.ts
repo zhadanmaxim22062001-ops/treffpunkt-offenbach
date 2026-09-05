@@ -35,8 +35,10 @@ test("an empty window shows an honest empty state with no false entries", async 
   await page.goto("/radar?ab=2026-11-01");
   await expect(page.locator('[aria-live="polite"]')).toHaveText("01.11.2026 – 10.11.2026");
   await expect(page.getByText("Keine Termine vom 01.11.2026 – 10.11.2026.")).toBeVisible();
-  // No day in this window should carry an entry dot.
-  const dots = page.locator('[role="radio"] span.rounded-full');
+  // No day in this window should carry an entry dot. The day-number circle
+  // is rounded-full too now (pill radius everywhere), so the dot needs its
+  // own size to distinguish it from that 44px circle.
+  const dots = page.locator('[role="radio"] span[class*="w-\\[4px\\]"]');
   await expect(dots).toHaveCount(0);
 });
 
@@ -46,7 +48,7 @@ test("the Offenbacher Woche range marks all four days and reports the full range
   const days = [28, 29, 30, 31];
   for (const d of days) {
     const cell = page.locator(`[role="radio"][aria-label*="${d}. Mai"]`);
-    await expect(cell.locator("span.rounded-full")).toHaveCount(1);
+    await expect(cell.locator('span[class*="w-\\[4px\\]"]')).toHaveCount(1);
   }
 
   // Selecting an interior day (30) should show the event once, with its
