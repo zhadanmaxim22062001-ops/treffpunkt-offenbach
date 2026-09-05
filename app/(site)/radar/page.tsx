@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Eyebrow, Heading, Lead, Rule, Section } from "@/components/ui";
 import { RadarList } from "@/components/RadarList";
-import { RadarCalendarWidget } from "@/components/RadarCalendarWidget";
+import { RadarDayRow } from "@/components/RadarDayRow";
 import {
   RADAR_CATEGORIES,
   RADAR_BUSINESS_CATEGORY_LIST,
@@ -10,8 +10,8 @@ import {
   getVisibleBusinessItems,
   type RadarCategory,
 } from "@/lib/radar-content";
-import { entriesOnDate, getCalendarEntries } from "@/lib/calendar";
-import { addMonths, todayBerlin, toIso } from "@/lib/date-berlin";
+import { defaultWindowSelection, getCalendarEntries } from "@/lib/calendar";
+import { addDays, addMonths, compareDates, todayBerlin, toIso } from "@/lib/date-berlin";
 
 export const metadata: Metadata = {
   title: "OF-Radar",
@@ -20,33 +20,36 @@ export const metadata: Metadata = {
   alternates: { types: { "application/rss+xml": "/radar/feed.xml" } },
 };
 
-type SearchParams = { kategorie?: string; monat?: string };
+type SearchParams = { kategorie?: string; ab?: string };
 
 function buildHref(kategorie?: string): string {
   return kategorie ? `/radar?kategorie=${encodeURIComponent(kategorie)}` : "/radar";
 }
 
-const MONTH_PARAM_RE = /^(\d{4})-(\d{2})$/;
+const WINDOW_START_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 const MONTHS_BACK = 12;
 const MONTHS_FORWARD = 24;
 
-/** Parses ?monat=YYYY-MM, clamped to the 12-back/24-forward browsing range
- *  — an out-of-range or malformed value falls back to the current month
+/** Parses ?ab=YYYY-MM-DD, clamped to the 12-months-back/24-forward browsing
+ *  range — a malformed, invalid, or out-of-range value falls back to today
  *  rather than erroring, same spirit as every other guard in this project:
  *  an honest default, not a broken page. */
-function resolveMonth(raw: string | undefined, today: { y: number; m: number }): { y: number; m: number } {
-  const match = raw?.match(MONTH_PARAM_RE);
+function resolveWindowStart(raw: string | undefined, today: ReturnType<typeof todayBerlin>) {
+  const match = raw?.match(WINDOW_START_RE);
   if (!match) return today;
   const y = Number(match[1]);
   const m = Number(match[2]);
+  const d = Number(match[3]);
   if (m < 1 || m > 12) return today;
-  const minTarget = addMonths({ y: today.y, m: today.m, d: 1 }, -MONTHS_BACK);
-  const maxTarget = addMonths({ y: today.y, m: today.m, d: 1 }, MONTHS_FORWARD);
-  const index = y * 12 + (m - 1);
-  const minIndex = minTarget.y * 12 + (minTarget.m - 1);
-  const maxIndex = maxTarget.y * 12 + (maxTarget.m - 1);
-  if (index < minIndex || index > maxIndex) return today;
-  return { y, m };
+  const candidate = { y, m, d };
+  // Round-tripping through toIso/parseIso would just re-parse the same
+  // numbers — the real validity check is that addDays(candidate, 0) lands
+  // back on itself; an impossible date like 2026-02-30 doesn't.
+  if (toIso(candidate) !== toIso(addDays(candidate, 0))) return today;
+  const minStart = addMonths(today, -MONTHS_BACK);
+  const maxStart = addMonths(today, MONTHS_FORWARD);
+  if (compareDates(candidate, minStart) < 0 || compareDates(candidate, maxStart) > 0) return today;
+  return candidate;
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -63,9 +66,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   // process's own time zone — see lib/date-berlin.ts.
   const todayDate = todayBerlin();
   const todayIso = toIso(todayDate);
-  const displayedMonth = resolveMonth(sp.monat, todayDate);
-  const isCurrentMonth = displayedMonth.y === todayDate.y && displayedMonth.m === todayDate.m;
-  const initialSelectedIso = isCurrentMonth && entriesOnDate(calendarEntries, todayIso).length > 0 ? todayIso : null;
+  const windowStart = resolveWindowStart(sp.ab, todayDate);
+  const windowDays = Array.from({ length: 10 }, (_, i) => addDays(windowStart, i));
+  const initialSelectedIso = defaultWindowSelection(calendarEntries, windowDays, todayIso);
 
   const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(todayIso);
   const items = activeCategory ? allBusinessItems.filter((item) => item.category === activeCategory) : allBusinessItems;
@@ -89,10 +92,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
 
       <div className="mt-10">
         <p className="eyebrow mb-6">Innenstadt-Kalender</p>
-        <RadarCalendarWidget
+        <RadarDayRow
           entries={calendarEntries}
-          initialYear={displayedMonth.y}
-          initialMonth={displayedMonth.m}
+          initialWindowStartIso={toIso(windowStart)}
           todayIso={todayIso}
           initialSelectedIso={initialSelectedIso}
           basePath="/radar"

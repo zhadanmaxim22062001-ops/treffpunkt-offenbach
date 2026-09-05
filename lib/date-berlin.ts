@@ -1,5 +1,5 @@
 /**
- * Calendar-date arithmetic for the OF-Radar month calendar. Deliberately has
+ * Calendar-date arithmetic for the OF-Radar day row. Deliberately has
  * nothing to do with time zones or instants — a calendar date (2026-05-28)
  * isn't one, and the moment you round-trip it through a JS Date/UTC to add
  * a day or find its weekday, you've turned it into one, and a reader east
@@ -119,43 +119,20 @@ export function todayBerlin(): CalendarDate {
   return { y: get("year"), m: get("month"), d: get("day") };
 }
 
-export type MonthGridCell = CalendarDate & { inMonth: boolean };
-
-/**
- * Every cell for a Monday-first month grid: the target month's own days,
- * plus exactly the leading days from the previous month needed to reach
- * the first Monday and the trailing days from the next month needed to
- * fill out the last week — never a full fixed 42-cell block, so a
- * five-week month stays five rows and a six-week one stays six.
- */
-export function getMonthGrid(year: number, month: number): MonthGridCell[] {
-  const firstWeekday = weekdayMonFirst({ y: year, m: month, d: 1 }); // 0=Mon
-  const totalDays = daysInMonth(year, month);
-  const cells: MonthGridCell[] = [];
-
-  for (let i = 0; i < firstWeekday; i++) {
-    const leading = addDays({ y: year, m: month, d: 1 }, i - firstWeekday);
-    cells.push({ ...leading, inMonth: false });
-  }
-  for (let d = 1; d <= totalDays; d++) {
-    cells.push({ y: year, m: month, d, inMonth: true });
-  }
-  let trailing = 1;
-  while (cells.length % 7 !== 0) {
-    const next = addMonths({ y: year, m: month, d: 1 }, 1);
-    cells.push({ y: next.y, m: next.m, d: trailing, inMonth: false });
-    trailing += 1;
-  }
-  return cells;
-}
-
 const WEEKDAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 export function weekdayShortLabels(): string[] {
   return WEEKDAY_LABELS;
 }
 
-const MONTH_FORMATTER = new Intl.DateTimeFormat("de-DE", { month: "long", timeZone: "UTC" });
 const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const WEEKDAY_DATE_FORMATTER = new Intl.DateTimeFormat("de-DE", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const SHORT_MONTH_FORMATTER = new Intl.DateTimeFormat("de-DE", { month: "short", timeZone: "UTC" });
 
 /**
  * Intl.DateTimeFormat needs *a* Date object to format, even though the
@@ -171,13 +148,23 @@ function toUtcMidnight({ y, m, d }: CalendarDate): Date {
   return new Date(Date.UTC(y, m - 1, d));
 }
 
-export function monthLabel(y: number, m: number): string {
-  const name = MONTH_FORMATTER.format(toUtcMidnight({ y, m, d: 1 }));
-  return `${name} ${y}`;
-}
-
 export function fullGermanDate(date: CalendarDate): string {
   return FULL_DATE_FORMATTER.format(toUtcMidnight(date));
+}
+
+/** "Samstag, 5. September 2026" — used for the day row's per-cell aria-label,
+ *  which needs the weekday spelled out; fullGermanDate above (no weekday)
+ *  still covers the places that already only ever showed the date. */
+export function fullGermanDateWithWeekday(date: CalendarDate): string {
+  return WEEKDAY_DATE_FORMATTER.format(toUtcMidnight(date));
+}
+
+/** "Sept." — only shown on the day row's first cell and on any cell where
+ *  the month changes from the one before it; no year, matching the row's
+ *  own compact style (a screen reader gets the full year via the cell's
+ *  aria-label regardless). */
+export function monthShortLabel(date: CalendarDate): string {
+  return SHORT_MONTH_FORMATTER.format(toUtcMidnight(date));
 }
 
 /** "28.05.2026" — the site's existing plain numeric German date format. */

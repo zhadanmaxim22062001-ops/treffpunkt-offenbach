@@ -118,25 +118,25 @@ type ButtonProps = {
   children: ReactNode;
   href: string;
   variant?: "solid" | "outline" | "ghost";
-  /** Set only when this button renders directly on the hero photo's scrim.
-   *  That scrim is theme-invariant (--c-hero-* in globals.css, never
-   *  redefined in the dark blocks — a photograph doesn't re-theme itself),
-   *  so the outline variant's normal theme-relative --c-ink/--c-line goes
-   *  near-invisible in light theme: dark navy text and a pale hairline on a
-   *  dark image. onPhoto swaps it for the .btn-outline-onphoto treatment,
-   *  built from the same invariant tokens as the scrim and the mark. The
-   *  solid variant is untouched by this prop — white-on-accent already
-   *  reads fine against the photo in both themes. */
-  onPhoto?: boolean;
+  /** Set only when this button renders on a --c-invert-bg surface (the
+   *  hero's navy text panel, or any other "invert" toned section). That
+   *  pairing is deliberately the opposite of the page's own theme-relative
+   *  direction in both themes (see --c-invert-bg/-fg in globals.css), so
+   *  the outline variant's normal --c-ink/--c-line goes dark-on-dark or
+   *  light-on-light there. onInvert swaps it for the .btn-outline-oninvert
+   *  treatment, built from --c-invert-fg instead. The solid variant is
+   *  untouched by this prop — white-on-accent already reads fine on both
+   *  the normal page background and the invert panel. */
+  onInvert?: boolean;
   className?: string;
 };
 
-export function Button({ children, href, variant = "solid", onPhoto = false, className }: ButtonProps) {
+export function Button({ children, href, variant = "solid", onInvert = false, className }: ButtonProps) {
   const base =
     "inline-flex items-center gap-2 px-5 py-3 font-display text-[14px] font-semibold tracking-[-0.005em] transition-colors duration-[120ms]";
-  if (variant === "outline" && onPhoto) {
+  if (variant === "outline" && onInvert) {
     return (
-      <Link href={href} className={clsx(base, "btn-outline-onphoto", className)}>
+      <Link href={href} className={clsx(base, "btn-outline-oninvert", className)}>
         {children}
       </Link>
     );

@@ -13,10 +13,10 @@ function formatDate(iso: string): string {
  * link, summary, the "Was das für Sie heißt" box (only when set: an
  * automatically-published frequenz entry never gets one), the deadline
  * countdown, and the sourced link. Extracted from components/RadarList.tsx
- * so the OF-Radar month calendar's selected-day panel (components/
- * RadarCalendarWidget.tsx) can show a frequenz entry exactly the way the
- * business list already shows every other item, rather than a second,
- * slightly-different implementation of the same block. `chipFadeDelay` is
+ * so the OF-Radar day row's selected-day panel (components/RadarDayRow.tsx)
+ * can show a frequenz entry exactly the way the business list already shows
+ * every other item, rather than a second, slightly-different implementation
+ * of the same block. `chipFadeDelay` is
  * the list's own staggered chip-fade-in timing — omit it for a single item
  * shown on its own, where there's nothing to stagger against.
  */

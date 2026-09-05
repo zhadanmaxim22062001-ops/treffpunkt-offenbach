@@ -3,7 +3,7 @@
  * is actually confirmed: the 2026 Offenbacher Woche, 28–31 May, its 28th
  * edition (see data/verein.ts KENNZAHLEN, where it's stated as history) —
  * carried below as isoStart/isoEnd since it's a real, already-public fact,
- * not a guess, and the OF-Radar month calendar needs at least one genuine
+ * not a guess, and the OF-Radar day row needs at least one genuine
  * multi-day entry to browse back to. It's already in the past as of any
  * "today" this site runs against from autumn 2026 onward, which is exactly
  * why `when` still separately says the *next* occurrence (2027) is unconfirmed

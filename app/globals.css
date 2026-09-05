@@ -217,18 +217,23 @@
     background-size: 100% 2px;
   }
 
-  /* Outline Button rendered directly on the hero photo (Button's onPhoto
-     prop) — built from the theme-invariant --c-hero-ink token instead of
-     --c-ink/--c-line/--c-accent, all of which flip per theme and would (in
-     light theme) paint dark navy text and a pale hairline onto a dark
-     photo. Border and hover-fill alphas via color-mix rather than a second
-     literal colour. Verified by pixel-sampling the rendered button against
-     the actual photo — see the commit that introduced this class for the
-     measured ratios. */
-  .btn-outline-onphoto {
-    border: 1px solid color-mix(in srgb, var(--c-hero-ink) 55%, transparent);
-    color: var(--c-hero-ink);
-    background-image: linear-gradient(var(--c-hero-ink), var(--c-hero-ink));
+  /* Outline Button rendered on a --c-invert-bg surface (Button's onInvert
+     prop) — the hero's navy text panel and, potentially, any other
+     "invert" toned section. Built from --c-invert-fg rather than
+     --c-ink/--c-line/--c-accent: those three are theme-relative in the
+     SAME direction as the page (dark in light theme, light in dark
+     theme), whereas --c-invert-bg/-fg is deliberately the opposite
+     pairing in both themes (see the tokens' definitions above) — so the
+     normal outline treatment would paint dark-on-dark in light theme and
+     light-on-light in dark theme on this surface. Unlike the old
+     photo-specific onPhoto variant this replaces, --c-invert-fg is
+     already theme-relative and correct in both themes on its own, so no
+     invariant token is needed here — it's a real background colour, not
+     photo pixels underneath. */
+  .btn-outline-oninvert {
+    border: 1px solid color-mix(in srgb, var(--c-invert-fg) 55%, transparent);
+    color: var(--c-invert-fg);
+    background-image: linear-gradient(var(--c-invert-fg), var(--c-invert-fg));
     background-repeat: no-repeat;
     background-position: 0 100%;
     background-size: 0 2px;
@@ -236,24 +241,29 @@
       background-color 160ms var(--ease-brand),
       background-size 180ms var(--ease-brand);
   }
-  .btn-outline-onphoto:hover,
-  .btn-outline-onphoto:focus-visible {
-    background-color: color-mix(in srgb, var(--c-hero-ink) 12%, transparent);
+  .btn-outline-oninvert:hover,
+  .btn-outline-oninvert:focus-visible {
+    background-color: color-mix(in srgb, var(--c-invert-fg) 12%, transparent);
     background-size: 100% 2px;
   }
 
-  /* Hero photo credit — deliberately quiet: no bar, no background, just
-     text sitting on the scrim at low opacity via the theme-invariant
-     --c-hero-ink token (the same reasoning as .btn-outline-onphoto above —
-     the scrim doesn't re-theme, so neither can anything printed on it).
-     Each link brightens to full opacity and underlines on its own
-     hover/focus, independent of its neighbour and of the static "Foto:"/
-     "·" text, which always stays dim. */
+  /* Hero photo credit — now sits on the navy panel's own bottom edge
+     (the photo carries no scrim for it to sit on any more), so it reads
+     off --c-invert-fg like everything else on that panel rather than the
+     photo-invariant --c-hero-ink. Each link brightens to full opacity and
+     underlines on its own hover/focus, independent of its neighbour and
+     of the static "Foto:"/"·" text, which always stays dim. */
   .hero-credit {
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.06em;
-    color: color-mix(in srgb, var(--c-hero-ink) 55%, transparent);
+    /* 65%, not the 55% this started at — measured (same pixel-sampling
+       approach as the rest of this project's contrast work): 55% gave
+       #748290 on the invert panel's paper-toned side, 3.71:1 against the
+       required 4.5:1. Both theme directions use the exact same two hex
+       values (just swapped which is "bg"), so this alpha is symmetric —
+       no separate light/dark tuning needed. */
+    color: color-mix(in srgb, var(--c-invert-fg) 65%, transparent);
   }
   .hero-credit a {
     color: inherit;
@@ -261,104 +271,31 @@
   }
   .hero-credit a:hover,
   .hero-credit a:focus-visible {
-    color: var(--c-hero-ink);
+    color: var(--c-invert-fg);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
-  /* Hero photo scrim — a thin, flat, unifying layer across the WHOLE
-     photo (just enough to tie it to the palette, not enough to hide the
-     city), plus a bottom-edge strip so the buttons/credit keep their
-     footing. The job of making the text readable no longer lives here —
-     see .hero-text-plate below — so this stays a single low alpha rather
-     than a directional gradient. Both are pseudo-elements (no
-     background-image, so neither is ever LCP-eligible) on an empty,
-     aria-hidden host div. */
-  .hero-scrim::before,
-  .hero-scrim::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-  }
-  .hero-scrim::before {
-    background: color-mix(in srgb, var(--c-hero-scrim) 14%, transparent);
-  }
-  .hero-scrim::after {
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--c-hero-scrim) 55%, transparent) 0%,
-      transparent 22%
-    );
-  }
-
-  /* The hero text plate — where the darkness that makes the headline
-     readable actually lives now, instead of a viewport-wide gradient.
-     Sized and positioned to the TEXT COLUMN, not the header: this class
-     goes directly on that column (which is what makes it "reflow with
-     the h1" for free — it's the same box, not a copy measured to match
-     it, so there's nothing to keep in sync across breakpoints).
-     position: relative here is what gives the ::before below something
-     to size itself against.
-
-     The plate itself is deliberately 110% of the column's own width, and
-     the gradient's stops are written as fractions of THAT wider box:
-     flat at 80% alpha from 0% to ~63.6% of the plate (which is exactly
-     70% of the column — 70 / 110), then down to fully transparent at
-     100% of the plate (110% of the column). Doing it this way means the
-     fade-to-zero point falls INSIDE the plate's own box instead of at
-     its edge, which is the difference between "invisible as a shape" and
-     a visible hard cutoff — a plate sized to exactly 100% of the column
-     with stops written past its own edge would just clip at a nonzero
-     alpha, and you'd be able to point at the line. */
-  .hero-text-plate {
-    position: relative;
-  }
-  .hero-text-plate::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 110%;
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--c-hero-scrim) 80%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 80%, transparent) 63.6%,
-      transparent 100%
-    );
-    pointer-events: none;
-  }
-
-  /* Small radial darkening centred on the hero mark — the halo (see the
-     tpof-* rules and HeroMark in components/Logo.tsx) wasn't quite enough
-     on its own where the mark sits over the brightest part of the sky;
-     measured by pixel-sampling, the worst point on the F needed about 6
-     more points of alpha to clear 3:1, so this stays deliberately weak and
-     tight rather than a heavier halo (which would fray, not help — see the
-     commit that added this). Extends slightly past the mark's own box
-     (inset: -15%) so the falloff has no hard edge. */
-  .hero-mark-glow::before {
-    content: "";
-    position: absolute;
-    inset: -15%;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--c-hero-scrim) 32%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 20%, transparent) 55%,
-      color-mix(in srgb, var(--c-hero-scrim) 10%, transparent) 80%,
-      transparent 100%
-    );
-  }
-
-  /* OF-Radar month calendar: the grid cross-fades on month change, 150ms,
-     and that's all — no slide, no direction. Reuses the existing
-     tpof-chip-fade keyframe rather than a new one; a `key` change on the
-     host element (components/RadarCalendarWidget.tsx) unmounts/remounts it
-     so the animation restarts, immediately, in the same render — see that
-     component for why it's a plain restarted keyframe and not
-     AnimatePresence. */
-  .radar-grid-fade {
+  /* OF-Radar ten-day row: cross-fades on window change, 150ms, and that's
+     all — no slide, no direction. Reuses the existing tpof-chip-fade
+     keyframe rather than a new one; a `key` change on the host element
+     (components/RadarDayRow.tsx) unmounts/remounts it so the animation
+     restarts, immediately, in the same render — see that component for
+     why it's a plain restarted keyframe and not AnimatePresence (which
+     delays the new window's mount past when keyboard focus needs to move
+     onto it). */
+  .radar-row-fade {
     animation: tpof-chip-fade 150ms var(--ease-brand) both;
+  }
+
+  /* Scrollbar-less horizontal scroll for the day row below 900px — the
+     row still scrolls (scroll-snap handles the actual paging-by-touch),
+     it just doesn't need chrome cluttering a 40px-tall strip. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 

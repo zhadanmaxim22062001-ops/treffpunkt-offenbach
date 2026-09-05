@@ -7,12 +7,11 @@ import type { Event } from "@/data/content";
  * A single association event's full rendering — summary, the confirmed date
  * range (or an honest "not yet confirmed" notice), and the .ics download.
  * Extracted from app/(site)/veranstaltungen/[slug]/page.tsx so the OF-Radar
- * month calendar's selected-day panel can show a verein-sourced entry with
- * the same block that page already uses, rather than a second
- * implementation of the same date-range-plus-.ics logic. That page keeps
- * its own Eyebrow/H1 around this; `heading`, when passed, renders an h2 +
- * place line instead, for contexts (the calendar) with no page-level H1 of
- * their own to reuse.
+ * day row's selected-day panel can show a verein-sourced entry with the same
+ * block that page already uses, rather than a second implementation of the
+ * same date-range-plus-.ics logic. That page keeps its own Eyebrow/H1 around
+ * this; `heading`, when passed, renders an h2 + place line instead, for
+ * contexts (the day row) with no page-level H1 of their own to reuse.
  */
 export function VereinEventBody({ event, heading = false }: { event: Event; heading?: boolean }) {
   return (

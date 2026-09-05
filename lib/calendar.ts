@@ -1,7 +1,7 @@
 import { getAllEvents, hasConfirmedDate } from "@/lib/events";
 import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, type RadarItem } from "@/lib/radar-content";
 import type { Event } from "@/data/content";
-import { parseIso, compareDates, isWithinRange, type CalendarDate } from "@/lib/date-berlin";
+import { parseIso, compareDates, isWithinRange, toIso, type CalendarDate } from "@/lib/date-berlin";
 
 type CalendarEntryBase = {
   key: string;
@@ -15,7 +15,7 @@ type CalendarEntryBase = {
 /**
  * A real discriminated union (not `source` plus a loose `RadarItem | Event`
  * union on `item`) so switching on `entry.source` actually narrows
- * `entry.item`'s type — the OF-Radar month calendar's day panel needs that
+ * `entry.item`'s type — the OF-Radar day row's day panel needs that
  * to pick RadarItemBody vs VereinEventBody without a cast. The full
  * original record travels with the entry either way, so rendering an
  * entry's details reuses the same components that already render a
@@ -32,7 +32,7 @@ export type CalendarEntry =
  * board-confirmed date, same guard /veranstaltungen already uses, isoEnd
  * carried through so multi-day events like Offenbacher Woche span their real
  * range) merged with frequenz-category OF-Radar items (data/radar.json).
- * Feeds the month calendar at the top of /radar and the homepage teaser.
+ * Feeds the day row at the top of /radar and the homepage teaser.
  *
  * Deliberately independent of RADAR_ITEMS_ARE_PLACEHOLDER for the events
  * half — the association's own confirmed events are real regardless of
@@ -77,20 +77,6 @@ export function entriesOnDate(entries: CalendarEntry[], iso: string): CalendarEn
   return entries.filter((e) => isWithinRange(date, parseIso(e.dateStart), parseIso(e.dateEnd)));
 }
 
-/** Every entry touching the given month at all — including a multi-day entry
- *  that starts in the previous month or ends in the next one, so it still
- *  marks its days that DO fall in the displayed month. */
-export function entriesTouchingMonth(entries: CalendarEntry[], year: number, month: number): CalendarEntry[] {
-  const monthStart: CalendarDate = { y: year, m: month, d: 1 };
-  const monthEnd: CalendarDate = { y: month === 12 ? year + 1 : year, m: month === 12 ? 1 : month + 1, d: 1 };
-  return entries.filter((e) => {
-    const start = parseIso(e.dateStart);
-    const end = parseIso(e.dateEnd);
-    // ranges overlap iff start < monthEnd && end >= monthStart
-    return compareDates(start, monthEnd) < 0 && compareDates(end, monthStart) >= 0;
-  });
-}
-
 /** The next entry starting on or after `iso`, earliest first — used for the
  *  "keine Termine am <Datum>, aber am <nächstes Datum>" fallback link. */
 export function nextEntryOnOrAfter(entries: CalendarEntry[], iso: string): CalendarEntry | undefined {
@@ -98,4 +84,21 @@ export function nextEntryOnOrAfter(entries: CalendarEntry[], iso: string): Calen
   return entries
     .filter((e) => compareDates(parseIso(e.dateStart), date) >= 0)
     .sort((a, b) => a.dateStart.localeCompare(b.dateStart))[0];
+}
+
+/**
+ * The one rule for which day the ten-day row pre-selects, shared between
+ * the server (SSR's initial state) and the client (RadarDayRow after
+ * paging or "Heute") so the two can never drift apart: today, if it falls
+ * in `days` and has an entry; else the first day in `days` that does;
+ * else null (an honest "nothing here" rather than forcing a choice).
+ */
+export function defaultWindowSelection(entries: CalendarEntry[], days: CalendarDate[], todayIso: string): string | null {
+  const todayInWindow = days.some((d) => toIso(d) === todayIso);
+  if (todayInWindow && entriesOnDate(entries, todayIso).length > 0) return todayIso;
+  for (const d of days) {
+    const iso = toIso(d);
+    if (entriesOnDate(entries, iso).length > 0) return iso;
+  }
+  return null;
 }
