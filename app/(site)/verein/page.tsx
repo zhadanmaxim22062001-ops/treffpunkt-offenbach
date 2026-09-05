@@ -32,21 +32,21 @@ export default function Page() {
           Der Vorstand des Gewerbevereins Treffpunkt Offenbach e. V.
         </p>
 
-        {/* One plain list, in the order the association itself uses — nine
-            rows, which is odd, so a single column stays even; a two-column
-            grid would leave one row stranded. Space, not rules, separates
-            them. */}
-        <ul className="mt-10 flex flex-col gap-7 max-w-[28ch]">
-          {VORSTAND.map((v) => (
-            <li key={v.name}>
-              <p className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{v.role}</p>
-              <p className="mt-1 font-display text-[19px] font-semibold">{v.name}</p>
+        {/* Plain list, in the association's own order — seven rows, so a
+            single column stays even; a two-column grid would leave one row
+            stranded. Space, not rules, separates them. Names only: the
+            board changed and no office assignments were given with the new
+            roster, so there is no role line to show. */}
+        <ul className="mt-10 flex flex-col gap-4 max-w-[28ch]">
+          {VORSTAND.map((name) => (
+            <li key={name}>
+              <p className="font-display text-[19px] font-semibold">{name}</p>
             </li>
           ))}
         </ul>
 
         <p className="prose-body mt-10 max-w-[60ch] text-[13px] text-muted">
-          Namen und Funktionen — der Vorstand eines eingetragenen Vereins ist öffentlich, private Kontaktdaten sind
+          Namen — der Vorstand eines eingetragenen Vereins ist öffentlich, private Kontaktdaten sind
           es nicht. Persönliche Telefonnummern oder E-Mail-Adressen finden Sie hier bewusst nicht; die vollständigen
           Vorstandsangaben stehen zusätzlich im{" "}
           <Link href="/impressum" className="link-underline">

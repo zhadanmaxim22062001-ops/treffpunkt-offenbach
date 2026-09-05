@@ -18,18 +18,22 @@ export const VEREIN = {
   foundedYear: null as number | null,
 };
 
-// Roles verbatim from treffpunkt-of.de — "Kassierer" and "Schriftführer
-// stellv.", not the "Kassenwart"/"stellv. Schriftführer" this used to say.
-export const VORSTAND = [
-  { name: "Stefan Becker", role: "1. Vorsitzender" },
-  { name: "Klaus Kohlweyer", role: "2. Vorsitzender" },
-  { name: "Tobias Allmeroth", role: "Kassierer" },
-  { name: "Jürgen Proske", role: "Schriftführer" },
-  { name: "Roland Nowak", role: "Schriftführer stellv." },
-  { name: "Birgitt Möbus", role: "Beisitzerin" },
-  { name: "Ursula Ölcer", role: "Beisitzerin" },
-  { name: "Matthias Roth", role: "Beisitzer" },
-  { name: "Günther Rösler", role: "Beisitzer" },
+/**
+ * The current board, in the association's own order. Deliberately just
+ * names — no `role` field. The board changed and we were given the new
+ * roster without office assignments; inventing "1. Vorsitzender" etc. next
+ * to a name nobody confirmed would be worse than the plain list. If/when
+ * the board confirms who holds which office, add a `role` field back then,
+ * filled in for every entry — not a mix of real and guessed roles.
+ */
+export const VORSTAND: string[] = [
+  "Petra Klein",
+  "Andy Hymmer",
+  "Roland Nowak",
+  "Birgitt Möbus",
+  "Ursula Ölcer",
+  "Matthias Roth",
+  "Mark Pegels",
 ];
 
 export const KENNZAHLEN = [

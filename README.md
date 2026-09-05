@@ -633,6 +633,14 @@ one on its own. Last run against the production build: **100 / 100 / 100 /
   watch for the "OF-Radar: neue Termine" pull request the GitHub Actions
   workflow opens for calendar entries;
 - Vereinsregister number and founding year, for the Impressum and `/verein`;
+- **Which board member(s) are Vertretungsberechtigte** — the board changed
+  (seven names, `data/verein.ts`'s `VORSTAND`) and we were given the new
+  roster with no office assignments. § 5 DDG wants the Impressum to name who
+  is authorised to represent the association, usually the Vorsitzende(n);
+  right now `/impressum` lists the seven names with no roles at all, which
+  is thinner than it should be. Ask the board which of the seven (if any)
+  hold that role before adding roles back — not a mix of confirmed and
+  guessed ones;
 - Membership fee amounts, for the open fee table on `/mitglied-werden`;
 - Confirmation that an AVV (data processing agreement) is in place with
   Vercel, and which Art. 44 DSGVO transfer basis applies — flagged

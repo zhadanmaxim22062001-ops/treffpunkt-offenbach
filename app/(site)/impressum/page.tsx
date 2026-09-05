@@ -18,9 +18,16 @@ export default function Page() {
         <p>Telefon: {VEREIN.phone}<br />E-Mail: {VEREIN.email}</p>
         <p>Inhaltlich verantwortlich: {VEREIN.responsible}</p>
         <p><strong className="font-display">Vorstand</strong><br />
-          {VORSTAND.map((v) => `${v.name} (${v.role})`).join(" · ")}</p>
+          {VORSTAND.join(" · ")}</p>
         {/* TODO-COPY: Registergericht und Vereinsregisternummer ergänzen, sobald
-            der Vorstand sie mitteilt — siehe VEREIN.registerNumber in data/verein.ts. */}
+            der Vorstand sie mitteilt — siehe VEREIN.registerNumber in data/verein.ts.
+            OPEN QUESTION FOR THE BOARD (flagged, not guessed): § 5 DDG wants the
+            Impressum to name who is authorised to represent the association
+            (Vertretungsberechtigte, usually the Vorsitzende(n)). We have seven
+            board names with no office assignments, so this Impressum can't say
+            who that is — ask the board which of the seven (if any) hold that
+            role, or confirm it's still Vorstand-as-a-whole. See README's "From
+            the board, still needed" list. */}
 
         <div>
           <strong className="font-display">Bildnachweise</strong>
