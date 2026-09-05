@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Eyebrow, Heading, Lead, Rule, Section } from "@/components/ui";
 import { RadarList } from "@/components/RadarList";
-import { Calendar } from "@/components/Calendar";
+import { RadarCalendarWidget } from "@/components/RadarCalendarWidget";
 import {
   RADAR_CATEGORIES,
   RADAR_BUSINESS_CATEGORY_LIST,
@@ -10,7 +10,8 @@ import {
   getVisibleBusinessItems,
   type RadarCategory,
 } from "@/lib/radar-content";
-import { getCalendarEntries } from "@/lib/calendar";
+import { entriesOnDate, getCalendarEntries } from "@/lib/calendar";
+import { addMonths, todayBerlin, toIso } from "@/lib/date-berlin";
 
 export const metadata: Metadata = {
   title: "OF-Radar",
@@ -19,10 +20,33 @@ export const metadata: Metadata = {
   alternates: { types: { "application/rss+xml": "/radar/feed.xml" } },
 };
 
-type SearchParams = { kategorie?: string };
+type SearchParams = { kategorie?: string; monat?: string };
 
 function buildHref(kategorie?: string): string {
   return kategorie ? `/radar?kategorie=${encodeURIComponent(kategorie)}` : "/radar";
+}
+
+const MONTH_PARAM_RE = /^(\d{4})-(\d{2})$/;
+const MONTHS_BACK = 12;
+const MONTHS_FORWARD = 24;
+
+/** Parses ?monat=YYYY-MM, clamped to the 12-back/24-forward browsing range
+ *  — an out-of-range or malformed value falls back to the current month
+ *  rather than erroring, same spirit as every other guard in this project:
+ *  an honest default, not a broken page. */
+function resolveMonth(raw: string | undefined, today: { y: number; m: number }): { y: number; m: number } {
+  const match = raw?.match(MONTH_PARAM_RE);
+  if (!match) return today;
+  const y = Number(match[1]);
+  const m = Number(match[2]);
+  if (m < 1 || m > 12) return today;
+  const minTarget = addMonths({ y: today.y, m: today.m, d: 1 }, -MONTHS_BACK);
+  const maxTarget = addMonths({ y: today.y, m: today.m, d: 1 }, MONTHS_FORWARD);
+  const index = y * 12 + (m - 1);
+  const minIndex = minTarget.y * 12 + (minTarget.m - 1);
+  const maxIndex = maxTarget.y * 12 + (maxTarget.m - 1);
+  if (index < minIndex || index > maxIndex) return today;
+  return { y, m };
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -35,9 +59,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
 
   // Computed fresh per request — this route is already dynamic (the
   // searchParams-driven filter forces that), so "today" here is never
-  // baked into a static build.
-  const today = new Date().toISOString().slice(0, 10);
-  const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(today);
+  // baked into a static build. Europe/Berlin explicitly, not the server
+  // process's own time zone — see lib/date-berlin.ts.
+  const todayDate = todayBerlin();
+  const todayIso = toIso(todayDate);
+  const displayedMonth = resolveMonth(sp.monat, todayDate);
+  const isCurrentMonth = displayedMonth.y === todayDate.y && displayedMonth.m === todayDate.m;
+  const initialSelectedIso = isCurrentMonth && entriesOnDate(calendarEntries, todayIso).length > 0 ? todayIso : null;
+
+  const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(todayIso);
   const items = activeCategory ? allBusinessItems.filter((item) => item.category === activeCategory) : allBusinessItems;
 
   return (
@@ -57,11 +87,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         </a>
       </p>
 
-      {calendarEntries.length > 0 && (
-        <div className="mt-10">
-          <Calendar entries={calendarEntries} />
-        </div>
-      )}
+      <div className="mt-10">
+        <p className="eyebrow mb-6">Innenstadt-Kalender</p>
+        <RadarCalendarWidget
+          entries={calendarEntries}
+          initialYear={displayedMonth.y}
+          initialMonth={displayedMonth.m}
+          todayIso={todayIso}
+          initialSelectedIso={initialSelectedIso}
+          basePath="/radar"
+        />
+      </div>
 
       <div className="mt-16">
         <Heading level={2} className="max-w-[28ch]">

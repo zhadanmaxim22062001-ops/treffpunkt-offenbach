@@ -349,6 +349,17 @@
       transparent 100%
     );
   }
+
+  /* OF-Radar month calendar: the grid cross-fades on month change, 150ms,
+     and that's all — no slide, no direction. Reuses the existing
+     tpof-chip-fade keyframe rather than a new one; a `key` change on the
+     host element (components/RadarCalendarWidget.tsx) unmounts/remounts it
+     so the animation restarts, immediately, in the same render — see that
+     component for why it's a plain restarted keyframe and not
+     AnimatePresence. */
+  .radar-grid-fade {
+    animation: tpof-chip-fade 150ms var(--ease-brand) both;
+  }
 }
 
 /* Mark: three elements with tpof-* classes, drawn in sequence */

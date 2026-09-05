@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Eyebrow, Heading, Section } from "@/components/ui";
-import { IcsDownloadButton } from "@/components/IcsDownloadButton";
+import { VereinEventBody } from "@/components/VereinEventBody";
 import { getAllEvents, getEventBySlug, hasConfirmedDate } from "@/lib/events";
 
 export function generateStaticParams() {
@@ -13,11 +13,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const event = getEventBySlug(slug);
   if (!event) return {};
   return { title: event.title, description: event.summary };
-}
-
-function formatGermanDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y}`;
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
@@ -33,30 +28,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         {event.when} · {event.place}
       </Eyebrow>
       <Heading level={1}>{event.title}</Heading>
-      <p className="prose-body mt-6 text-[17px]">{event.summary}</p>
-
-      {confirmed ? (
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <p className="font-mono text-[13px] tnum text-ink-2">
-            {formatGermanDate(event.isoStart)}
-            {event.isoEnd && ` – ${formatGermanDate(event.isoEnd)}`}
-          </p>
-          <IcsDownloadButton
-            event={{
-              slug: event.slug,
-              title: event.title,
-              summary: event.summary,
-              location: `${event.place}, Offenbach am Main`,
-              isoStart: event.isoStart,
-              isoEnd: event.isoEnd,
-            }}
-          />
-        </div>
-      ) : (
-        <p className="mt-8 inline-block px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em]" style={{ background: "var(--c-accent-soft)", color: "var(--c-accent)" }}>
-          Termin noch nicht bestätigt
-        </p>
-      )}
+      <div className="mt-6">
+        <VereinEventBody event={event} />
+      </div>
 
       {confirmed && (
         <script

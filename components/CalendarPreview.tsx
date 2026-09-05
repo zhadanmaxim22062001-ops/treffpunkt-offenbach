@@ -29,8 +29,8 @@ export function CalendarPreview({ entries, limit }: { entries: CalendarEntry[]; 
   if (today === null) return null;
 
   const upcoming = entries
-    .filter((entry) => new Date(`${entry.date}T00:00:00`).getTime() >= today)
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .filter((entry) => new Date(`${entry.dateStart}T00:00:00`).getTime() >= today)
+    .sort((a, b) => a.dateStart.localeCompare(b.dateStart))
     .slice(0, limit);
 
   if (upcoming.length === 0) return null;
@@ -40,7 +40,8 @@ export function CalendarPreview({ entries, limit }: { entries: CalendarEntry[]; 
       {upcoming.map((entry) => (
         <li key={entry.key}>
           <Link href={entry.href} className="link-underline font-mono text-[13px] tnum">
-            {formatDate(entry.date)} — {entry.title}
+            {formatDate(entry.dateStart)}
+            {entry.dateEnd !== entry.dateStart ? `–${formatDate(entry.dateEnd)}` : ""} — {entry.title}
           </Link>
         </li>
       ))}

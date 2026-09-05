@@ -1,11 +1,18 @@
 /**
  * Seed content for the homepage and /veranstaltungen. Only one date in here
- * is actually confirmed: the 2026 Offenbacher Woche ran 28–31 May, its 28th
- * edition — and that's already in the past (see data/verein.ts KENNZAHLEN,
- * where it's stated as history, not a claim about what's next). Nobody has
- * given us a confirmed date for any *upcoming* occurrence of any of these
- * four events, so `isoStart`/`isoEnd` are omitted everywhere below.
+ * is actually confirmed: the 2026 Offenbacher Woche, 28–31 May, its 28th
+ * edition (see data/verein.ts KENNZAHLEN, where it's stated as history) —
+ * carried below as isoStart/isoEnd since it's a real, already-public fact,
+ * not a guess, and the OF-Radar month calendar needs at least one genuine
+ * multi-day entry to browse back to. It's already in the past as of any
+ * "today" this site runs against from autumn 2026 onward, which is exactly
+ * why `when` still separately says the *next* occurrence (2027) is unconfirmed
+ * — isoStart/isoEnd describe which date already happened, not a claim about
+ * what's next. `getNextConfirmedEvent()` (lib/events.ts) only ever considers
+ * a future isoStart, so a past one here doesn't make it show up as "next."
  *
+ * Nobody has given us a confirmed date for any *upcoming* occurrence of any
+ * of these four events, so isoStart/isoEnd stay omitted everywhere else.
  * Leave them omitted until a real board-confirmed date exists. lib/events.ts
  * treats an event without isoStart as dateless: no Event JSON-LD (schema.org
  * requires startDate, and a guessed one would be worse than none), no .ics
@@ -31,6 +38,10 @@ export const EVENTS: Event[] = [
     slug: "offenbacher-woche",
     title: "Offenbacher Woche",
     when: "Termin für 2027 noch offen",
+    // The 2026 edition's real, already-public dates — see the file-level
+    // comment above for why this is recorded despite being in the past.
+    isoStart: "2026-05-28",
+    isoEnd: "2026-05-31",
     place: "Innenstadt",
     summary:
       "Vier Tage Musik, Marktstände und verkaufsoffener Sonntag. 2026 haben wir sie zum 28. Mal ausgerichtet, vom 28. bis 31. Mai — gemeinsam mit dem Einzelhandel der Innenstadt.",
