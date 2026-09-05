@@ -23,7 +23,7 @@ export function Footer() {
             <br />
             {VEREIN.zip} {VEREIN.city}
             <br />
-            <a className="link-underline" href={`tel:${VEREIN.phone.replace(/\s/g, "")}`}>
+            <a className="link-underline" href={`tel:${VEREIN.phoneE164}`}>
               {VEREIN.phone}
             </a>
             <br />

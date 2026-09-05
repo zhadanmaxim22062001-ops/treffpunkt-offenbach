@@ -34,7 +34,7 @@ const JSON_LD = {
   alternateName: VEREIN.shortName,
   url: SITE_URL,
   email: VEREIN.email,
-  telephone: VEREIN.phone,
+  telephone: VEREIN.phoneE164,
   address: {
     "@type": "PostalAddress",
     streetAddress: VEREIN.street,

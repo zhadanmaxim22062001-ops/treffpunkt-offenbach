@@ -10,7 +10,15 @@ export const VEREIN = {
   addressNote: "im Hause M. Schneider",
   zip: "63065",
   city: "Offenbach am Main",
-  phone: "0160 92240226",
+  // Display format, spaced exactly as the association gives it out.
+  phone: "0171 2707607",
+  // E.164 — the only form actually valid inside a tel: href or schema.org's
+  // `telephone`. Derived from `phone`, but kept as its own field rather than
+  // computed at call sites: stripping/reformatting a German number into
+  // E.164 isn't a one-line regex in general (mobile vs. landline prefixes,
+  // the dropped leading 0), so this is filled in by hand once instead of
+  // getting relitigated at every call site.
+  phoneE164: "+491712707607",
   email: "info@treffpunkt-offenbach.com",
   responsible: "Klaus Kohlweyer",
   // TODO-COPY: Vereinsregister number and founding year — ask the board
