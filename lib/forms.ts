@@ -41,11 +41,26 @@ export const membershipSchema = z.object({
   startedAt,
 });
 
+// The one form behind both /kontakt and /mitglied-werden (see
+// components/ContactForm.tsx and app/api/kontakt/route.ts) — `kontext` is
+// what tells the route which subject line and no-JS redirect target to use,
+// and it's validated here as a closed enum precisely so it can never become
+// free text: it ends up in an email subject line, and "trust the client for
+// which of two known strings this is" is a very different (and fine) thing
+// from "trust the client for arbitrary text in a subject line". `betrieb`/
+// `branche` are optional on both contexts — only the membership variant's
+// form ever renders them (see ContactForm's extraFields), and someone
+// asking a question before joining shouldn't have to fill them in either.
+export const KONTEXTE = ["kontakt", "mitgliedschaft"] as const;
+
 export const contactSchema = z.object({
+  kontext: z.enum(KONTEXTE, { message: "Ungültige Anfrage." }),
   name: z.string().trim().min(2, "Bitte geben Sie Ihren Namen an.").max(100),
   email: z.string().trim().email("Bitte geben Sie eine gültige E-Mail-Adresse an."),
   telefon: z.string().trim().max(50).optional().or(z.literal("")),
   unternehmen: z.string().trim().max(200).optional().or(z.literal("")),
+  betrieb: z.string().trim().max(200).optional().or(z.literal("")),
+  branche: z.enum(BRANCHEN as [string, ...string[]]).optional().or(z.literal("")),
   nachricht: z
     .string()
     .trim()
@@ -58,6 +73,7 @@ export const contactSchema = z.object({
 
 export type MembershipInput = z.infer<typeof membershipSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
+export type Kontext = (typeof KONTEXTE)[number];
 
 /**
  * True if the submission is spam: honeypot filled in, or submitted faster

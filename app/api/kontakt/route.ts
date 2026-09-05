@@ -15,13 +15,20 @@ export const runtime = "nodejs";
  * message body or the sender's address — only enough to see, from the
  * Vercel function logs, that a send failed and roughly why.
  *
+ * One route behind both /kontakt and /mitglied-werden — see components/
+ * ContactForm.tsx's `kontext` prop and lib/forms.ts's KONTEXTE enum. That
+ * also means the rate limit below (keyed only on IP) is naturally shared
+ * across both forms rather than each getting its own bucket, which is
+ * the only version of "rate limited" that actually limits anything.
+ *
  * Accepts two request shapes so the form works with and without
  * JavaScript: a JSON body (the fetch-based submit in components/
  * ContactForm.tsx) or a native application/x-www-form-urlencoded POST (a
  * browser submitting the plain <form action="/api/kontakt" method="post">
  * with no JS to intercept it). The response shape follows the request:
  * JSON in, JSON back; a plain form POST in, a 303 redirect to a
- * server-rendered state on /kontakt back — see respondSuccess/respondError.
+ * server-rendered state on the originating page back — see
+ * respondSuccess/respondError.
  */
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") ?? "";
@@ -30,13 +37,19 @@ export async function POST(request: Request) {
   let raw: Record<string, unknown>;
   if (isJson) {
     const body = await request.json().catch(() => null);
-    if (!body) return respondError(isJson, request, { message: "Ungültige Anfrage." }, 400);
+    if (!body) return respondError(isJson, request, "kontakt", { message: "Ungültige Anfrage." }, 400);
     raw = body;
   } else {
     const form = await request.formData().catch(() => null);
-    if (!form) return respondError(isJson, request, { message: "Ungültige Anfrage." }, 400);
+    if (!form) return respondError(isJson, request, "kontakt", { message: "Ungültige Anfrage." }, 400);
     raw = Object.fromEntries(form.entries());
   }
+
+  // Only used to pick a redirect target for the two error paths below that
+  // happen BEFORE schema validation — never trusted for anything that ends
+  // up in the email itself (subject/body always come from `parsed.data`,
+  // i.e. only after the enum check has passed).
+  const rawKontext = raw.kontext === "mitgliedschaft" ? "mitgliedschaft" : "kontakt";
 
   const parsed = contactSchema.safeParse(raw);
   if (!parsed.success) {
@@ -45,7 +58,7 @@ export async function POST(request: Request) {
       const key = issue.path[0];
       if (typeof key === "string" && !(key in errors)) errors[key] = issue.message;
     }
-    return respondError(isJson, request, { errors }, 400);
+    return respondError(isJson, request, rawKontext, { errors }, 400);
   }
 
   const data = parsed.data;
@@ -53,7 +66,7 @@ export async function POST(request: Request) {
   // Honeypot filled, or submitted faster than a human plausibly could —
   // both get a normal-looking success so a bot learns nothing from a retry.
   if (looksLikeSpam(data)) {
-    return respondSuccess(isJson, request);
+    return respondSuccess(isJson, request, data.kontext);
   }
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
@@ -61,14 +74,20 @@ export async function POST(request: Request) {
     return respondError(
       isJson,
       request,
+      data.kontext,
       { message: "Zu viele Anfragen von Ihrer Adresse. Bitte versuchen Sie es in einigen Minuten erneut." },
       429,
     );
   }
 
+  const subject =
+    data.kontext === "mitgliedschaft"
+      ? `Beitrittsanfrage über treffpunkt-offenbach.vercel.app — ${data.name}`
+      : `Kontaktanfrage über treffpunkt-offenbach.com — ${data.name}`;
+
   try {
     await sendFormEmail({
-      subject: `Kontaktanfrage über treffpunkt-offenbach.com — ${data.name}`,
+      subject,
       replyTo: data.email,
       text: buildMailBody(data),
     });
@@ -77,6 +96,7 @@ export async function POST(request: Request) {
     return respondError(
       isJson,
       request,
+      data.kontext,
       {
         message:
           "Die Nachricht konnte nicht gesendet werden. Bitte schreiben Sie uns direkt an info@treffpunkt-offenbach.com.",
@@ -85,20 +105,34 @@ export async function POST(request: Request) {
     );
   }
 
-  return respondSuccess(isJson, request);
+  return respondSuccess(isJson, request, data.kontext);
 }
 
-function buildMailBody(data: { name: string; email: string; telefon?: string; unternehmen?: string; nachricht: string }): string {
+function buildMailBody(data: {
+  name: string;
+  email: string;
+  telefon?: string;
+  unternehmen?: string;
+  betrieb?: string;
+  branche?: string;
+  nachricht: string;
+}): string {
   const lines = [`Name: ${data.name}`, `E-Mail: ${data.email}`];
   if (data.telefon) lines.push(`Telefon: ${data.telefon}`);
   if (data.unternehmen) lines.push(`Unternehmen: ${data.unternehmen}`);
+  if (data.betrieb) lines.push(`Betrieb: ${data.betrieb}`);
+  if (data.branche) lines.push(`Branche: ${data.branche}`);
   lines.push("", data.nachricht);
   return lines.join("\n");
 }
 
-function respondSuccess(isJson: boolean, request: Request) {
+function redirectPath(kontext: "kontakt" | "mitgliedschaft"): string {
+  return kontext === "mitgliedschaft" ? "/mitglied-werden" : "/kontakt";
+}
+
+function respondSuccess(isJson: boolean, request: Request, kontext: "kontakt" | "mitgliedschaft") {
   if (isJson) return NextResponse.json({ ok: true });
-  return NextResponse.redirect(new URL("/kontakt?gesendet=1", request.url), 303);
+  return NextResponse.redirect(new URL(`${redirectPath(kontext)}?gesendet=1`, request.url), 303);
 }
 
 /**
@@ -114,9 +148,10 @@ function respondSuccess(isJson: boolean, request: Request) {
 function respondError(
   isJson: boolean,
   request: Request,
+  kontext: "kontakt" | "mitgliedschaft",
   payload: { message?: string; errors?: Record<string, string> },
   status: number,
 ) {
   if (isJson) return NextResponse.json({ ok: false, ...payload }, { status });
-  return NextResponse.redirect(new URL("/kontakt?fehler=1", request.url), 303);
+  return NextResponse.redirect(new URL(`${redirectPath(kontext)}?fehler=1`, request.url), 303);
 }

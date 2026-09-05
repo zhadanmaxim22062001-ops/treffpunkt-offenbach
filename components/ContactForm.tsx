@@ -33,12 +33,19 @@ type Status = "idle" | "submitting" | "success" | "error";
  */
 export function ContactForm({
   endpoint,
+  kontext,
   extraFields = [],
   consentText,
   submitLabel = "Absenden",
   fallbackContact,
 }: {
   endpoint: string;
+  /** Sent as a real form field (not inferred from `endpoint`) and validated
+   *  server-side against lib/forms.ts's KONTEXTE enum — it picks the email
+   *  subject line and the no-JS redirect target, see app/api/kontakt/
+   *  route.ts. Required, not defaulted: every caller states explicitly
+   *  which of the two forms this is. */
+  kontext: "kontakt" | "mitgliedschaft";
   extraFields?: ExtraField[];
   consentText: ReactNode;
   submitLabel?: string;
@@ -139,9 +146,13 @@ export function ContactForm({
           a no-JS visitor, same effect), read server-side to reject
           anything submitted implausibly fast. */}
       <input type="hidden" name="startedAt" value={startedAt} />
+      <input type="hidden" name="kontext" value={kontext} />
 
       <Field label="Name" name="name" required maxLength={100} error={errors.name} />
-      {extraFields.includes("betrieb") && <Field label="Betrieb" name="betrieb" required error={errors.betrieb} />}
+      {/* Both optional, unlike every other field here required — someone
+          asking a question before joining shouldn't have to disclose their
+          business yet (see the ContactForm-level doc comment above). */}
+      {extraFields.includes("betrieb") && <Field label="Betrieb" name="betrieb" error={errors.betrieb} />}
       {extraFields.includes("unternehmen") && <Field label="Unternehmen" name="unternehmen" error={errors.unternehmen} />}
       {extraFields.includes("branche") && (
         <div className="flex flex-col gap-1">
@@ -151,7 +162,6 @@ export function ContactForm({
           <select
             id="branche"
             name="branche"
-            required
             defaultValue=""
             className="border bg-paper px-3 py-2 font-display text-[14px]"
             style={{ borderColor: errors.branche ? "var(--c-accent)" : "var(--c-line)" }}

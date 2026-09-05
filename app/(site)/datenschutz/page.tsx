@@ -9,25 +9,30 @@ export default function Page() {
       <div className="prose-body mt-8 flex flex-col gap-5 text-[16px]">
         <p>Diese Website setzt keine Cookies und bindet keine Drittanbieter-Skripte ein. Schriften, Kartenausschnitte
           und alle sonstigen Inhalte werden vom eigenen Server ausgeliefert — es besteht keine Verbindung zu Google
-          Fonts oder anderen Drittanbietern. Über das Kontaktformular auf der{" "}
-          <a href="/kontakt" className="link-underline">Kontaktseite</a> hinaus werden keine personenbezogenen Daten
-          von Besuchern erhoben, außer den technisch notwendigen Zugriffsdaten, die beim Hosting anfallen (siehe
-          unten).</p>
+          Fonts oder anderen Drittanbietern. Über die Kontaktformulare auf der{" "}
+          <a href="/kontakt" className="link-underline">Kontaktseite</a> und auf der Seite{" "}
+          <a href="/mitglied-werden" className="link-underline">„Mitglied werden“</a> hinaus werden keine
+          personenbezogenen Daten von Besuchern erhoben, außer den technisch notwendigen Zugriffsdaten, die beim
+          Hosting anfallen (siehe unten).</p>
 
         <p>
           <strong className="font-display">Kontaktformular</strong><br />
-          Wenn Sie das Formular auf der{" "}
-          <a href="/kontakt" className="link-underline">Kontaktseite</a> nutzen, verarbeiten wir die von Ihnen
-          eingegebenen Daten (Name, E-Mail-Adresse, optional Telefonnummer und Unternehmen, sowie Ihre Nachricht)
-          ausschließlich zur Bearbeitung Ihrer Anfrage. Die Nachricht wird per E-Mail an ein Postfach des Vereins
-          zugestellt; es findet keine Speicherung in einer Datenbank statt, und die Daten werden nicht an Dritte
-          weitergegeben. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bearbeitung Ihrer Anfrage) sowie, soweit die
-          Anfrage nicht zu einer Mitgliedschaft oder einem Vertrag führt, Art. 6 Abs. 1 lit. f DSGVO (unser
-          berechtigtes Interesse an der Beantwortung eingehender Anfragen). Zur Abwehr von Missbrauch (automatisiert
-          ausgefüllte Formulare) wird serverseitig geprüft, wie schnell nach dem Laden der Seite das Formular
-          abgeschickt wurde; diese Prüfung erzeugt keine gespeicherten Daten. Die genaue Aufbewahrungsdauer der
-          E-Mails im Vereinspostfach wird an dieser Stelle ergänzt, sobald sie mit dem Vorstand abgestimmt ist —
-          dieser Absatz ist ein Arbeitsentwurf und noch nicht anwaltlich geprüft.
+          Beide Kontaktformulare — auf der{" "}
+          <a href="/kontakt" className="link-underline">Kontaktseite</a> und auf der Seite{" "}
+          <a href="/mitglied-werden" className="link-underline">„Mitglied werden“</a> — laufen über dieselbe Technik
+          und dieselbe Prüfung; welche Daten wir zu welchem Zweck verarbeiten, ist auf beiden Seiten identisch. Wenn
+          Sie eines der beiden nutzen, verarbeiten wir die von Ihnen eingegebenen Daten (Name, E-Mail-Adresse,
+          optional Telefonnummer sowie — je nach Formular — Unternehmen bzw. Betrieb und Branche, sowie Ihre
+          Nachricht) ausschließlich zur Bearbeitung Ihrer Anfrage. Die Nachricht wird per E-Mail an ein Postfach des
+          Vereins zugestellt; es findet keine Speicherung in einer Datenbank statt, und die Daten werden nicht an
+          Dritte weitergegeben. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bearbeitung Ihrer Anfrage) sowie,
+          soweit die Anfrage nicht zu einer Mitgliedschaft oder einem Vertrag führt, Art. 6 Abs. 1 lit. f DSGVO
+          (unser berechtigtes Interesse an der Beantwortung eingehender Anfragen). Zur Abwehr von Missbrauch
+          (automatisiert ausgefüllte Formulare) wird serverseitig geprüft, wie schnell nach dem Laden der Seite das
+          Formular abgeschickt wurde, und wie viele Anfragen von derselben IP-Adresse in kurzer Zeit eingehen; beide
+          Prüfungen erzeugen keine gespeicherten Daten. Die genaue Aufbewahrungsdauer der E-Mails im
+          Vereinspostfach wird an dieser Stelle ergänzt, sobald sie mit dem Vorstand abgestimmt ist — dieser Absatz
+          ist ein Arbeitsentwurf und noch nicht anwaltlich geprüft.
         </p>
 
         <p>

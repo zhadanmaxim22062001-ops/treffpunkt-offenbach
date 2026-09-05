@@ -63,6 +63,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
               )}
               <ContactForm
                 endpoint="/api/kontakt"
+                kontext="kontakt"
                 extraFields={["telefon", "unternehmen"]}
                 submitLabel="Nachricht senden"
                 consentText={

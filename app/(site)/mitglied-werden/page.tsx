@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { Card, Eyebrow, Heading, Lead, Section } from "@/components/ui";
+import { ContactForm } from "@/components/ContactForm";
 import { VEREIN } from "@/data/verein";
 
 export const metadata: Metadata = {
   title: "Mitglied werden",
   description: "Vorteile der Mitgliedschaft im Gewerbeverein Treffpunkt Offenbach und wie Sie beitreten.",
 };
+
+type SearchParams = { gesendet?: string; fehler?: string };
 
 // The association's own four benefits, taken from treffpunkt-of.de.
 const VORTEILE = [
@@ -15,7 +18,7 @@ const VORTEILE = [
   },
   {
     title: "Mitglieder-Netzwerk",
-    body: "Über hundert Betriebe, die dieselben Straßen teilen. Nachbarn kennen heißt schneller einen Handwerker, einen Nachmieter oder eine Lösung finden.",
+    body: "Betriebe, die dieselben Straßen teilen. Nachbarn kennen heißt schneller einen Handwerker, einen Nachmieter oder eine Lösung finden.",
   },
   {
     title: "Kostenvorteile für Mitglieder bei Aktionen",
@@ -30,7 +33,9 @@ const PROBLEMLOESUNGEN = {
   body: "Konkrete Unterstützung bei Dingen, die ein einzelner Betrieb allein nur mühsam klärt — zum Beispiel bei der Beschaffung und Genehmigung von Werbeschildern.",
 };
 
-export default function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const sp = await searchParams;
+
   return (
     <>
       <Section>
@@ -92,24 +97,93 @@ export default function Page() {
         </p>
       </Section>
 
+      {/* Someone who just read the case for joining shouldn't have to leave
+          this page to act on it — the same ContactForm /kontakt uses
+          (kontext="mitgliedschaft" picks a different subject line and
+          no-JS redirect target server-side, see app/api/kontakt/route.ts;
+          betrieb/branche are the only extra fields, both optional — a
+          question before joining doesn't require disclosing the business
+          yet). Email/phone stay below as the direct alternative, same as
+          they always were. */}
       <Section>
         <Eyebrow className="mb-4">Beitritt</Eyebrow>
-        <Heading className="max-w-[24ch]">Schreiben Sie uns.</Heading>
-        <p className="prose-body mt-4 max-w-[60ch] text-[15px]">
-          Am schnellsten per E-Mail oder Telefon — wir schicken Ihnen die Beitrittsunterlagen zu.
-        </p>
-        <address className="prose-body mt-6 not-italic text-[15px] leading-relaxed">
-          <a className="link-underline font-display font-semibold" href={`mailto:${VEREIN.email}`}>
-            {VEREIN.email}
-          </a>
-          <br />
-          <a className="link-underline" href={`tel:${VEREIN.phoneE164}`}>
-            {VEREIN.phone}
-          </a>
-        </address>
+        <Heading className="max-w-[24ch]">Interesse? Schreiben Sie uns.</Heading>
+        <Lead className="mt-4 max-w-[60ch]">
+          Erzählen Sie kurz, wer Sie sind und wo Sie arbeiten — wir melden uns mit allem Weiteren.
+        </Lead>
+
+        <div className="mt-10 max-w-[60ch]">
+          {sp.gesendet === "1" ? (
+            <div
+              role="status"
+              className="border p-6"
+              style={{ borderColor: "var(--c-accent)", backgroundColor: "var(--c-accent-soft)" }}
+            >
+              <p className="font-display text-[16px] font-semibold" style={{ color: "var(--c-accent)" }}>
+                Danke, Ihre Nachricht ist angekommen.
+              </p>
+              <p className="mt-2 text-[14px] text-ink-2">Wir melden uns so bald wie möglich bei Ihnen.</p>
+            </div>
+          ) : (
+            <>
+              {sp.fehler === "1" && (
+                <div
+                  role="alert"
+                  className="mb-5 border p-4"
+                  style={{ borderColor: "var(--c-signal)", backgroundColor: "var(--c-signal-soft)" }}
+                >
+                  <p className="font-mono text-[12px]" style={{ color: "var(--c-signal)" }}>
+                    Die Nachricht konnte nicht gesendet werden. Bitte prüfen Sie Ihre Angaben und versuchen Sie es
+                    erneut, oder schreiben Sie uns direkt.
+                  </p>
+                </div>
+              )}
+              <ContactForm
+                endpoint="/api/kontakt"
+                kontext="mitgliedschaft"
+                extraFields={["betrieb", "branche"]}
+                submitLabel="Anfrage senden"
+                consentText={
+                  <>
+                    Ich habe die{" "}
+                    <a href="/datenschutz" className="link-underline">
+                      Datenschutzerklärung
+                    </a>{" "}
+                    gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage
+                    gespeichert und verarbeitet werden.
+                  </>
+                }
+                fallbackContact={
+                  <>
+                    oder schreiben Sie direkt an{" "}
+                    <a className="link-underline" href={`mailto:${VEREIN.email}`}>
+                      {VEREIN.email}
+                    </a>
+                  </>
+                }
+              />
+            </>
+          )}
+        </div>
+
+        <div className="mt-12 max-w-[60ch]">
+          <p className="eyebrow mb-3">Oder direkt erreichbar</p>
+          <p className="prose-body text-[15px]">
+            Am schnellsten per E-Mail oder Telefon — wir schicken Ihnen die Beitrittsunterlagen zu.
+          </p>
+          <address className="prose-body mt-4 not-italic text-[15px] leading-relaxed">
+            <a className="link-underline font-display font-semibold" href={`mailto:${VEREIN.email}`}>
+              {VEREIN.email}
+            </a>
+            <br />
+            <a className="link-underline" href={`tel:${VEREIN.phoneE164}`}>
+              {VEREIN.phone}
+            </a>
+          </address>
+        </div>
         {/* TODO-COPY: the board's old PDF Beitrittsformular isn't available yet —
             link it here once the Vorstand provides it. No placeholder paragraph
-            until then; visitors already have email/phone above. */}
+            until then; visitors already have the form and email/phone above. */}
       </Section>
     </>
   );
