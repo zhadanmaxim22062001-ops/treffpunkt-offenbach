@@ -221,7 +221,7 @@ export function RadarCalendarWidget({
     <div>
       <div className="flex items-center justify-between gap-2">
         {prevDisabled ? (
-          <span aria-disabled="true" className="px-2 py-1 font-display text-[20px]" style={{ color: "var(--c-muted)", opacity: 0.4 }}>
+          <span aria-disabled="true" className="px-2 py-1 font-display text-[20px]" style={{ color: "var(--c-muted)" }}>
             ‹<span className="sr-only">Voriger Monat</span>
           </span>
         ) : (
@@ -247,7 +247,7 @@ export function RadarCalendarWidget({
           </button>
         </div>
         {nextDisabled ? (
-          <span aria-disabled="true" className="px-2 py-1 font-display text-[20px]" style={{ color: "var(--c-muted)", opacity: 0.4 }}>
+          <span aria-disabled="true" className="px-2 py-1 font-display text-[20px]" style={{ color: "var(--c-muted)" }}>
             <span className="sr-only">Nächster Monat</span>›
           </span>
         ) : (
@@ -303,7 +303,7 @@ export function RadarCalendarWidget({
                         key={`${cell.y}-${cell.m}-${cell.d}`}
                         aria-hidden="true"
                         className="flex min-h-[40px] items-start justify-center pt-2 font-mono text-[13px] tnum"
-                        style={{ color: "var(--c-muted)", opacity: 0.35 }}
+                        style={{ color: "var(--c-muted)" }}
                       >
                         {cell.d}
                       </div>
