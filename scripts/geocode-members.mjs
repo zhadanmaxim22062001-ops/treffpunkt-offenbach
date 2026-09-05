@@ -6,7 +6,7 @@
 // fetched a small OSM tile crop per member, but the OSMF tile usage policy
 // names bulk downloading as prohibited and points heavy or commercial
 // third-party use at a paid provider instead — fine for a dozen placeholders,
-// not fine for the real list of 100+ members (roughly 900 tiles, committed
+// not fine for the real list of 50+ members (several hundred tiles, committed
 // into the repo, re-fetched on every re-geocode). Member pages instead link
 // out to OpenStreetMap directly (see components StaticMap is no longer used
 // there); scripts/fetch-verein-map.mjs handles the one map the site does

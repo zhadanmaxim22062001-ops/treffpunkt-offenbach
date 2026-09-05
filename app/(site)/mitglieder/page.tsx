@@ -5,7 +5,7 @@ import { BRANCHEN, MEMBERS_ARE_PLACEHOLDER, filterMembers, getAllMembers, getDis
 
 export const metadata: Metadata = {
   title: "Mitgliederverzeichnis",
-  description: "Über hundert Betriebe im Gewerbeverein Treffpunkt Offenbach — nach Branche und Straße filterbar.",
+  description: "Die Betriebe im Gewerbeverein Treffpunkt Offenbach — nach Branche und Straße filterbar.",
 };
 
 type SearchParams = { branche?: string; strasse?: string; q?: string };
@@ -52,7 +52,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
     <Section>
       <Eyebrow className="mb-4">Mitglieder</Eyebrow>
       <Heading level={1} className="max-w-[20ch]">
-        Über hundert Betriebe, nach Branche und Straße filterbar.
+        Die Betriebe des Vereins, nach Branche und Straße filterbar.
       </Heading>
       <Lead className="mt-6 max-w-[60ch]">
         Das Verzeichnis der Mitgliedsbetriebe des Gewerbevereins Treffpunkt Offenbach — Einzelhandel, Gastronomie,

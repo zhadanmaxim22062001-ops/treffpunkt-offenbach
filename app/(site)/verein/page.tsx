@@ -17,7 +17,7 @@ export default function Page() {
           Wer wir sind.
         </Heading>
         <Lead className="mt-6 max-w-[60ch]">
-          {VEREIN.name} vertritt die Interessen von über hundert Betrieben in der Offenbacher Innenstadt — Handel,
+          {VEREIN.name} vertritt die Interessen der Betriebe in der Offenbacher Innenstadt — Handel,
           Gastronomie, Handwerk, Dienstleistung. Wir richten die Formate aus, die Menschen in die Stadt holen, und
           sitzen als Verein früher am Tisch als jeder Einzelne, wenn Entscheidungen im Rathaus Betriebe betreffen.
         </Lead>

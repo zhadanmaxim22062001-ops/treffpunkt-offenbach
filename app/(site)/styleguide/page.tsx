@@ -62,7 +62,7 @@ export default function Styleguide() {
           <Heading level={1}>Innenstadt beleben.</Heading>
           <Heading level={2}>Nachbarn kennen.</Heading>
           <Heading level={3}>Fristen nicht verpassen.</Heading>
-          <Lead>Wir sind über hundert Betriebe, die dieselbe Straße teilen.</Lead>
+          <Lead>Wir sind Betriebe, die dieselbe Straße teilen.</Lead>
           <p className="prose-body">Fließtext in Newsreader 400. Antiqua im Text ist bei Vereinsseiten selten
             und unterscheidet die Seite genau deshalb sofort. Zeilenlänge bleibt bei 66 Zeichen.</p>
           <p className="eyebrow">Eyebrow · IBM Plex Mono · 0.14em</p>

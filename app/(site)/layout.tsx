@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: "%s · Treffpunkt Offenbach",
   },
   description:
-    "Der Gewerbeverein Treffpunkt Offenbach e. V. belebt die Innenstadt, vernetzt über hundert Betriebe und vertritt ihre Interessen. Mit dem OF-Radar: Meldungen aus Offenbach, gefiltert auf das, was Unternehmen betrifft.",
+    "Der Gewerbeverein Treffpunkt Offenbach e. V. belebt die Innenstadt, vernetzt Betriebe und vertritt ihre Interessen. Mit dem OF-Radar: Meldungen aus Offenbach, gefiltert auf das, was Unternehmen betrifft.",
   openGraph: {
     type: "website",
     locale: "de_DE",

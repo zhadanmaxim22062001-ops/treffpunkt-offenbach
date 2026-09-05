@@ -256,7 +256,7 @@ site.
 OpenStreetMap tile crop, fetched once per member at import time) — that was
 fine for 12 placeholders but doesn't hold up for the real list: the OSMF tile
 usage policy names bulk downloading as prohibited and points heavy or
-third-party use at a paid provider, and 100+ members would mean roughly 900
+third-party use at a paid provider, and 50+ members would mean several hundred
 tiles committed into the repo, re-fetched on every re-geocode. A shop's address
 is right there in text on the same page anyway, so the map earned very little
 for what it cost. `/mitglieder/[slug]` links out to OpenStreetMap instead

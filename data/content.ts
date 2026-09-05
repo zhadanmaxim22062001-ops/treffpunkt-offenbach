@@ -81,7 +81,7 @@ export const LEISTUNGEN: Leistung[] = [
   },
   {
     title: "Netzwerk statt Einzelkampf",
-    body: "Über hundert Betriebe, die dieselben Straßen teilen. Wer seine Nachbarn kennt, findet schneller einen Handwerker, einen Nachmieter oder jemanden, der dasselbe Problem schon gelöst hat.",
+    body: "Betriebe, die dieselben Straßen teilen. Wer seine Nachbarn kennt, findet schneller einen Handwerker, einen Nachmieter oder jemanden, der dasselbe Problem schon gelöst hat.",
   },
   {
     title: "Interessen vertreten",
