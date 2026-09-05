@@ -266,17 +266,14 @@
     text-underline-offset: 2px;
   }
 
-  /* Hero photo scrim — directional, not a flat overlay: darkness sits only
-     where the text/buttons/credit actually are, so the rest of the photo
-     opens up. Both layers are pseudo-elements (no background-image, so
-     neither is ever LCP-eligible) on an empty, aria-hidden host div.
-     ::before carries the "which side is dark" job and swaps its whole
-     gradient direction at the 900px breakpoint (see below) rather than
-     blending two — a horizontal gradient has nothing to fade on a mobile
-     width where the text column spans nearly the full photo anyway.
-     ::after is the same at every width: a short darkening along the bottom
-     edge so the buttons and credit line keep their footing regardless of
-     what ::before is doing above them. */
+  /* Hero photo scrim — a thin, flat, unifying layer across the WHOLE
+     photo (just enough to tie it to the palette, not enough to hide the
+     city), plus a bottom-edge strip so the buttons/credit keep their
+     footing. The job of making the text readable no longer lives here —
+     see .hero-text-plate below — so this stays a single low alpha rather
+     than a directional gradient. Both are pseudo-elements (no
+     background-image, so neither is ever LCP-eligible) on an empty,
+     aria-hidden host div. */
   .hero-scrim::before,
   .hero-scrim::after {
     content: "";
@@ -284,31 +281,7 @@
     inset: 0;
   }
   .hero-scrim::before {
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--c-hero-scrim) 88%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 74%, transparent) 35%,
-      color-mix(in srgb, var(--c-hero-scrim) 34%, transparent) 62%,
-      color-mix(in srgb, var(--c-hero-scrim) 16%, transparent) 100%
-    );
-  }
-  @media (max-width: 899px) {
-    /* Below md the text column runs nearly the full height of the hero
-       (eyebrow through the credit line), not just its left third the way it
-       does on desktop — measured directly, content occupies roughly 11% to
-       100% of the header's height at 420px. There's no real gap to open up
-       within that span, so this stays strong through the headline and lead
-       and only eases in the last quarter, where ::after's bottom scrim adds
-       its own reinforcement anyway. */
-    .hero-scrim::before {
-      background: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--c-hero-scrim) 88%, transparent) 0%,
-        color-mix(in srgb, var(--c-hero-scrim) 82%, transparent) 45%,
-        color-mix(in srgb, var(--c-hero-scrim) 62%, transparent) 75%,
-        color-mix(in srgb, var(--c-hero-scrim) 32%, transparent) 100%
-      );
-    }
+    background: color-mix(in srgb, var(--c-hero-scrim) 14%, transparent);
   }
   .hero-scrim::after {
     background: linear-gradient(
@@ -316,6 +289,44 @@
       color-mix(in srgb, var(--c-hero-scrim) 55%, transparent) 0%,
       transparent 22%
     );
+  }
+
+  /* The hero text plate — where the darkness that makes the headline
+     readable actually lives now, instead of a viewport-wide gradient.
+     Sized and positioned to the TEXT COLUMN, not the header: this class
+     goes directly on that column (which is what makes it "reflow with
+     the h1" for free — it's the same box, not a copy measured to match
+     it, so there's nothing to keep in sync across breakpoints).
+     position: relative here is what gives the ::before below something
+     to size itself against.
+
+     The plate itself is deliberately 110% of the column's own width, and
+     the gradient's stops are written as fractions of THAT wider box:
+     flat at 80% alpha from 0% to ~63.6% of the plate (which is exactly
+     70% of the column — 70 / 110), then down to fully transparent at
+     100% of the plate (110% of the column). Doing it this way means the
+     fade-to-zero point falls INSIDE the plate's own box instead of at
+     its edge, which is the difference between "invisible as a shape" and
+     a visible hard cutoff — a plate sized to exactly 100% of the column
+     with stops written past its own edge would just clip at a nonzero
+     alpha, and you'd be able to point at the line. */
+  .hero-text-plate {
+    position: relative;
+  }
+  .hero-text-plate::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 110%;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--c-hero-scrim) 80%, transparent) 0%,
+      color-mix(in srgb, var(--c-hero-scrim) 80%, transparent) 63.6%,
+      transparent 100%
+    );
+    pointer-events: none;
   }
 
   /* Small radial darkening centred on the hero mark — the halo (see the

@@ -85,7 +85,7 @@ export default function Home() {
         )}
         <Container className="relative z-10">
           <div className={clsx("grid items-center gap-12 py-16 md:py-24", !heroImage && "md:grid-cols-[1.1fr_0.9fr]")}>
-            <div className={heroImage ? "max-w-[540px]" : undefined}>
+            <div className={heroImage ? "hero-text-plate max-w-[540px]" : undefined}>
               <Eyebrow className="mb-6" style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.9 } : undefined}>
                 Gewerbeverein · Offenbach am Main
               </Eyebrow>
