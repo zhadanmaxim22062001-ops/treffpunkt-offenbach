@@ -27,8 +27,20 @@ const ROUTES = [
   "/styleguide",
 ];
 
-const WIDTHS = [1360, 900, 420, 360];
+const WIDTHS = [420, 768, 1024, 1360];
 const THEMES = ["light", "dark"] as const;
+
+// The no-cookie-banner premise depends on this being true: nothing on the
+// site should ever call out to a third party (fonts, analytics, map tiles,
+// anything). localhost/127.0.0.1 is the dev/test server itself.
+function isThirdParty(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return host !== "localhost" && host !== "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
 
 const OUT_DIR = "test-results/visual";
 mkdirSync(OUT_DIR, { recursive: true });
@@ -44,6 +56,11 @@ for (const route of ROUTES) {
           }
         });
         page.on("pageerror", (err) => consoleIssues.push(`[pageerror] ${err.message}`));
+
+        const thirdPartyRequests: string[] = [];
+        page.on("request", (req) => {
+          if (isThirdParty(req.url())) thirdPartyRequests.push(req.url());
+        });
 
         await page.setViewportSize({ width, height: 900 });
         await page.emulateMedia({ colorScheme: theme });
@@ -104,6 +121,7 @@ for (const route of ROUTES) {
         await page.screenshot({ path: `${OUT_DIR}/${safeName}__${theme}__${width}.png`, fullPage: true });
 
         expect(consoleIssues, `console issues on ${route} (${theme}, ${width}px):\n${consoleIssues.join("\n")}`).toEqual([]);
+        expect(thirdPartyRequests, `third-party requests on ${route} (${theme}, ${width}px):\n${thirdPartyRequests.join("\n")}`).toEqual([]);
       });
     }
   }
