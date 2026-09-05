@@ -70,6 +70,12 @@
      hero in app/(site)/page.tsx. */
   --c-hero-scrim: #0b2138;
   --c-hero-ink: #f5f9fc;
+  /* The light accent (#5aa9e8, the dark theme's --c-accent value), not the
+     light theme's #0f5fa8 — the mark sits on a dark photo, and the darker
+     blue disappears there regardless of which theme is active. Same
+     reasoning as --c-hero-scrim/--c-hero-ink above: a photo doesn't
+     re-theme, so nothing drawn on it can either. */
+  --c-hero-accent: #5aa9e8;
   color-scheme: light;
 }
 
@@ -258,6 +264,79 @@
     color: var(--c-hero-ink);
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+
+  /* Hero photo scrim — directional, not a flat overlay: darkness sits only
+     where the text/buttons/credit actually are, so the rest of the photo
+     opens up. Both layers are pseudo-elements (no background-image, so
+     neither is ever LCP-eligible) on an empty, aria-hidden host div.
+     ::before carries the "which side is dark" job and swaps its whole
+     gradient direction at the 900px breakpoint (see below) rather than
+     blending two — a horizontal gradient has nothing to fade on a mobile
+     width where the text column spans nearly the full photo anyway.
+     ::after is the same at every width: a short darkening along the bottom
+     edge so the buttons and credit line keep their footing regardless of
+     what ::before is doing above them. */
+  .hero-scrim::before,
+  .hero-scrim::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .hero-scrim::before {
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--c-hero-scrim) 88%, transparent) 0%,
+      color-mix(in srgb, var(--c-hero-scrim) 74%, transparent) 35%,
+      color-mix(in srgb, var(--c-hero-scrim) 34%, transparent) 62%,
+      color-mix(in srgb, var(--c-hero-scrim) 16%, transparent) 100%
+    );
+  }
+  @media (max-width: 899px) {
+    /* Below md the text column runs nearly the full height of the hero
+       (eyebrow through the credit line), not just its left third the way it
+       does on desktop — measured directly, content occupies roughly 11% to
+       100% of the header's height at 420px. There's no real gap to open up
+       within that span, so this stays strong through the headline and lead
+       and only eases in the last quarter, where ::after's bottom scrim adds
+       its own reinforcement anyway. */
+    .hero-scrim::before {
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--c-hero-scrim) 88%, transparent) 0%,
+        color-mix(in srgb, var(--c-hero-scrim) 82%, transparent) 45%,
+        color-mix(in srgb, var(--c-hero-scrim) 62%, transparent) 75%,
+        color-mix(in srgb, var(--c-hero-scrim) 32%, transparent) 100%
+      );
+    }
+  }
+  .hero-scrim::after {
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--c-hero-scrim) 55%, transparent) 0%,
+      transparent 22%
+    );
+  }
+
+  /* Small radial darkening centred on the hero mark — the halo (see the
+     tpof-* rules and HeroMark in components/Logo.tsx) wasn't quite enough
+     on its own where the mark sits over the brightest part of the sky;
+     measured by pixel-sampling, the worst point on the F needed about 6
+     more points of alpha to clear 3:1, so this stays deliberately weak and
+     tight rather than a heavier halo (which would fray, not help — see the
+     commit that added this). Extends slightly past the mark's own box
+     (inset: -15%) so the falloff has no hard edge. */
+  .hero-mark-glow::before {
+    content: "";
+    position: absolute;
+    inset: -15%;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--c-hero-scrim) 32%, transparent) 0%,
+      color-mix(in srgb, var(--c-hero-scrim) 20%, transparent) 55%,
+      color-mix(in srgb, var(--c-hero-scrim) 10%, transparent) 80%,
+      transparent 100%
+    );
   }
 }
 

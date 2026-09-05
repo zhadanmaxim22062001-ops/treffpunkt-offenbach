@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { clsx } from "clsx";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
-import { LogoMark } from "@/components/Logo";
+import { LogoMark, HeroMark } from "@/components/Logo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
 import { CountUp, LineReveal, MountReveal, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
@@ -59,17 +59,12 @@ export default function Home() {
               className="object-cover object-[center_20%] md:object-[center_42%]"
               aria-hidden="true"
             />
-            {/* Left-to-right navy gradient so the headline holds contrast on
-                the left; thins toward the right, where the mark sits over a
-                brighter part of the photo instead of type. */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--c-hero-scrim) 90%, transparent) 0%, color-mix(in srgb, var(--c-hero-scrim) 90%, transparent) 48%, color-mix(in srgb, var(--c-hero-scrim) 30%, transparent) 100%)",
-              }}
-              aria-hidden="true"
-            />
+            {/* Directional scrim, not a flat overlay — see .hero-scrim in
+                globals.css. Darkness sits where the headline/lead/buttons
+                and the credit line actually are; the rest of the photo (the
+                skyline, the river) opens up instead of sitting under a flat
+                dark wash. */}
+            <div className="hero-scrim absolute inset-0" aria-hidden="true" />
             {/* The mark, drawn large enough that its ring overlaps the
                 photo's skyline/river band — the "play" between the F
                 breaking out of the ring and the towers breaking the
@@ -78,11 +73,11 @@ export default function Home() {
                 mark this size would sit on top of the buttons, so it's
                 hidden rather than fought into a cramped corner. */}
             <div
-              className="pointer-events-none absolute hidden md:block"
+              className="hero-mark-glow pointer-events-none absolute hidden md:block"
               style={{ right: "2%", bottom: "4%", width: "clamp(260px, 32vw, 480px)" }}
               aria-hidden="true"
             >
-              <LogoMark size={480} animated color="var(--c-hero-ink)" className="h-auto w-full" />
+              <HeroMark size={480} animated className="h-auto w-full" />
             </div>
           </>
         ) : (

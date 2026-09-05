@@ -96,6 +96,61 @@ export function LogoMark({
   );
 }
 
+/** Same 84px-radius ring as MARK_PRIMARY_PATHS.ring, gap widened from 30°
+ *  to 38° (4° each side, same centre/radius so it overlays exactly) — for
+ *  HeroMark's halo only, whose extra stroke width would otherwise close up
+ *  the gap the F's arm passes through. Computed by hand: the primary ring's
+ *  circle is centred at (112, 120) r=84; the visible ring's two open ends
+ *  sit at -22° and -52°, so the halo's move to -18° and -56°. */
+const MARK_HALO_RING_PATH = "M191.89 94.04a84 84 0 1 1-32.92-43.68";
+
+/**
+ * The large mark drawn over the homepage hero photo. Two things a plain
+ * `<LogoMark color=".../>` can't do: the ring and the F need DIFFERENT
+ * theme-invariant colours (paper ring, blue F — the mark's own construction,
+ * just inverted for a dark ground), and the stroke needs a halo so it holds
+ * up against a busy, now-brighter skyline instead of fraying into it.
+ *
+ * The halo is a second, wider, dimmer copy of the same three paths, drawn
+ * first (underneath). It's deliberately static — no draw-on, no CSS
+ * animation classes at all — rather than trying to keep a second
+ * stroke-dasharray in lockstep with the visible group's: the halo's ring
+ * path isn't even the same length as the visible one (wider gap, see
+ * MARK_HALO_RING_PATH), so sharing a dasharray number would drift. A static
+ * halo sidesteps that entirely — there's nothing to desynchronise from.
+ */
+export function HeroMark({
+  size = 480,
+  animated = false,
+  className,
+}: {
+  size?: number;
+  animated?: boolean;
+  className?: string;
+}) {
+  const { ring, f, bar } = MARK_PRIMARY_PATHS;
+  return (
+    <svg viewBox="0 0 240 240" aria-hidden="true" width={size} height={size} className={className} style={{ overflow: "visible" }}>
+      <g
+        fill="none"
+        strokeWidth={23}
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+        stroke="color-mix(in srgb, var(--c-hero-scrim) 45%, transparent)"
+      >
+        <path d={MARK_HALO_RING_PATH} />
+        <path d={f} />
+        <path d={bar} />
+      </g>
+      <g className={clsx(animated && "logo-draw")} fill="none" strokeWidth={13} strokeLinecap="butt" strokeLinejoin="miter">
+        <path className="tpof-ring" d={ring} stroke="var(--c-hero-ink)" />
+        <path className="tpof-f" d={f} stroke="var(--c-hero-accent)" />
+        <path className="tpof-bar" d={bar} stroke="var(--c-hero-accent)" />
+      </g>
+    </svg>
+  );
+}
+
 /** Horizontal lockup: mark + two lines, optically equal in width. */
 export function LogoLockup({
   markSize = 44,
