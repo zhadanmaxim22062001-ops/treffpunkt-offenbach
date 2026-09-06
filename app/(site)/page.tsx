@@ -47,24 +47,35 @@ export default function Home() {
           hard edges anywhere, one soft transition. See .hero-scrim in
           globals.css. */}
       <header
-        className={clsx(
-          "relative overflow-hidden",
-          heroImage ? "min-h-[560px] md:min-h-[680px]" : "bg-paper",
-        )}
+        className={clsx("relative overflow-hidden", !heroImage && "bg-paper")}
+        // Fits the viewport it's actually in, not a fixed guess: 100svh (not
+        // vh — vh includes a mobile browser's collapsing address bar, which
+        // would make the hero jump height as the visitor scrolls) minus the
+        // sticky nav's own measured height (75.5px, rounded up). Floored at
+        // 560px so it doesn't collapse on a short window, capped at 860px so
+        // it doesn't become absurd on a tall monitor. Without this, the
+        // hero's height was purely content-driven and taller than most
+        // viewports — the mark, anchored near its bottom, ended up below the
+        // fold on first load; scrolling down ~90px (past the now-nonexistent
+        // extra height) was the only way to see all of it.
+        style={heroImage ? { height: "clamp(560px, calc(100svh - 76px), 860px)" } : undefined}
       >
         {heroImage ? (
           <>
-            {/* Full-bleed photo. Cropped to bias toward the top on narrow
-                viewports (object-position) so the skyline stays in frame —
-                the river, which sits lower in the source photo, is what
-                gets cropped away first, not the towers. */}
+            {/* Full-bleed photo. object-position moved down from the photo's
+                centre (which was mostly empty sky in this wide aerial shot)
+                to bias toward the skyline band instead — tuned by eye at
+                every required width; see the commit message for the exact
+                value settled on. Mobile (<md) keeps its own separate crop
+                (20%) — that layout stacks full-width with the vertical
+                scrim and wasn't part of the reported problem. */}
             <Image
               src={heroImage}
               alt=""
               fill
               priority
               sizes="100vw"
-              className="object-cover object-[center_20%] md:object-[center_42%]"
+              className="object-cover object-[center_20%] md:object-[50%_65%]"
               aria-hidden="true"
             />
             {/* Directional scrim, not a flat overlay — see .hero-scrim in
@@ -92,7 +103,19 @@ export default function Home() {
           <BrandBackdrop />
         )}
         <Container className="relative z-10">
-          <div className={clsx("grid items-center gap-12 py-16 md:py-24", !heroImage && "md:grid-cols-[1.1fr_0.9fr]")}>
+          {/* py-24 (md+) was sized for a content-driven, taller-than-any-
+              viewport hero; now that the header itself is height-clamped to
+              the real viewport, that much padding pushed the credit line
+              (which sits after this grid, still inside Container) below
+              900px at 1360x900. Trimmed to py-14 — measured to bring credit
+              back within the fold, see the commit message for the exact
+              numbers. */}
+          <div
+            className={clsx(
+              "grid items-center gap-12 py-16",
+              heroImage ? "md:py-14" : "md:py-24 md:grid-cols-[1.1fr_0.9fr]",
+            )}
+          >
             <div className={heroImage ? "max-w-[540px]" : undefined}>
               <Eyebrow className="mb-6" style={heroImage ? { color: "var(--c-hero-ink)", opacity: 0.9 } : undefined}>
                 Gewerbeverein · Offenbach am Main
