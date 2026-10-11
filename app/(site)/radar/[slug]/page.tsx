@@ -90,7 +90,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <Chip tone={cat.tone}>{cat.label}</Chip>
         </div>
 
-        <Heading level={1} className="mt-4 max-w-[36ch]">
+        <Heading level={1} className="mt-4 max-w-[36ch] break-words hyphens-auto">
           {item.headline}
         </Heading>
 

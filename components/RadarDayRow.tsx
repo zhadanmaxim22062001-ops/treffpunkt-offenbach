@@ -270,24 +270,12 @@ export function RadarDayRow({
             return (
               <div
                 key={iso}
-                ref={(el) => {
-                  if (el) cellRefs.current.set(iso, el);
-                  else cellRefs.current.delete(iso);
-                }}
-                role="radio"
-                tabIndex={isFocusTarget ? 0 : -1}
-                aria-checked={isSelected}
-                aria-current={isToday ? "date" : undefined}
-                aria-label={
-                  // The visible number leads, so "click 23" (speech input) matches
-                  // the start of the accessible name (WCAG 2.5.3).
-                  `${fullGermanDate(day)}, ${weekdayLongLabel(day)}${
-                    count === 0 ? "" : `, ${count} ${count === 1 ? "Termin" : "Termine"}`
-                  }`
-                }
                 onClick={() => selectDay(day)}
-                className="flex min-w-[54px] flex-1 shrink-0 snap-start cursor-pointer flex-col items-center gap-1.5 py-2 outline-none min-[900px]:min-w-0"
+                className="flex min-w-[54px] flex-1 shrink-0 snap-start cursor-pointer flex-col items-center gap-1.5 py-2 min-[900px]:min-w-0"
               >
+                {/* Month and weekday sit OUTSIDE the radio: its visible text is
+                    then just the day number, which is exactly how the accessible
+                    name starts — "click 23" works for speech input (WCAG 2.5.3). */}
                 <span
                   className="h-[13px] font-mono text-[10px] uppercase tracking-[0.06em] text-muted"
                   style={{ opacity: showMonthLabel ? 1 : 0 }}
@@ -298,27 +286,41 @@ export function RadarDayRow({
                 <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted" aria-hidden="true">
                   {weekdayShortLabels()[weekday]}
                 </span>
-                <span
-                  className="flex h-11 w-11 items-center justify-center rounded-full font-mono text-[16px] tnum"
-                  style={{
-                    backgroundColor: isSelected ? "var(--c-accent)" : "transparent",
-                    boxShadow: isToday ? `inset 0 0 0 2px ${ringColor}` : "none",
-                    color: numberColor,
-                    fontWeight: count > 0 || isToday || isSelected ? 600 : 400,
+                <div
+                  ref={(el) => {
+                    if (el) cellRefs.current.set(iso, el);
+                    else cellRefs.current.delete(iso);
                   }}
-                  aria-hidden="true"
+                  role="radio"
+                  tabIndex={isFocusTarget ? 0 : -1}
+                  aria-checked={isSelected}
+                  aria-current={isToday ? "date" : undefined}
+                  aria-label={`${fullGermanDate(day)}, ${weekdayLongLabel(day)}${
+                    count === 0 ? "" : `, ${count} ${count === 1 ? "Termin" : "Termine"}`
+                  }`}
+                  className="flex flex-col items-center gap-1.5"
                 >
-                  {day.d}
-                </span>
-                <span className="flex h-[4px] gap-[3px]" aria-hidden="true">
-                  {Array.from({ length: dotCount }).map((_, dotIndex) => (
-                    <span
-                      key={dotIndex}
-                      className="block h-[4px] w-[4px] rounded-full"
-                      style={{ backgroundColor: "var(--c-accent)" }}
-                    />
-                  ))}
-                </span>
+                  <span
+                    className="flex h-11 w-11 items-center justify-center rounded-full font-mono text-[16px] tnum"
+                    style={{
+                      backgroundColor: isSelected ? "var(--c-accent)" : "transparent",
+                      boxShadow: isToday ? `inset 0 0 0 2px ${ringColor}` : "none",
+                      color: numberColor,
+                      fontWeight: count > 0 || isToday || isSelected ? 600 : 400,
+                    }}
+                  >
+                    {day.d}
+                  </span>
+                  <span className="flex h-[4px] gap-[3px]" aria-hidden="true">
+                    {Array.from({ length: dotCount }).map((_, dotIndex) => (
+                      <span
+                        key={dotIndex}
+                        className="block h-[4px] w-[4px] rounded-full"
+                        style={{ backgroundColor: "var(--c-accent)" }}
+                      />
+                    ))}
+                  </span>
+                </div>
               </div>
             );
           })}

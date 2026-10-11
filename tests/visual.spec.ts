@@ -24,10 +24,12 @@ const ROUTES = [
   "/radar/gefuehrte-textwanderung-durch-die-frankfurter-strasse",
   "/radar/gestaltungsbeirat-tagt-erst-wieder-im-dezember",
   "/radar/ihk-aktion-heimat-shoppen-im-september",
+  "/radar/weihnachtsmarkt-16-november-bis-30-dezember",
+  "/radar/vereinshuette-weihnachtsmarkt-bewerbung-bis-23-oktober",
   "/styleguide",
 ];
 
-const WIDTHS = [420, 768, 1024, 1360];
+const WIDTHS = [320, 420, 768, 899, 900, 1024, 1360];
 const THEMES = ["light", "dark"] as const;
 
 // The no-cookie-banner premise depends on this being true: nothing on the
