@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 354 354" role="img">
+<title>Treffpunkt Offenbach</title>
+<defs>
+<radialGradient id="he"><stop offset=".972" stop-color="#C0E0EB"/><stop offset="1" stop-color="#C0E0EB" stop-opacity="0"/></radialGradient>
+</defs>
+<circle cx="177.0" cy="177.0" r="177.0" fill="url(#he)"/>
+<circle cx="177.0" cy="177.0" r="110.0" fill="#5898C4"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 402 402" role="img">
+<title>Treffpunkt Offenbach</title>
+<defs>
+<radialGradient id="sf"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".18" stop-color="#000" stop-opacity=".52"/><stop offset=".35" stop-color="#000" stop-opacity=".41"/><stop offset=".52" stop-color="#000" stop-opacity=".26"/><stop offset=".61" stop-color="#000" stop-opacity=".20"/><stop offset=".70" stop-color="#000" stop-opacity=".13"/><stop offset=".88" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+<radialGradient id="hf"><stop offset=".972" stop-color="#C0E0EB"/><stop offset="1" stop-color="#C0E0EB" stop-opacity="0"/></radialGradient>
+</defs>
+<circle cx="177.0" cy="177.0" r="177.0" fill="url(#hf)"/>
+<circle cx="237.0" cy="237.0" r="165.0" fill="url(#sf)"/>
+<circle cx="177.0" cy="177.0" r="110.0" fill="#5898C4"/>
+</svg>
