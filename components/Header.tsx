@@ -78,7 +78,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Hauptnavigation">
+        <nav className="hidden items-center gap-7 min-[900px]:flex" aria-label="Hauptnavigation">
           {NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -118,7 +118,7 @@ export function Header() {
           <button
             ref={toggleRef}
             type="button"
-            className="md:hidden"
+            className="min-[900px]:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
@@ -135,7 +135,7 @@ export function Header() {
         id="mobile-nav"
         hidden={!open}
         aria-label="Hauptnavigation, mobil"
-        className="border-t md:hidden"
+        className="border-t min-[900px]:hidden"
         style={{ borderColor: "var(--c-line)" }}
       >
         <ul className="mx-auto flex w-full max-w-[1180px] flex-col px-6 py-3">

@@ -9,7 +9,7 @@ import { test, expect } from "@playwright/test";
  * menu opens.
  */
 const NAME = "Gewerbeverein Treffpunkt Offenbach e. V.";
-const WIDTHS = [320, 375, 414, 640, 768, 1360];
+const WIDTHS = [320, 375, 414, 640, 768, 899, 900, 1360];
 const MODES = [
   { label: "system light", scheme: "light", explicit: null },
   { label: "system dark", scheme: "dark", explicit: null },
