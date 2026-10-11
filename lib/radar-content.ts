@@ -29,7 +29,21 @@ export type RadarItem = {
   place?: string;
   sourceName: string;
   sourceUrl: string;
+  /** The date the item is ABOUT and sorts/displays by: the event's first
+   *  day (frequenz), a deadline's day, or — for plain news — the day the
+   *  source published it. */
   date: string;
+  /** Last day of a multi-day event, inclusive (ISO). Optional; only valid
+   *  together with `date` as the first day and never before it — see
+   *  validateRadarItem. Calendar strip, .ics (exclusive DTEND = day after)
+   *  and Event JSON-LD (endDate) all read it. */
+  dateEnd?: string | null;
+  /** When the SOURCE published it, for the "Quelle:" line. If the key is
+   *  absent the line falls back to `date` (every item written before this
+   *  field existed); set it to null when the source page carries no
+   *  publication date, and the line shows the source name alone rather than
+   *  borrowing the event day or a deadline as a publication date. */
+  sourceDate?: string | null;
   urgency: RadarUrgency;
   deadline?: string | null;
   /** "manual": a human wrote the German copy. "auto": published by the
@@ -68,8 +82,57 @@ export const RADAR_CATEGORIES: Record<RadarCategory, { label: string; tone: "acc
 export const RADAR_ITEMS_ARE_PLACEHOLDER =
   typeof (radarData as { _note?: string })._note === "string" && (radarData as { _note?: string })._note!.includes("TODO-COPY");
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+function isIsoDate(value: unknown): value is string {
+  return typeof value === "string" && ISO_DATE.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+}
+
+/**
+ * The guard for item dates. Returns the problems with one item (empty list =
+ * valid). An item with `dateEnd` and no valid start `date` is invalid, as is
+ * a range that ends before it starts, or a bad `deadline`/`sourceDate`.
+ */
+export function validateRadarItem(item: Partial<RadarItem> & { slug?: string }): string[] {
+  const problems: string[] = [];
+  const label = item.slug ?? "(ohne slug)";
+  if (item.dateEnd != null) {
+    if (!isIsoDate(item.date)) problems.push(`${label}: dateEnd ohne gültiges Startdatum (date)`);
+    else if (!isIsoDate(item.dateEnd)) problems.push(`${label}: dateEnd ist kein ISO-Datum: ${item.dateEnd}`);
+    else if (item.dateEnd < item.date) problems.push(`${label}: dateEnd (${item.dateEnd}) liegt vor date (${item.date})`);
+  }
+  if (!isIsoDate(item.date)) problems.push(`${label}: date fehlt oder ist kein ISO-Datum`);
+  if (item.deadline != null && !isIsoDate(item.deadline)) problems.push(`${label}: deadline ist kein ISO-Datum`);
+  if (item.sourceDate != null && !isIsoDate(item.sourceDate)) problems.push(`${label}: sourceDate ist kein ISO-Datum`);
+  return problems;
+}
+
+/** Throws at build/boot on a malformed data/radar.json — better a failed
+ *  deploy than a calendar that quietly shows an event a day short or not at all. */
 export function getRadarItems(): RadarItem[] {
-  return radarData.items as RadarItem[];
+  const items = radarData.items as RadarItem[];
+  const problems = items.flatMap((item) => validateRadarItem(item));
+  if (problems.length > 0) throw new Error(`data/radar.json ungültig: ${problems.join(" | ")}`);
+  return items;
+}
+
+/** "23.10.2026" */
+export function formatIsoDe(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+/** "16.11.–30.12.2026" for a range, "23.10.2026" for a single day. */
+export function formatItemDate(item: Pick<RadarItem, "date" | "dateEnd">): string {
+  if (!item.dateEnd || item.dateEnd === item.date) return formatIsoDe(item.date);
+  const [y1, m1, d1] = item.date.split("-");
+  const [y2] = item.dateEnd.split("-");
+  const start = y1 === y2 ? `${d1}.${m1}.` : `${d1}.${m1}.${y1}`;
+  return `${start}–${formatIsoDe(item.dateEnd)}`;
+}
+
+/** The publication date of the source, or null if the source carries none. */
+export function itemSourceDate(item: Pick<RadarItem, "date" | "sourceDate">): string | null {
+  return "sourceDate" in item ? (item.sourceDate ?? null) : item.date;
 }
 
 export function getRadarItemBySlug(slug: string): RadarItem | undefined {
@@ -100,7 +163,7 @@ const VISIBILITY_WINDOW_DAYS = 30;
  *
  * 1. `pinned: true` always wins — for something like a delayed committee
  *    session that stays relevant on its own timeline, not a generic one.
- * 2. `frequenz` items stay visible through their own event date, then drop
+ * 2. `frequenz` items stay visible through their own event date (the last day of a range), then drop
  *    off — a market that already happened isn't upcoming anymore.
  * 3. An item with a `deadline` stays visible until that deadline passes,
  *    however old it is — a funding window open for three months stays up
@@ -114,7 +177,7 @@ const VISIBILITY_WINDOW_DAYS = 30;
  */
 export function isRadarItemVisible(item: RadarItem, todayIso: string): boolean {
   if (item.pinned) return true;
-  if (item.category === "frequenz") return item.date >= todayIso;
+  if (item.category === "frequenz") return (item.dateEnd ?? item.date) >= todayIso;
   if (item.deadline) return item.deadline >= todayIso;
   const ageDays = (Date.parse(todayIso) - Date.parse(item.date)) / 86_400_000;
   return ageDays <= VISIBILITY_WINDOW_DAYS;

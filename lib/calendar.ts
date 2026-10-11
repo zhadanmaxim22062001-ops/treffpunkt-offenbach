@@ -59,7 +59,7 @@ export function getCalendarEntries(): CalendarEntry[] {
         .map((item) => ({
           key: `radar-${item.slug}`,
           dateStart: item.date,
-          dateEnd: item.date,
+          dateEnd: item.dateEnd ?? item.date,
           title: item.headline,
           href: `/radar/${item.slug}`,
           source: "radar",

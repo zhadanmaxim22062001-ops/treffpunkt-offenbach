@@ -405,53 +405,7 @@
       "actionDe": "",
       "urgency": null,
       "deadline": null
-    },
-    {
-      "id": "2026-10-11-weihnachtsmarkt-zeitraum",
-      "sourceName": "Stadt Offenbach (offenbach.de)",
-      "sourceUrl": "https://www.offenbach.de/buerger_innen/familie_soziales/buergerliches_engagement/ehrenamt/wissenswertes/vereinshuette-auf-dem-weihnachtsmarkt.php",
-      "headlineSource": "Bewerbungen für die Belegung der Vereinshütte ab 14. September um 18 Uhr möglich",
-      "date": "2026-11-16",
-      "dateEnd": "2026-12-30",
-      "fetchedAt": "2026-10-11T12:00:00.000Z",
-      "category": "frequenz",
-      "headlineDe": "Weihnachtsmarkt: Die Stadt nennt den 16. November bis 30. Dezember",
-      "summaryDe": "Auf ihrer Seite zur Vereinshütte nennt die Stadt als Zeitraum des Offenbacher Weihnachtsmarkts den 16. November bis zum 30. Dezember. Am Totensonntag (22. November) sowie vom 24. bis 26. Dezember bleibt der Markt geschlossen.",
-      "actionDe": "Die Schließtage lassen sich in Öffnungs- und Dekorationsplanung einrechnen. Tägliche Öffnungszeiten für 2026 haben wir noch nicht bestätigt gefunden.",
-      "urgency": "low",
-      "deadline": null,
-      "place": "Innenstadt (Aliceplatz, Stadthof)"
-    },
-    {
-      "id": "2026-10-11-vereinshuette-bewerbung",
-      "sourceName": "Stadt Offenbach (offenbach.de)",
-      "sourceUrl": "https://www.offenbach.de/buerger_innen/familie_soziales/buergerliches_engagement/ehrenamt/wissenswertes/vereinshuette-auf-dem-weihnachtsmarkt.php",
-      "headlineSource": "Bewerbungen für die Belegung der Vereinshütte ab 14. September um 18 Uhr möglich",
-      "date": "2026-09-14",
-      "fetchedAt": "2026-10-11T12:00:00.000Z",
-      "category": "foerderung",
-      "headlineDe": "Vereinshütte auf dem Weihnachtsmarkt: Bewerbung bis 23. Oktober",
-      "summaryDe": "Vereine und Initiativen können sich über die Seite der Stadt für die Vereinshütte auf dem Weihnachtsmarkt bewerben. Bewerbungsschluss ist Freitag, der 23. Oktober.",
-      "actionDe": "Wer als Verein oder Initiative auf dem Markt sichtbar sein möchte, hat dafür noch bis zum 23. Oktober Zeit.",
-      "urgency": "mid",
-      "deadline": "2026-10-23"
-    },
-    {
-      "id": "2026-10-11-wetterkunde-wochenmarkt",
-      "sourceName": "Stadt Offenbach (offenbach.de)",
-      "sourceUrl": "http://www.offenbach.de/gaeste/artikel/unterm-schermsche-wetterkunde06.10.2026.php",
-      "headlineSource": "Wetterkunde zum Anfassen auf dem Wochenmarkt",
-      "date": "2026-10-13",
-      "fetchedAt": "2026-10-11T12:00:00.000Z",
-      "category": "frequenz",
-      "headlineDe": "Wetterinstrumente zum Selberbauen auf dem Wochenmarkt",
-      "summaryDe": "Am 13. Oktober zeigt SCAPE° von 9 bis 13 Uhr auf dem Wochenmarkt „Unterm Schermsche“, wie Barometer, Thermometer und Hygrometer funktionieren. Die Teilnahme ist kostenlos und ohne Anmeldung möglich.",
-      "actionDe": "Betriebe rund um den Markt können am Vormittag mit etwas mehr Publikum rechnen.",
-      "urgency": "low",
-      "deadline": null,
-      "place": "Wochenmarkt „Unterm Schermsche“ (Wilhelmsplatz)"
     }
   ],
-  "generatedAt": "2026-09-03T10:52:24.826Z",
-  "reviewNotes": "2026-10-11: drei geprüfte Kandidaten am Ende der Liste, NICHT veröffentlicht. Freigabe pro Eintrag steht aus."
+  "generatedAt": "2026-09-03T10:52:24.826Z"
 }

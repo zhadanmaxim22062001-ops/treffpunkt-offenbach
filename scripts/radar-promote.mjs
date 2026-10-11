@@ -79,6 +79,14 @@ async function main() {
     fail(`"date" ist kein gültiges ISO-Datum (YYYY-MM-DD): ${p.date}`);
     return;
   }
+  if (p.dateEnd != null && (!isValidIsoDate(p.dateEnd) || p.dateEnd < p.date)) {
+    fail(`"dateEnd" muss ein gültiges ISO-Datum am oder nach "date" sein (letzter Tag, einschließlich): ${p.dateEnd}`);
+    return;
+  }
+  if (p.sourceDate != null && !isValidIsoDate(p.sourceDate)) {
+    fail(`"sourceDate" ist gesetzt, aber kein gültiges ISO-Datum: ${p.sourceDate}`);
+    return;
+  }
   if (p.deadline != null && !isValidIsoDate(p.deadline)) {
     fail(`"deadline" ist gesetzt, aber kein gültiges ISO-Datum: ${p.deadline}`);
     return;
@@ -116,6 +124,11 @@ async function main() {
     sourceName: p.sourceName,
     sourceUrl: p.sourceUrl,
     date: p.date,
+    // Optional, set by hand on the inbox proposal: last day of a multi-day
+    // event (inclusive), and the source's own publication date — null when
+    // the source page carries none (see lib/radar-content.ts).
+    ...(p.dateEnd ? { dateEnd: p.dateEnd } : {}),
+    ...("sourceDate" in p ? { sourceDate: p.sourceDate } : {}),
     urgency: p.urgency,
     deadline: p.deadline ?? null,
     origin: "manual",

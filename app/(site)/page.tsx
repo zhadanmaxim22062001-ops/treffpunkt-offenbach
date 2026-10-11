@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { clsx } from "clsx";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
+import { RadarItemDate, RadarSourceLabel } from "@/components/RadarItemDate";
 import { HeroDot } from "@/components/Logo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
 import { CountUp, LineReveal, MountReveal, Reveal } from "@/components/motion";
@@ -295,9 +296,7 @@ export default function Home() {
                   }}
                 >
                   <div className="flex flex-wrap items-center gap-3">
-                    <time className="font-mono text-[11px] tracking-[0.08em] text-muted" dateTime={item.date}>
-                      {formatDate(item.date)}
-                    </time>
+                    <RadarItemDate item={item} className="font-mono text-[11px] tracking-[0.08em] text-muted" />
                     <Chip tone={cat.tone}>{cat.label}</Chip>
                   </div>
                   <h3 className="mt-3 max-w-[52ch] font-display text-[19px] font-semibold leading-snug">
@@ -314,7 +313,7 @@ export default function Home() {
                     {item.action}
                   </p>
                   <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                    Quelle: {item.sourceName} · {formatDate(item.date)}
+                    Quelle: <RadarSourceLabel item={item} />
                   </p>
                 </Reveal>
               );
@@ -430,9 +429,4 @@ export default function Home() {
       </Section>
     </>
   );
-}
-
-function formatDate(iso: string) {
-  const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y}`;
 }

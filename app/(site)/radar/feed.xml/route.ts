@@ -1,4 +1,4 @@
-import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, isRadarItemVisible } from "@/lib/radar-content";
+import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, isRadarItemVisible, itemSourceDate } from "@/lib/radar-content";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.treffpunkt-offenbach.com";
 
@@ -39,12 +39,15 @@ export function GET() {
   const itemsXml = sorted
     .map((item) => {
       const url = `${SITE_URL}/radar/${item.slug}`;
+      // No pubDate when the source page carries no publication date — RSS
+      // allows that, and we don't print a made-up one.
+      const published = itemSourceDate(item);
       return [
         "  <item>",
         `    <title>${escapeXml(item.headline)}</title>`,
         `    <link>${url}</link>`,
         `    <guid isPermaLink="true">${url}</guid>`,
-        `    <pubDate>${toRfc822(item.date)}</pubDate>`,
+        ...(published ? [`    <pubDate>${toRfc822(published)}</pubDate>`] : []),
         `    <description>${escapeXml(item.summary)}</description>`,
         "  </item>",
       ].join("\n");

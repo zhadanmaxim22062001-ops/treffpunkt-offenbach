@@ -289,6 +289,9 @@ only (#3B3B3B → #F2F6F9).
   show one — no JavaScript swap, no CSS filter.
 - The two blues of the logo are logo-only tokens (`--c-brand-dot`,
   `--c-brand-halo`), never UI colours: #5898C4 is 3.2:1 on white.
+- The hero dot (`circle-shadow.svg`) is hidden below 768px **on purpose**: on a
+  phone the brand is already in the header, and a large decorative circle would
+  crowd the headline. Do not "fix" the missing dot on small screens.
 - Contrast: WCAG 1.4.3 exempts logotypes, so the glow's wash-out on a bright
   photo and the light glyphs crossing the pale halo in the dark theme are the
   artwork, not defects.
@@ -575,6 +578,23 @@ the item aged out of the list.
   coming up", not two half-overlapping ones.
 - **`/radar/feed.xml`.** A plain RSS 2.0 feed, built from the same file,
   for anyone who'd rather subscribe than check back.
+
+### Dates on an item
+
+- `date` is the day the item is *about*: the first day of an event, the day of a
+  deadline, or the source's publication day for plain news.
+- `dateEnd` (optional) is the **last** day of a multi-day event, inclusive. It is
+  only valid with a start `date` and never before it — `validateRadarItem`
+  (`lib/radar-content.ts`) throws at build time otherwise. The day-strip marks
+  every day of the range, the `.ics` writes an *exclusive* `DTEND` (a range
+  ending 30.12. writes `DTEND;VALUE=DATE:20261231`), and the Event JSON-LD gets
+  `startDate` and `endDate`.
+- `sourceDate` (optional) is when the *source* published it, for the "Quelle:"
+  line. Absent → falls back to `date` (items from before this field). `null` →
+  the source page carries no publication date: the line shows the source name
+  alone. Never put a deadline or an event day there to fill the gap.
+- A location is only ever what the source page itself names (`place`); never
+  infer one from navigation or breadcrumbs.
 
 ### Publishing a real item without either script
 

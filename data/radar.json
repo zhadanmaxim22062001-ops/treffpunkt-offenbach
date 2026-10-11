@@ -52,6 +52,35 @@
       "urgency": "mid",
       "deadline": null,
       "origin": "manual"
+    },
+    {
+      "slug": "weihnachtsmarkt-16-november-bis-30-dezember",
+      "category": "frequenz",
+      "headline": "Weihnachtsmarkt: Die Stadt nennt den 16. November bis 30. Dezember",
+      "summary": "Die Stadt Offenbach nennt für den Weihnachtsmarkt den Zeitraum vom 16. November bis zum 30. Dezember 2026. Geschlossen bleibt er am Totensonntag (22. November) und vom 24. bis 26. Dezember.",
+      "action": "Wer Personal und Aktionen plant, kann die Schließtage des Marktes einrechnen.",
+      "sourceName": "Stadt Offenbach (offenbach.de)",
+      "sourceUrl": "https://www.offenbach.de/buerger_innen/familie_soziales/buergerliches_engagement/ehrenamt/wissenswertes/vereinshuette-auf-dem-weihnachtsmarkt.php",
+      "date": "2026-11-16",
+      "dateEnd": "2026-12-30",
+      "sourceDate": null,
+      "urgency": "low",
+      "deadline": null,
+      "origin": "manual"
+    },
+    {
+      "slug": "vereinshuette-weihnachtsmarkt-bewerbung-bis-23-oktober",
+      "category": "foerderung",
+      "headline": "Vereinshütte auf dem Weihnachtsmarkt: Bewerbung bis 23. Oktober",
+      "summary": "Vereine und Initiativen können sich über die Seite der Stadt für die Vereinshütte auf dem Weihnachtsmarkt bewerben. Bewerbungsschluss ist Freitag, der 23. Oktober 2026.",
+      "action": "Wer als Verein oder Initiative auf dem Markt sichtbar sein möchte, muss die Bewerbung bis dahin einreichen.",
+      "sourceName": "Stadt Offenbach (offenbach.de)",
+      "sourceUrl": "https://www.offenbach.de/buerger_innen/familie_soziales/buergerliches_engagement/ehrenamt/wissenswertes/vereinshuette-auf-dem-weihnachtsmarkt.php",
+      "date": "2026-10-23",
+      "sourceDate": null,
+      "urgency": "mid",
+      "deadline": "2026-10-23",
+      "origin": "manual"
     }
   ]
 }

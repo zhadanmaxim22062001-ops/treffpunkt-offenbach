@@ -3,7 +3,15 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Chip, Eyebrow, Heading, Section } from "@/components/ui";
 import { RadarDeadline } from "@/components/RadarDeadline";
-import { RADAR_CATEGORIES, RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItemBySlug, getRadarItems } from "@/lib/radar-content";
+import { IcsDownloadButton } from "@/components/IcsDownloadButton";
+import { RadarItemDate, RadarSourceLabel } from "@/components/RadarItemDate";
+import {
+  RADAR_CATEGORIES,
+  RADAR_ITEMS_ARE_PLACEHOLDER,
+  getRadarItemBySlug,
+  getRadarItems,
+  itemSourceDate,
+} from "@/lib/radar-content";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.treffpunkt-offenbach.com";
 
@@ -15,11 +23,6 @@ export function generateStaticParams() {
 }
 
 export const dynamicParams = false;
-
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y}`;
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -36,15 +39,38 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   const cat = RADAR_CATEGORIES[item.category];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: item.headline,
-    description: item.summary,
-    datePublished: item.date,
-    url: `${SITE_URL}/radar/${item.slug}`,
-    publisher: { "@type": "Organization", name: "Gewerbeverein Treffpunkt Offenbach e. V." },
-  };
+  // A calendar item (frequenz) is an Event: startDate/endDate are the
+  // source-stated first and last day (schema.org dates, end inclusive), and
+  // the location is only what the item itself names — never inferred. Every
+  // other item stays an Article, with datePublished only when the source
+  // actually carries a publication date.
+  const sourceDate = itemSourceDate(item);
+  const jsonLd =
+    item.category === "frequenz"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Event",
+          name: item.headline,
+          description: item.summary,
+          startDate: item.date,
+          ...(item.dateEnd && item.dateEnd !== item.date ? { endDate: item.dateEnd } : {}),
+          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+          location: {
+            "@type": "Place",
+            name: item.place ?? "Offenbach am Main",
+            address: { "@type": "PostalAddress", addressLocality: "Offenbach am Main", addressCountry: "DE" },
+          },
+          url: `${SITE_URL}/radar/${item.slug}`,
+        }
+      : {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: item.headline,
+          description: item.summary,
+          ...(sourceDate ? { datePublished: sourceDate } : {}),
+          url: `${SITE_URL}/radar/${item.slug}`,
+          publisher: { "@type": "Organization", name: "Gewerbeverein Treffpunkt Offenbach e. V." },
+        };
 
   return (
     <Section>
@@ -60,9 +86,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         }}
       >
         <div className="flex flex-wrap items-center gap-3">
-          <time className="font-mono text-[11px] tracking-[0.08em] text-muted tnum" dateTime={item.date}>
-            {formatDate(item.date)}
-          </time>
+          <RadarItemDate item={item} className="font-mono text-[11px] tracking-[0.08em] text-muted tnum" />
           <Chip tone={cat.tone}>{cat.label}</Chip>
         </div>
 
@@ -90,10 +114,25 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <RadarDeadline slug={item.slug} headline={item.headline} summary={item.summary} deadline={item.deadline} />
         )}
 
+        {item.category === "frequenz" && (
+          <div className="mt-6">
+            <IcsDownloadButton
+              event={{
+                slug: item.slug,
+                title: item.headline,
+                summary: item.summary,
+                location: item.place,
+                isoStart: item.date,
+                isoEnd: item.dateEnd ?? null,
+              }}
+            />
+          </div>
+        )}
+
         <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
           Quelle:{" "}
           <a href={item.sourceUrl} className="link-underline" target="_blank" rel="noopener noreferrer">
-            {item.sourceName} · {formatDate(item.date)}
+            <RadarSourceLabel item={item} />
           </a>
           {item.origin === "auto" && " · Automatisch aus der Quelle übernommen"}
         </p>

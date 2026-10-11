@@ -11,7 +11,7 @@ import {
   addMonths,
   compareDates,
   fullGermanDate,
-  fullGermanDateWithWeekday,
+  weekdayLongLabel,
   isSameDate,
   monthShortLabel,
   parseIso,
@@ -279,9 +279,11 @@ export function RadarDayRow({
                 aria-checked={isSelected}
                 aria-current={isToday ? "date" : undefined}
                 aria-label={
-                  count === 0
-                    ? fullGermanDateWithWeekday(day)
-                    : `${fullGermanDateWithWeekday(day)}, ${count} ${count === 1 ? "Termin" : "Termine"}`
+                  // The visible number leads, so "click 23" (speech input) matches
+                  // the start of the accessible name (WCAG 2.5.3).
+                  `${fullGermanDate(day)}, ${weekdayLongLabel(day)}${
+                    count === 0 ? "" : `, ${count} ${count === 1 ? "Termin" : "Termine"}`
+                  }`
                 }
                 onClick={() => selectDay(day)}
                 className="flex min-w-[54px] flex-1 shrink-0 snap-start cursor-pointer flex-col items-center gap-1.5 py-2 outline-none min-[900px]:min-w-0"

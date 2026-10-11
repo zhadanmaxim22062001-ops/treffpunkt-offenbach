@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { Chip } from "@/components/ui";
 import { RadarDeadline } from "@/components/RadarDeadline";
+import { RadarItemDate, RadarSourceLabel } from "@/components/RadarItemDate";
 import { RADAR_CATEGORIES, type RadarItem } from "@/lib/radar-content";
-
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${d}.${m}.${y}`;
-}
 
 /**
  * A single OF-Radar item's full rendering — date, category chip, headline
@@ -25,9 +21,7 @@ export function RadarItemBody({ item, chipFadeDelay }: { item: RadarItem; chipFa
   return (
     <>
       <div className="flex flex-wrap items-center gap-3">
-        <time className="font-mono text-[11px] tracking-[0.08em] text-muted tnum" dateTime={item.date}>
-          {formatDate(item.date)}
-        </time>
+        <RadarItemDate item={item} className="font-mono text-[11px] tracking-[0.08em] text-muted tnum" />
         <Chip tone={cat.tone}>
           {chipFadeDelay !== undefined ? (
             <span className="chip-fade-in inline-block" style={{ animationDelay: `${chipFadeDelay}s` }}>
@@ -59,7 +53,7 @@ export function RadarItemBody({ item, chipFadeDelay }: { item: RadarItem; chipFa
       <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
         Quelle:{" "}
         <a href={item.sourceUrl} className="link-underline" target="_blank" rel="noopener noreferrer">
-          {item.sourceName} · {formatDate(item.date)}
+          <RadarSourceLabel item={item} />
         </a>
       </p>
     </>

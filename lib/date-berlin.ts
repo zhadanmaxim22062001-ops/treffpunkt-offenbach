@@ -171,3 +171,9 @@ export function monthShortLabel(date: CalendarDate): string {
 export function shortGermanDate(date: CalendarDate): string {
   return `${String(date.d).padStart(2, "0")}.${String(date.m).padStart(2, "0")}.${date.y}`;
 }
+
+const WEEKDAY_LONG_FORMATTER = new Intl.DateTimeFormat("de-DE", { weekday: "long", timeZone: "UTC" });
+/** "Freitag" */
+export function weekdayLongLabel(date: CalendarDate): string {
+  return WEEKDAY_LONG_FORMATTER.format(toUtcMidnight(date));
+}
