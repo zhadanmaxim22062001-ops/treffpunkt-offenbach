@@ -52,10 +52,11 @@ identity, not a recurring issue.
 
 - Archivo, Newsreader, IBM Plex Mono fonts — loaded **locally** via `next/font/local`;
   no requests to Google's servers at all, which matters for DSGVO;
-- The OF-Siegel mark: `components/Logo.tsx`, the 64px version-switch threshold is
-  built in;
+- The association's own logo, as delivered (never redrawn): `components/Logo.tsx`
+  renders the light and dark file of a lockup side by side and CSS shows one;
+  see "Logo" below;
 - Header with navigation and theme toggle, footer, skip link, Organization JSON-LD;
-- The homepage: hero with the mark drawing itself in, animated Kennzahlen, three
+- The homepage: hero with the logo's dot fading in, animated Kennzahlen, three
   cards, OF-Radar teaser, member marquee, next event, inverted CTA strip;
 - `/styleguide` — every component on one page for comparison (noindex'd, not for
   search engines);
@@ -271,6 +272,32 @@ local fonts: a live map embed would mean every visitor's browser calling a
 third party and handing over their IP, which is exactly the problem the site
 otherwise avoids.
 
+## Logo
+
+The logo is the association's own, vectorised from the original artwork; the
+files are in `public/brand/` and must not be redrawn, recoloured, filtered or
+re-letterspaced. The inverse files differ from the light ones in text colour
+only (#3B3B3B → #F2F6F9).
+
+- Header, all widths: `logo-compact` (60px high from 640px, 48px below).
+  Footer: the three-line `logo` at 110px high. Open Graph / print / e-mail:
+  the three-line lockup. The three-line lockup is not a header asset — its dot
+  is ~4× the cap height, so at header height the third line is illegible.
+- Minimum rendered width: 170px three-line, 120px compact. Clear space: the
+  core-dot diameter on every side. `/styleguide` shows both rules.
+- Theme: both files are in the DOM, `.logo-light`/`.logo-dark` (globals.css)
+  show one — no JavaScript swap, no CSS filter.
+- The two blues of the logo are logo-only tokens (`--c-brand-dot`,
+  `--c-brand-halo`), never UI colours: #5898C4 is 3.2:1 on white.
+- Contrast: WCAG 1.4.3 exempts logotypes, so the glow's wash-out on a bright
+  photo and the light glyphs crossing the pale halo in the dark theme are the
+  artwork, not defects.
+- Tests: `tests/header-logo.spec.ts` asserts the header logo is rendered and
+  named at 320–1360px in all four theme modes.
+- **Historical `tpof` prefix:** the localStorage keys `tpof-theme` and
+  `tpof:radar-profile` keep their old prefix on purpose. Renaming them would
+  silently reset every visitor's saved theme and radar profile.
+
 ## Animation
 
 One system, applied consistently, all in `components/motion.tsx` plus a
@@ -278,9 +305,9 @@ handful of CSS classes in `app/globals.css`:
 
 - Hero headline: `LineReveal` masks each line in via `translateY` (never
   `opacity`, so the h1 stays LCP-eligible from first paint), starting the
-  instant `.logo-draw`'s ring finishes (`HERO_TEXT_DELAY` in
-  `app/(site)/page.tsx` mirrors the 0.85s in globals.css by comment, not
-  by shared constant — if the ring's duration changes, update both).
+  instant the hero dot (`.hero-dot`, 420ms) has settled (`HERO_TEXT_DELAY` in
+  `app/(site)/page.tsx` mirrors that by comment, not by shared constant — if
+  the dot's duration changes, update both).
   Lead/buttons follow 150ms later via `MountReveal`.
 - `Header.tsx`'s active nav link gets a `layoutId`-based indicator that
   slides between links on route change (Framer Motion shared layout).
@@ -332,8 +359,7 @@ required note on what was changed) and an `isMediaCreditComplete()` guard;
 `lib/hero-image.ts` returns the image path only when every field is filled in
 *and* the file exists on disk. If either is missing, the hero silently falls
 back to `components/BrandBackdrop.tsx` — the same soft token-based gradient
-plus giant, very faint OF-Siegel (built from `MARK_PRIMARY_PATHS`) it always
-used. Same guard pattern as `MEMBERS_ARE_PLACEHOLDER` /
+(no logo or mark any more) it always used. Same guard pattern as `MEMBERS_ARE_PLACEHOLDER` /
 `RADAR_ITEMS_ARE_PLACEHOLDER`: a copyrighted image can't ship uncredited by
 accident, on purpose or otherwise.
 

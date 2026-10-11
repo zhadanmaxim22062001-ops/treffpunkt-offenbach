@@ -1,7 +1,7 @@
 /**
  * Decorative-only background for the photo-less hero fallback and the
  * ink-inverted CTA band: a soft radial glow, nothing else. It used to carry
- * a giant, very faint copy of the retired OF-Siegel bleeding off the right
+ * a giant, very faint copy of the former mark bleeding off the right
  * edge; the association's own logo is not used as wallpaper, so that is gone
  * rather than replaced. Flat CSS only: no images, no blur filters.
  *
