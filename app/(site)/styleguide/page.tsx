@@ -41,8 +41,8 @@ export default function Styleguide() {
             <figcaption className="eyebrow mt-3">Kompakt · mindestens {logoWidth("compact", logoMinHeight("compact"))} px breit</figcaption>
           </figure>
           <figure className="m-0">
-            <HeroDot style={{ width: 120, height: 120 }} />
-            <figcaption className="eyebrow mt-3">Punkt mit Schatten · Hero</figcaption>
+            <HeroDot shadow style={{ width: 120, height: 120 }} />
+            <figcaption className="eyebrow mt-3">Punkt mit Schatten · nur helle Seite</figcaption>
           </figure>
         </div>
 

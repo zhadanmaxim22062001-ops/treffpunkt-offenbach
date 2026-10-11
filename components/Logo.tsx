@@ -70,18 +70,21 @@ export function Logo({
 }
 
 /**
- * The dot alone, with its shadow — large decorative use (the hero). Purely
- * decorative: the lockup in the header already names the association.
+ * The dot alone — decorative. Shadow-free (circle.svg) by default: the cast
+ * shadow in circle-shadow.svg is a black gradient that only reads right on a
+ * light page; on a photo or on navy it turns the pale halo grey. Pass
+ * `shadow` only for a light background (the styleguide sample).
  */
-export function HeroDot({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export function HeroDot({ className, style, shadow = false }: { className?: string; style?: React.CSSProperties; shadow?: boolean }) {
+  const size = shadow ? 402 : 354;
   return (
     // eslint-disable-next-line @next/next/no-img-element -- SVG, no optimisation wanted
     <img
-      src="/brand/circle-shadow.svg"
+      src={shadow ? "/brand/circle-shadow.svg" : "/brand/circle.svg"}
       alt=""
       aria-hidden="true"
-      width={402}
-      height={402}
+      width={size}
+      height={size}
       decoding="async"
       className={clsx("max-w-none", className)}
       style={style}

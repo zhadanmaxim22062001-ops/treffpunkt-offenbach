@@ -4,9 +4,11 @@
     <radialGradient id="shc"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset=".18" stop-color="#000" stop-opacity=".52"/><stop offset=".35" stop-color="#000" stop-opacity=".41"/><stop offset=".52" stop-color="#000" stop-opacity=".26"/><stop offset=".61" stop-color="#000" stop-opacity=".20"/><stop offset=".70" stop-color="#000" stop-opacity=".13"/><stop offset=".88" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
     <radialGradient id="hac"><stop offset=".972" stop-color="#C0E0EB" stop-opacity="1"/><stop offset="1" stop-color="#C0E0EB" stop-opacity="0"/></radialGradient>
   </defs>
-  <circle cx="493.5" cy="222.5" r="177.0" fill="url(#hac)"/>
-  <circle cx="553.5" cy="282.5" r="165.0" fill="url(#shc)"/>
-  <circle cx="493.5" cy="222.5" r="110.0" fill="#5898C4"/>
+  <g class="tpof-dot" style="transform-origin:493.5px 222.5px">
+    <circle cx="493.5" cy="222.5" r="177.0" fill="url(#hac)"/>
+    <circle cx="553.5" cy="282.5" r="165.0" fill="url(#shc)"/>
+    <circle cx="493.5" cy="222.5" r="110.0" fill="#5898C4"/>
+  </g>
   <g fill="#3B3B3B" transform="translate(-105,-205) scale(0.25000000) translate(0,3264) scale(0.1,-0.1)">
     <path d="M4205 17387 c-3 -7 -4 -149 -3 -317 l3 -305 535 -5 535 -5 5 -1395 5
 -1395 435 0 435 0 5 1395 5 1395 555 5 555 5 0 315 0 315 -1533 3 c-1227 2

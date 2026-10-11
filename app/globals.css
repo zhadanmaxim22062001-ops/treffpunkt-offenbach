@@ -385,13 +385,39 @@
     display: block;
   }
 
-  /* The one move the logo makes: the hero dot scales 0.92 -> 1 and fades in
-     once on load, 420ms on the brand easing. Nothing in the header
-     animates. Only under no-preference — a visitor who asked for reduced
-     motion gets the finished state with no animation at all. */
+  /* The hero logo's motion. Two things, both only under no-preference — a
+     visitor who asked for reduced motion gets the finished state, dot at
+     scale 1, no animation at all:
+       1. the whole hero logo scales 0.92 -> 1 and fades in once on load
+          (.hero-dot, 420ms, brand easing);
+       2. the dot BREATHES: scale 1 -> 1.035 -> 1, 3.6s ease-in-out, forever
+          (client request; it overrides the "nothing moves unless scrolled
+          or hovered" rule for this one element). Transform only — no
+          filter, shadow or opacity on the group, which would repaint a very
+          large element every frame. will-change: transform on the group,
+          nothing else. The letters never move; the header and footer logos
+          never animate. The SVG box doesn't change, so no layout shift. */
   @media (prefers-reduced-motion: no-preference) {
     .hero-dot {
       animation: hero-dot-in 420ms var(--ease-brand) both;
+    }
+    .hero-logo .tpof-dot {
+      animation: dot-pulse 3.6s ease-in-out infinite;
+      will-change: transform;
+    }
+  }
+  .hero-logo svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  @keyframes dot-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.035);
     }
   }
   @keyframes hero-dot-in {

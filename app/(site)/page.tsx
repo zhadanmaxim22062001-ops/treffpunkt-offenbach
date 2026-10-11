@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 import { RadarItemDate, RadarSourceLabel } from "@/components/RadarItemDate";
 import { HeroDot } from "@/components/Logo";
+import { HeroLogo } from "@/components/HeroLogo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
 import { CountUp, LineReveal, MountReveal, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
@@ -87,20 +88,23 @@ export default function Home() {
                 skyline, the river) opens up instead of sitting under a flat
                 dark wash. */}
             <div className="hero-scrim absolute inset-0" aria-hidden="true" />
-            {/* The dot alone, with its shadow (circle-shadow.svg), 46% of the
-                hero's height, bottom-right, bleeding off the right and
-                bottom edges. Nothing else from the logo goes on the photo.
-                Positioned by the outer box (pure layout, no animation) so
-                the inner image can scale/fade without fighting its
-                translate. Hidden below md as before: the text stacks
-                full-width there and a dot this size would sit on the
-                buttons. */}
+            {/* The logo, TREFF ● PUNKT (logo-compact-inverse, no shadow — the cast
+                shadow turns the halo grey on a photo), bottom-right. 34% of
+                the hero's width (the largest that keeps clear of the lead
+                and buttons on a short 800-900px window: >=30px box gap,
+                measured), the words whole: the dot sits in the middle
+                of the lockup, so the right edge can't bleed without cutting
+                the T. Positioned by the outer box (pure layout, no
+                animation) so the inner logo can scale/fade/pulse without
+                fighting it. Hidden below md as before: the brand is already
+                in the header on a phone, and a large decorative logo would
+                crowd the headline there (see the README's Logo section). */}
             <div
-              className="pointer-events-none absolute right-0 bottom-0 hidden aspect-square md:block"
-              style={{ height: "46%", transform: "translate(11%, 11%)" }}
+              className="pointer-events-none absolute hidden md:block"
+              style={{ width: "34%", right: "2%", bottom: 0 }}
               aria-hidden="true"
             >
-              <HeroDot className="hero-dot h-full w-full" />
+              <HeroLogo className="hero-dot" />
             </div>
           </>
         ) : (

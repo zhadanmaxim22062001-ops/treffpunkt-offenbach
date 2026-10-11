@@ -1,8 +1,26 @@
 "use client";
 
 import { clsx } from "clsx";
-import { motion, useInView, useReducedMotion, useScroll } from "motion/react";
+import { motion, useInView, useReducedMotion as useReducedMotionRaw, useScroll } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+
+/**
+ * `prefers-reduced-motion`, safe for SSR. The server can't know the visitor's
+ * preference, so it always renders the animated markup (content starting at
+ * y: 110% / opacity 0); motion's own hook then reports `true` on the first
+ * CLIENT render, which hydrates a *different* tree against that HTML — React
+ * keeps the server markup ("won't be patched up") and the hero headline
+ * stayed translated out of view for exactly the visitors who asked for less
+ * motion. So: report false until mounted, then the real value — the server
+ * and the first client render agree, and reduced-motion visitors get the
+ * plain, un-animated tree right after hydration.
+ */
+export function useReducedMotion(): boolean {
+  const raw = useReducedMotionRaw();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted && !!raw;
+}
 
 /**
  * Section reveal: 16px up + fade, once, ~60ms stagger.

@@ -3,6 +3,8 @@
 <defs>
 <radialGradient id="he"><stop offset=".972" stop-color="#C0E0EB"/><stop offset="1" stop-color="#C0E0EB" stop-opacity="0"/></radialGradient>
 </defs>
+<g class="tpof-dot" style="transform-origin:177.0px 177.0px">
 <circle cx="177.0" cy="177.0" r="177.0" fill="url(#he)"/>
 <circle cx="177.0" cy="177.0" r="110.0" fill="#5898C4"/>
+</g>
 </svg>
