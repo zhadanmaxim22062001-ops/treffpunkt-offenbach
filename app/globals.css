@@ -82,17 +82,17 @@
   --c-brand-dot: #5898c4;
   --c-brand-halo: #c0e0eb;
   /* Sticky header's outer height (row + 1px border), per the logo size that
-     fits at each breakpoint: compact lockup 45px + 24px row padding below
-     640px, full lockup 72px + 24px from 640px up. components/Header.tsx
+     fits at each breakpoint: compact lockup 48px + 24px row padding below
+     640px, 60px + 24px from 640px up. components/Header.tsx
      sizes its row from this and the homepage hero subtracts it, so the two
      can't drift apart. */
-  --header-h: 70px;
+  --header-h: 73px;
   color-scheme: light;
 }
 
 @media (min-width: 640px) {
   :root {
-    --header-h: 97px;
+    --header-h: 85px;
   }
 }
 
@@ -393,22 +393,6 @@
     .hero-dot {
       animation: hero-dot-in 420ms var(--ease-brand) both;
     }
-  }
-  /* Soft darkening of the photo around the hero dot (the same job the old
-     mark's glow did): the dot's pale halo (#C0E0EB) is light-on-light where
-     it crosses bright rooftops, and the artwork itself may not change, so
-     the photo gives a little instead. Weak and wide so it has no edge. */
-  .hero-dot-glow::before {
-    content: "";
-    position: absolute;
-    inset: -22%;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--c-hero-scrim) 46%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 40%, transparent) 50%,
-      color-mix(in srgb, var(--c-hero-scrim) 22%, transparent) 72%,
-      transparent 100%
-    );
   }
   @keyframes hero-dot-in {
     from {

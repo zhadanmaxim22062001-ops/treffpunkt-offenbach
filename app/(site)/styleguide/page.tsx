@@ -54,14 +54,18 @@ export default function Styleguide() {
             etwa <span className="tnum">36</span> px).
           </li>
           <li>
-            Mindestbreite: <span className="tnum">170</span> px für den dreizeiligen Block,{" "}
-            <span className="tnum">120</span> px für die kompakte Zeile. Darunter wird die dritte Zeile unleserlich —
-            dafür gibt es die kompakte Fassung.
+            Mindestbreite: <span className="tnum">170</span> px gilt nur für den dreizeiligen Block (Footer, Open
+            Graph, Druck, E-Mail); die kompakte Zeile darf bis <span className="tnum">120</span> px herunter. Darunter
+            wird die dritte Zeile unleserlich.
           </li>
           <li>
-            Die beiden Maße sind verbindlich, die Höhen folgen daraus: <span className="tnum">72</span> px voll,{" "}
-            <span className="tnum">45</span> px kompakt (<code className="font-mono text-[12px]">logoMinHeight()</code> in
-            components/Logo.tsx rechnet es aus und warnt in der Entwicklung, wenn jemand darunter geht).
+            Im Kopfbereich steht nie der dreizeilige Block: sein Punkt ist etwa viermal so hoch wie die Versalhöhe von
+            TREFFPUNKT, bei Kopfzeilenhöhe wäre die dritte Zeile Matsch. Dort steht die kompakte Zeile,{" "}
+            <span className="tnum">60</span> px hoch (<span className="tnum">161</span> px breit), unter 640 px{" "}
+            <span className="tnum">48</span> px (<span className="tnum">129</span> px). Der Footer zeigt den vollen Block
+            mit <span className="tnum">110</span> px Höhe (<span className="tnum">263</span> px breit).{" "}
+            <code className="font-mono text-[12px]">logoMinHeight()</code> in components/Logo.tsx warnt in der
+            Entwicklung, wenn jemand unter die Mindestbreite geht.
           </li>
         </ul>
         <div className="mt-8 flex flex-wrap items-start gap-12">

@@ -5,8 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { motion, useReducedMotion } from "motion/react";
-import { Logo, logoMinHeight } from "./Logo";
+import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
+
+/** Compact lockup heights (1051x390 artwork): 161px / 129px wide. Keep in step with --header-h. */
+const HEADER_LOGO_H = 60;
+const HEADER_LOGO_H_SMALL = 48;
 
 const NAV = [
   { href: "/verein", label: "Verein" },
@@ -51,30 +55,30 @@ export function Header() {
       style={{ borderColor: "var(--c-line)", backgroundColor: "color-mix(in srgb, var(--c-paper) 88%, transparent)" }}
     >
       {/* Row height comes from --header-h (globals.css): the logo sets it, not
-          the other way round — 45px compact below 640px, 72px full from 640px
-          (each is the smallest height at which that lockup still meets its
-          minimum rendered width: 120px / 170px), plus 24px of padding and the
-          1px border. The homepage hero subtracts the same variable. */}
+          the other way round — compact lockup 48px high below 640px, 60px from
+          640px, plus 24px of padding and the 1px border. The homepage hero
+          subtracts the same variable. The three-line lockup is deliberately
+          not used here: its dot is ~4x the cap height, so at header size the
+          third line is illegible. It lives in the footer. */}
       <div
         className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6"
         style={{ height: "calc(var(--header-h) - 1px)" }}
       >
         {/* First focusable element after the skip link. No aria-label: the
             <img> alt already names the link, and a custom label would
-            override the visible artwork's own name. Exactly one of the two
-            breakpoint wrappers below is displayed, and within it exactly one
-            of the light/dark files — the rest are display:none, i.e. out of
+            override the visible artwork's own name. Of the light/dark pair
+            exactly one is displayed; the other is display:none, i.e. out of
             the accessibility tree. */}
         <Link href="/" className="flex shrink-0 items-center">
           <span className="block sm:hidden">
-            <Logo variant="compact" height={logoMinHeight("compact")} />
+            <Logo variant="compact" height={HEADER_LOGO_H_SMALL} />
           </span>
           <span className="hidden sm:block">
-            <Logo variant="full" height={logoMinHeight("full")} />
+            <Logo variant="compact" height={HEADER_LOGO_H} />
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Hauptnavigation">
+        <nav className="hidden items-center gap-7 md:flex" aria-label="Hauptnavigation">
           {NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -114,7 +118,7 @@ export function Header() {
           <button
             ref={toggleRef}
             type="button"
-            className="lg:hidden"
+            className="md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
@@ -131,7 +135,7 @@ export function Header() {
         id="mobile-nav"
         hidden={!open}
         aria-label="Hauptnavigation, mobil"
-        className="border-t lg:hidden"
+        className="border-t md:hidden"
         style={{ borderColor: "var(--c-line)" }}
       >
         <ul className="mx-auto flex w-full max-w-[1180px] flex-col px-6 py-3">

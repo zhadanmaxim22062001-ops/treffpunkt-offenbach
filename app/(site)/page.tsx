@@ -95,7 +95,7 @@ export default function Home() {
                 full-width there and a dot this size would sit on the
                 buttons. */}
             <div
-              className="hero-dot-glow pointer-events-none absolute right-0 bottom-0 hidden aspect-square md:block"
+              className="pointer-events-none absolute right-0 bottom-0 hidden aspect-square md:block"
               style={{ height: "46%", transform: "translate(11%, 11%)" }}
               aria-hidden="true"
             >
