@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { buildIcs } from "../lib/ics";
-import { entriesOnDate, getCalendarEntries } from "../lib/calendar";
+import { entriesOnDate, getCalendarEntries, nextDeadlineOnOrAfter } from "../lib/calendar";
 import { formatItemDate, itemSourceDate, validateRadarItem } from "../lib/radar-content";
 
 /**
@@ -123,5 +123,43 @@ test.describe("dateEnd: pages", () => {
     await page.goto(`/radar/${HUETTE}`);
     await expect(page.locator("time").first()).toHaveAttribute("datetime", "2026-10-23");
     await expect(page.getByRole("main")).toContainText("23.10.2026");
+  });
+});
+
+test.describe("empty strip names the nearest Frist and the next Termin", () => {
+  test("nextDeadlineOnOrAfter picks the soonest open deadline", () => {
+    const list = [
+      { iso: "2026-10-23", title: "A", href: "/radar/a" },
+      { iso: "2026-12-01", title: "B", href: "/radar/b" },
+    ];
+    expect(nextDeadlineOnOrAfter(list, "2026-10-11")?.title).toBe("A");
+    expect(nextDeadlineOnOrAfter(list, "2026-10-23")?.title).toBe("A");
+    expect(nextDeadlineOnOrAfter(list, "2026-10-24")?.title).toBe("B");
+    expect(nextDeadlineOnOrAfter(list, "2026-12-02")).toBeUndefined();
+  });
+
+  test("server-rendered (no JavaScript): Frist first, then Termin, both linked", async ({ browser }) => {
+    // The deadline item drops off the list after 23.10.2026; the assertion only makes sense until then.
+    test.skip(new Date() > new Date("2026-10-23T22:00:00Z"), "deadline has passed");
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto("/radar?ab=2026-10-11");
+    const panel = page.locator("p", { hasText: "ist nichts eingetragen" }).first();
+    const text = (await panel.innerText()).replace(/\s+/g, " ");
+    expect(text).toMatch(/^In den nächsten zehn Tagen ist nichts eingetragen\.|^Keine Termine vom/);
+    const frist = text.indexOf("Nächste Frist: 23.10.2026 — Vereinshütte auf dem Weihnachtsmarkt: Bewerbung bis 23. Oktober.");
+    const termin = text.indexOf("Nächster Termin: 16.11.2026 — Weihnachtsmarkt: Die Stadt nennt den 16. November bis 30. Dezember.");
+    expect(frist, text).toBeGreaterThan(-1);
+    expect(termin, text).toBeGreaterThan(frist);
+    await expect(panel.getByRole("link")).toHaveCount(2);
+    await ctx.close();
+  });
+
+  test("window with no Frist ahead: only the Termin line", async ({ page }) => {
+    // From 12.11.2026 on no deadline exists in the data, but the Weihnachtsmarkt starts 16.11.
+    await page.goto("/radar?ab=2026-11-01");
+    const panel = page.locator("p", { hasText: "Keine Termine" }).first();
+    await expect(panel).toContainText("Nächster Termin: 16.11.2026");
+    await expect(panel).not.toContainText("Nächste Frist");
   });
 });

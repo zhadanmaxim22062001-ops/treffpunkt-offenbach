@@ -1,5 +1,5 @@
 import { getAllEvents, hasConfirmedDate } from "@/lib/events";
-import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, type RadarItem } from "@/lib/radar-content";
+import { RADAR_ITEMS_ARE_PLACEHOLDER, getRadarItems, getVisibleBusinessItems, type RadarItem } from "@/lib/radar-content";
 import type { Event } from "@/data/content";
 import { parseIso, compareDates, isWithinRange, toIso, type CalendarDate } from "@/lib/date-berlin";
 
@@ -101,4 +101,21 @@ export function defaultWindowSelection(entries: CalendarEntry[], days: CalendarD
     if (entriesOnDate(entries, iso).length > 0) return iso;
   }
   return null;
+}
+
+/** A deadline (Frist) from the business list, as the empty-strip line needs it. */
+export type DeadlineRef = { iso: string; title: string; href: string };
+
+/** Every still-open deadline, soonest first. Computed on the server per request. */
+export function getDeadlineRefs(todayIso: string): DeadlineRef[] {
+  if (RADAR_ITEMS_ARE_PLACEHOLDER) return [];
+  return getVisibleBusinessItems(todayIso)
+    .filter((item): item is RadarItem & { deadline: string } => !!item.deadline && item.deadline >= todayIso)
+    .map((item) => ({ iso: item.deadline, title: item.headline, href: `/radar/${item.slug}` }))
+    .sort((a, b) => a.iso.localeCompare(b.iso));
+}
+
+/** The soonest deadline on or after `iso`. */
+export function nextDeadlineOnOrAfter(deadlines: DeadlineRef[], iso: string): DeadlineRef | undefined {
+  return deadlines.find((d) => d.iso >= iso);
 }

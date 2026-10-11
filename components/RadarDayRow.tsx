@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RadarItemBody } from "@/components/RadarItemBody";
 import { VereinEventBody } from "@/components/VereinEventBody";
-import { defaultWindowSelection, entriesOnDate, nextEntryOnOrAfter, type CalendarEntry } from "@/lib/calendar";
+import {
+  defaultWindowSelection,
+  entriesOnDate,
+  nextDeadlineOnOrAfter,
+  nextEntryOnOrAfter,
+  type CalendarEntry,
+  type DeadlineRef,
+} from "@/lib/calendar";
 import {
   addDays,
   addMonths,
@@ -54,12 +61,15 @@ function windowDays(start: CalendarDate): CalendarDate[] {
  */
 export function RadarDayRow({
   entries,
+  deadlines,
   initialWindowStartIso,
   todayIso,
   initialSelectedIso,
   basePath,
 }: {
   entries: CalendarEntry[];
+  /** Open Fristen from the business list, soonest first — for the empty-day line. */
+  deadlines: DeadlineRef[];
   initialWindowStartIso: string;
   todayIso: string;
   initialSelectedIso: string | null;
@@ -178,6 +188,7 @@ export function RadarDayRow({
   const selectedEntries = selectedIso ? entriesOnDate(entries, selectedIso) : [];
   const searchFromIso = selectedIso ?? toIso(windowStart);
   const nextFallback = selectedEntries.length === 0 ? nextEntryOnOrAfter(entries, searchFromIso) : undefined;
+  const nextDeadline = selectedEntries.length === 0 ? nextDeadlineOnOrAfter(deadlines, searchFromIso) : undefined;
 
   const rangeLabel = `${shortGermanDate(days[0])} – ${shortGermanDate(days[WINDOW_SIZE - 1])}`;
 
@@ -348,6 +359,16 @@ export function RadarDayRow({
               : isDefaultWindow
                 ? "In den nächsten zehn Tagen ist nichts eingetragen."
                 : `Keine Termine vom ${rangeLabel}.`}
+            {nextDeadline && (
+              <>
+                {" "}
+                Nächste Frist:{" "}
+                <Link href={nextDeadline.href} className="link-underline">
+                  {shortGermanDate(parseIso(nextDeadline.iso))} — {nextDeadline.title}
+                </Link>
+                .
+              </>
+            )}
             {nextFallback && (
               <>
                 {" "}

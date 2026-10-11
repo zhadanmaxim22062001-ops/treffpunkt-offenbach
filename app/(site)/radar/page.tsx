@@ -10,7 +10,7 @@ import {
   getVisibleBusinessItems,
   type RadarCategory,
 } from "@/lib/radar-content";
-import { defaultWindowSelection, getCalendarEntries } from "@/lib/calendar";
+import { defaultWindowSelection, getCalendarEntries, getDeadlineRefs } from "@/lib/calendar";
 import { addDays, addMonths, compareDates, todayBerlin, toIso } from "@/lib/date-berlin";
 
 export const metadata: Metadata = {
@@ -70,6 +70,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   const windowDays = Array.from({ length: 10 }, (_, i) => addDays(windowStart, i));
   const initialSelectedIso = defaultWindowSelection(calendarEntries, windowDays, todayIso);
 
+  const deadlines = getDeadlineRefs(todayIso);
   const allBusinessItems = RADAR_ITEMS_ARE_PLACEHOLDER ? [] : getVisibleBusinessItems(todayIso);
   const items = activeCategory ? allBusinessItems.filter((item) => item.category === activeCategory) : allBusinessItems;
 
@@ -94,6 +95,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         <p className="eyebrow mb-6">Innenstadt-Kalender</p>
         <RadarDayRow
           entries={calendarEntries}
+          deadlines={deadlines}
           initialWindowStartIso={toIso(windowStart)}
           todayIso={todayIso}
           initialSelectedIso={initialSelectedIso}
