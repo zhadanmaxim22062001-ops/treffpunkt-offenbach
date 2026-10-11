@@ -70,13 +70,30 @@
      hero in app/(site)/page.tsx. */
   --c-hero-scrim: #0b2138;
   --c-hero-ink: #f5f9fc;
-  /* The light accent (#5aa9e8, the dark theme's --c-accent value), not the
-     light theme's #0f5fa8 — the mark sits on a dark photo, and the darker
-     blue disappears there regardless of which theme is active. Same
-     reasoning as --c-hero-scrim/--c-hero-ink above: a photo doesn't
-     re-theme, so nothing drawn on it can either. */
-  --c-hero-accent: #5aa9e8;
+  /* The two blues of the association's own logo (the dot and its pale halo),
+     measured from the original artwork. They are the LOGO's colours and
+     nothing else's: #5898C4 on white is only 3.2:1 — fine for a graphic
+     shape, not for text, links, buttons, chips or focus rings, which is why
+     the UI keeps its own --c-accent and never borrows these. The logo SVGs
+     under /brand carry the same two values inline (an <img> can't read CSS
+     variables), so these tokens exist to document them in one place and to
+     colour the logo's swatches in /styleguide. Theme-invariant on purpose,
+     like the --c-hero-* tokens above. */
+  --c-brand-dot: #5898c4;
+  --c-brand-halo: #c0e0eb;
+  /* Sticky header's outer height (row + 1px border), per the logo size that
+     fits at each breakpoint: compact lockup 45px + 24px row padding below
+     640px, full lockup 72px + 24px from 640px up. components/Header.tsx
+     sizes its row from this and the homepage hero subtracts it, so the two
+     can't drift apart. */
+  --header-h: 70px;
   color-scheme: light;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-h: 97px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -123,6 +140,10 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    /* Reserve the scrollbar's width up front, so opening the mobile menu
+       (which can make the page tall enough to need one) never nudges the
+       header — logo included — sideways by a scrollbar's width. */
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -298,9 +319,8 @@
      column (which stops well short of it) ever needed to be readable.
      Now the weight sits entirely in the left 40%; from 70% on it's flat
      at 5% — just enough to tie the sky to the palette, not perceptible
-     as darkening — so the mark's ring/F sit on an essentially untouched
-     photo (see .hero-mark-glow below for how their own contrast holds
-     up against that). ::after's bottom strip is unchanged. */
+     as darkening — so the hero dot sits on an essentially untouched
+     photo. ::after's bottom strip is unchanged. */
   .hero-scrim::before {
     background: linear-gradient(
       to right,
@@ -337,29 +357,72 @@
     );
   }
 
-  /* Small radial darkening centred on the hero mark — the halo (see the
-     tpof-* rules and HeroMark in components/Logo.tsx) wasn't quite enough
-     on its own where the mark sits over the brightest part of the sky;
-     measured by pixel-sampling, the worst point on the F needed about 6
-     more points of alpha to clear 3:1, so this stays deliberately weak and
-     tight rather than a heavier halo (which would fray, not help — see the
-     commit that added this). Extends slightly past the mark's own box
-     (inset: -15%) so the falloff has no hard edge. */
-  .hero-mark-glow::before {
+  /* The logo's two files per variant (light / dark text), both always in
+     the DOM, one shown by CSS — never swapped in JavaScript (flashes the
+     wrong logo on first paint) and never inverted with a filter (turns the
+     blue dot grey). Same three states as the rest of the theme system:
+     system (prefers-color-scheme, nothing stamped on <html>), explicit
+     light, explicit dark. display:none also removes the hidden <img> from
+     the accessibility tree, so the name is announced once. */
+  .logo-light {
+    display: block;
+  }
+  .logo-dark {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .logo-light {
+      display: none;
+    }
+    :root:not([data-theme="light"]) .logo-dark {
+      display: block;
+    }
+  }
+  :root[data-theme="dark"] .logo-light {
+    display: none;
+  }
+  :root[data-theme="dark"] .logo-dark {
+    display: block;
+  }
+
+  /* The one move the logo makes: the hero dot scales 0.92 -> 1 and fades in
+     once on load, 420ms on the brand easing. Nothing in the header
+     animates. Only under no-preference — a visitor who asked for reduced
+     motion gets the finished state with no animation at all. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-dot {
+      animation: hero-dot-in 420ms var(--ease-brand) both;
+    }
+  }
+  /* Soft darkening of the photo around the hero dot (the same job the old
+     mark's glow did): the dot's pale halo (#C0E0EB) is light-on-light where
+     it crosses bright rooftops, and the artwork itself may not change, so
+     the photo gives a little instead. Weak and wide so it has no edge. */
+  .hero-dot-glow::before {
     content: "";
     position: absolute;
-    inset: -15%;
+    inset: -22%;
     background: radial-gradient(
       circle,
-      color-mix(in srgb, var(--c-hero-scrim) 32%, transparent) 0%,
-      color-mix(in srgb, var(--c-hero-scrim) 20%, transparent) 55%,
-      color-mix(in srgb, var(--c-hero-scrim) 10%, transparent) 80%,
+      color-mix(in srgb, var(--c-hero-scrim) 46%, transparent) 0%,
+      color-mix(in srgb, var(--c-hero-scrim) 40%, transparent) 50%,
+      color-mix(in srgb, var(--c-hero-scrim) 22%, transparent) 72%,
       transparent 100%
     );
   }
+  @keyframes hero-dot-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   /* OF-Radar ten-day row: cross-fades on window change, 150ms, and that's
-     all — no slide, no direction. Reuses the existing tpof-chip-fade
+     all — no slide, no direction. Reuses the existing chip-fade
      keyframe rather than a new one; a `key` change on the host element
      (components/RadarDayRow.tsx) unmounts/remounts it so the animation
      restarts, immediately, in the same render — see that component for
@@ -367,7 +430,7 @@
      delays the new window's mount past when keyboard focus needs to move
      onto it). */
   .radar-row-fade {
-    animation: tpof-chip-fade 150ms var(--ease-brand) both;
+    animation: chip-fade 150ms var(--ease-brand) both;
   }
 
   /* Scrollbar-less horizontal scroll for the day row below 900px — the
@@ -381,45 +444,24 @@
   }
 }
 
-/* Mark: three elements with tpof-* classes, drawn in sequence */
-.logo-draw .tpof-ring {
-  stroke-dasharray: 484;
-  stroke-dashoffset: 484;
-  animation: tpof-draw 0.85s cubic-bezier(0.3, 0.7, 0.3, 1) forwards;
-}
-.logo-draw .tpof-f {
-  stroke-dasharray: 236;
-  stroke-dashoffset: 236;
-  animation: tpof-draw 0.75s 0.5s var(--ease-brand) forwards;
-}
-.logo-draw .tpof-bar {
-  stroke-dasharray: 72;
-  stroke-dashoffset: 72;
-  animation: tpof-draw 0.3s 1.05s ease-out forwards;
-}
-
-@keyframes tpof-draw {
-  to { stroke-dashoffset: 0; }
-}
-
 /* Radar list chip: fades in a beat after the item's own text has appeared. */
 .chip-fade-in {
-  animation: tpof-chip-fade 0.3s var(--ease-brand) both;
+  animation: chip-fade 0.3s var(--ease-brand) both;
 }
-@keyframes tpof-chip-fade {
+@keyframes chip-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 .marquee-track {
-  animation: tpof-marquee 40s linear infinite;
+  animation: marquee-scroll 40s linear infinite;
 }
 .marquee:hover .marquee-track,
 .marquee:focus-within .marquee-track {
   animation-play-state: paused;
 }
 
-@keyframes tpof-marquee {
+@keyframes marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
@@ -464,11 +506,6 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-  .logo-draw .tpof-ring,
-  .logo-draw .tpof-f,
-  .logo-draw .tpof-bar {
-    stroke-dashoffset: 0;
   }
   .marquee-track { animation: none; }
 }

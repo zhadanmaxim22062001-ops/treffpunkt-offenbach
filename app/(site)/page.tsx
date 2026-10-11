@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { clsx } from "clsx";
 import { Button, Card, Chip, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
-import { LogoMark, HeroMark } from "@/components/Logo";
+import { HeroDot } from "@/components/Logo";
 import { BrandBackdrop } from "@/components/BrandBackdrop";
 import { CountUp, LineReveal, MountReveal, Reveal } from "@/components/motion";
 import { KENNZAHLEN } from "@/data/verein";
@@ -17,9 +17,11 @@ import { HERO_PHOTO_CREDIT, isMediaCreditComplete } from "@/data/media";
 
 const members = getAllMembers();
 
-// Matches .logo-draw .tpof-ring's 0.85s animation-duration in globals.css —
-// the headline starts revealing exactly as the ring closes, not before.
-const HERO_TEXT_DELAY = 0.85;
+// The headline starts revealing a beat after the hero dot begins its 420ms
+// fade-in (.hero-dot in globals.css) — they finish together, neither waits on
+// the other. (This used to be 0.85s, timed to the retired mark's ring-draw
+// animation; nothing is drawn on any more, so nothing to wait for.)
+const HERO_TEXT_DELAY = 0.15;
 
 // This page is otherwise fully static, but the radar teaser and calendar
 // preview both depend on "today" (item aging, event dates) — an hourly
@@ -51,14 +53,14 @@ export default function Home() {
         // Fits the viewport it's actually in, not a fixed guess: 100svh (not
         // vh — vh includes a mobile browser's collapsing address bar, which
         // would make the hero jump height as the visitor scrolls) minus the
-        // sticky nav's own measured height (75.5px, rounded up). Floored at
+        // sticky nav's own height (--header-h in globals.css, set by the logo size). Floored at
         // 560px so it doesn't collapse on a short window, capped at 860px so
         // it doesn't become absurd on a tall monitor. Without this, the
         // hero's height was purely content-driven and taller than most
         // viewports — the mark, anchored near its bottom, ended up below the
         // fold on first load; scrolling down ~90px (past the now-nonexistent
         // extra height) was the only way to see all of it.
-        style={heroImage ? { height: "clamp(560px, calc(100svh - 76px), 860px)" } : undefined}
+        style={heroImage ? { height: "clamp(560px, calc(100svh - var(--header-h)), 860px)" } : undefined}
       >
         {heroImage ? (
           <>
@@ -84,19 +86,20 @@ export default function Home() {
                 skyline, the river) opens up instead of sitting under a flat
                 dark wash. */}
             <div className="hero-scrim absolute inset-0" aria-hidden="true" />
-            {/* The mark, drawn large enough that its ring overlaps the
-                photo's skyline/river band — the "play" between the F
-                breaking out of the ring and the towers breaking the
-                horizon. That composition needs the wide two-column layout
-                to have room; below md the text stacks full-width and a
-                mark this size would sit on top of the buttons, so it's
-                hidden rather than fought into a cramped corner. */}
+            {/* The dot alone, with its shadow (circle-shadow.svg), 46% of the
+                hero's height, bottom-right, bleeding off the right and
+                bottom edges. Nothing else from the logo goes on the photo.
+                Positioned by the outer box (pure layout, no animation) so
+                the inner image can scale/fade without fighting its
+                translate. Hidden below md as before: the text stacks
+                full-width there and a dot this size would sit on the
+                buttons. */}
             <div
-              className="hero-mark-glow pointer-events-none absolute hidden md:block"
-              style={{ right: "2%", bottom: "4%", width: "clamp(260px, 32vw, 480px)" }}
+              className="hero-dot-glow pointer-events-none absolute right-0 bottom-0 hidden aspect-square md:block"
+              style={{ height: "46%", transform: "translate(11%, 11%)" }}
               aria-hidden="true"
             >
-              <HeroMark size={480} animated className="h-auto w-full" />
+              <HeroDot className="hero-dot h-full w-full" />
             </div>
           </>
         ) : (
@@ -161,7 +164,7 @@ export default function Home() {
                 className="flex aspect-square w-full max-w-[400px] items-center justify-center justify-self-center border"
                 style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}
               >
-                <LogoMark size={230} animated />
+                <HeroDot className="hero-dot" style={{ width: 230, height: 230 }} />
               </div>
             )}
           </div>

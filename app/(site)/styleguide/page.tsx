@@ -1,5 +1,5 @@
 import { Button, Card, Chip, Eyebrow, Heading, Lead, Rule, Section } from "@/components/ui";
-import { LogoLockup, LogoMark } from "@/components/Logo";
+import { HeroDot, Logo, logoMinHeight, logoWidth } from "@/components/Logo";
 
 export const metadata = { title: "Styleguide", robots: { index: false, follow: false } };
 
@@ -23,20 +23,80 @@ export default function Styleguide() {
       </Section>
 
       <Section tone="paper-2">
-        <Eyebrow className="mb-6">Marke</Eyebrow>
+        <Eyebrow className="mb-6">Logo</Eyebrow>
         <p className="prose-body mb-8 max-w-[60ch] text-[14px] text-muted">
-          Drei Zeichnungen, nicht eine skalierte: <strong>Primär</strong> ab 64px (offener Ring, Stärke 13),{" "}
-          <strong>Header</strong> von 28–63px, für den Bereich, in dem der offene Ring sonst optisch zulaufen würde
-          (gleicher Ring, aber Stärke 16, breitere Lücke, kürzerer Arm — Wiedererkennung schlägt hier die optische
-          Regel), <strong>Kompakt</strong> unter 28px (geschlossener Ring, Stärke 19).
+          Das Logo ist das des Vereins und wird nicht verändert: keine andere Schrift, keine andere Laufweite, kein
+          anderer Punkt, keine Farbe, kein Filter, und der Schatten bleibt. Aus den Originalkonturen vektorisiert, alle
+          Dateien liegen unter <code className="font-mono text-[12px]">/brand</code>. Hell- und Dunkelvariante
+          unterscheiden sich <strong>nur</strong> in der Textfarbe (#3B3B3B → #F2F6F9); beide sind immer im DOM, CSS
+          zeigt eine — kein Skript, kein Filter.
         </p>
         <div className="flex flex-wrap items-end gap-12">
-          <figure className="m-0"><LogoMark size={120} /><figcaption className="eyebrow mt-3">Primär · ab 64px</figcaption></figure>
-          <figure className="m-0"><LogoMark size={64} /><figcaption className="eyebrow mt-3">Primär · 64px</figcaption></figure>
-          <figure className="m-0"><LogoMark size={48} /><figcaption className="eyebrow mt-3">Header · 28–63px</figcaption></figure>
-          <figure className="m-0"><LogoMark size={40} /><figcaption className="eyebrow mt-3">Header · 40px (Navigation)</figcaption></figure>
-          <figure className="m-0"><LogoMark size={24} /><figcaption className="eyebrow mt-3">Kompakt · unter 28px</figcaption></figure>
-          <figure className="m-0"><LogoLockup markSize={56} /><figcaption className="eyebrow mt-3">Lockup</figcaption></figure>
+          <figure className="m-0">
+            <Logo variant="full" height={logoMinHeight("full")} />
+            <figcaption className="eyebrow mt-3">Voll · mindestens {logoWidth("full", logoMinHeight("full"))} px breit</figcaption>
+          </figure>
+          <figure className="m-0">
+            <Logo variant="compact" height={logoMinHeight("compact")} />
+            <figcaption className="eyebrow mt-3">Kompakt · mindestens {logoWidth("compact", logoMinHeight("compact"))} px breit</figcaption>
+          </figure>
+          <figure className="m-0">
+            <HeroDot style={{ width: 120, height: 120 }} />
+            <figcaption className="eyebrow mt-3">Punkt mit Schatten · Hero</figcaption>
+          </figure>
+        </div>
+
+        <h3 className="mt-14 font-display text-[17px] font-semibold">Schutzraum und Mindestgröße</h3>
+        <ul className="prose-body mt-3 max-w-[60ch] list-disc pl-5 text-[14px]">
+          <li>
+            Schutzraum auf allen vier Seiten: der Durchmesser des Kernpunkts — das sind 220 von 1051 Einheiten, also{" "}
+            <span className="tnum">20,9</span> % der Logobreite (bei <span className="tnum">172</span> px Breite
+            etwa <span className="tnum">36</span> px).
+          </li>
+          <li>
+            Mindestbreite: <span className="tnum">170</span> px für den dreizeiligen Block,{" "}
+            <span className="tnum">120</span> px für die kompakte Zeile. Darunter wird die dritte Zeile unleserlich —
+            dafür gibt es die kompakte Fassung.
+          </li>
+          <li>
+            Die beiden Maße sind verbindlich, die Höhen folgen daraus: <span className="tnum">72</span> px voll,{" "}
+            <span className="tnum">45</span> px kompakt (<code className="font-mono text-[12px]">logoMinHeight()</code> in
+            components/Logo.tsx rechnet es aus und warnt in der Entwicklung, wenn jemand darunter geht).
+          </li>
+        </ul>
+        <div className="mt-8 flex flex-wrap items-start gap-12">
+          <figure className="m-0">
+            <div
+              className="inline-block border border-dashed"
+              style={{ borderColor: "var(--c-muted)", padding: `${(logoWidth("full", logoMinHeight("full")) * 220) / 1051}px` }}
+            >
+              <Logo variant="full" height={logoMinHeight("full")} />
+            </div>
+            <figcaption className="eyebrow mt-3">Schutzraum (gestrichelt) = Kernpunkt-Durchmesser</figcaption>
+          </figure>
+        </div>
+
+        <h3 className="mt-14 font-display text-[17px] font-semibold">Die zwei Blautöne des Logos</h3>
+        <p className="prose-body mt-3 max-w-[60ch] text-[14px] text-muted">
+          Eigene Tokens, nur für das Logo: <code className="font-mono text-[12px]">--c-brand-dot</code> (#5898C4) und{" "}
+          <code className="font-mono text-[12px]">--c-brand-halo</code> (#C0E0EB). Der Kernpunkt hat auf Weiß nur{" "}
+          <span className="tnum">3,2</span>:1 — als Fläche in Ordnung, für Text, Links, Buttons, Chips und Fokusringe
+          nicht. Die Oberfläche bleibt bei <code className="font-mono text-[12px]">--c-accent</code>.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          {[
+            ["Kernpunkt", "--c-brand-dot", "#5898C4"],
+            ["Lichthof", "--c-brand-halo", "#C0E0EB"],
+          ].map(([name, token, hex]) => (
+            <div key={token} className="w-[170px] border" style={{ borderColor: "var(--c-line)" }}>
+              <div style={{ background: `var(${token})`, height: 56 }} />
+              <div className="p-3">
+                <p className="font-display text-[13px] font-semibold">{name}</p>
+                <p className="font-mono text-[11px] text-muted">{token}</p>
+                <p className="font-mono text-[11px] text-muted">{hex}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </Section>
 

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { motion, useReducedMotion } from "motion/react";
-import { LogoLockup } from "./Logo";
+import { Logo, logoMinHeight } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV = [
@@ -50,17 +50,31 @@ export function Header() {
       className="sticky top-0 z-50 border-b backdrop-blur-[6px]"
       style={{ borderColor: "var(--c-line)", backgroundColor: "color-mix(in srgb, var(--c-paper) 88%, transparent)" }}
     >
-      <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6 py-3">
-        {/* No aria-label here — LogoLockup already supplies an accessible
-            name (visible "TREFFPUNKT"/"OFFENBACH" text + an sr-only
-            expansion). A custom label on this link would override that and
-            risk not containing the visible text verbatim, which breaks
-            voice-control name matching (WCAG 2.5.3). */}
-        <Link href="/">
-          <LogoLockup markSize={40} />
+      {/* Row height comes from --header-h (globals.css): the logo sets it, not
+          the other way round — 45px compact below 640px, 72px full from 640px
+          (each is the smallest height at which that lockup still meets its
+          minimum rendered width: 120px / 170px), plus 24px of padding and the
+          1px border. The homepage hero subtracts the same variable. */}
+      <div
+        className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-6 px-6"
+        style={{ height: "calc(var(--header-h) - 1px)" }}
+      >
+        {/* First focusable element after the skip link. No aria-label: the
+            <img> alt already names the link, and a custom label would
+            override the visible artwork's own name. Exactly one of the two
+            breakpoint wrappers below is displayed, and within it exactly one
+            of the light/dark files — the rest are display:none, i.e. out of
+            the accessibility tree. */}
+        <Link href="/" className="flex shrink-0 items-center">
+          <span className="block sm:hidden">
+            <Logo variant="compact" height={logoMinHeight("compact")} />
+          </span>
+          <span className="hidden sm:block">
+            <Logo variant="full" height={logoMinHeight("full")} />
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Hauptnavigation">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Hauptnavigation">
           {NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
@@ -89,7 +103,7 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center gap-4">
           <ThemeToggle />
           <Link
             href="/mitglied-werden"
@@ -100,7 +114,7 @@ export function Header() {
           <button
             ref={toggleRef}
             type="button"
-            className="md:hidden"
+            className="lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
@@ -117,7 +131,7 @@ export function Header() {
         id="mobile-nav"
         hidden={!open}
         aria-label="Hauptnavigation, mobil"
-        className="border-t md:hidden"
+        className="border-t lg:hidden"
         style={{ borderColor: "var(--c-line)" }}
       >
         <ul className="mx-auto flex w-full max-w-[1180px] flex-col px-6 py-3">

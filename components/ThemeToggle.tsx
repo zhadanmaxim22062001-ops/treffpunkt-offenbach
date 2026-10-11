@@ -41,7 +41,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setMode(next[mode])}
-      className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors duration-[120ms] hover:text-ink"
+      className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors duration-[120ms] hover:text-ink"
       aria-label={`Darstellung: ${label[mode]}. Umschalten auf ${label[next[mode]]}`}
     >
       {label[mode]}

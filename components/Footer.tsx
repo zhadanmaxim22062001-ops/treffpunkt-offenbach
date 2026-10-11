@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogoMark } from "./Logo";
+import { Logo, logoMinHeight } from "./Logo";
 import { VEREIN } from "@/data/verein";
 
 export function Footer() {
@@ -7,7 +7,9 @@ export function Footer() {
     <footer className="border-t" style={{ borderColor: "var(--c-line)", backgroundColor: "var(--c-paper-2)" }}>
       <div className="mx-auto grid w-full max-w-[1180px] gap-10 px-6 py-14 md:grid-cols-[1.2fr_1fr_1fr]">
         <div>
-          <LogoMark size={72} />
+          {/* Theme-matched pair, not a fixed inverse file: the footer sits on --c-paper-2, which is light in the light theme
+              (dark text variant) and dark in the dark theme (inverse variant). Height is the lockup's minimum (170px wide). */}
+          <Logo variant="full" height={logoMinHeight("full")} />
           <p className="mt-5 max-w-[34ch] text-[15px] leading-relaxed text-ink-2">
             {VEREIN.name}. Wir beleben die Innenstadt, vernetzen Betriebe und vertreten ihre Interessen
             gegenüber der Stadt.
