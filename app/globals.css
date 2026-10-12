@@ -386,30 +386,76 @@
   }
 
   /* The hero logo's motion. Two things, both only under no-preference — a
-     visitor who asked for reduced motion gets the finished state, dot at
-     scale 1, no animation at all:
+     visitor who asked for reduced motion gets the finished state (dot at
+     scale 1, halo at its resting .86) with no animation at all:
        1. the whole hero logo scales 0.92 -> 1 and fades in once on load
           (.hero-dot, 420ms, brand easing);
-       2. the dot BREATHES: scale 1 -> 1.035 -> 1, 3.6s ease-in-out, forever
+       2. the dot BREATHES, two layers in phase, 3.0s ease-in-out, forever
           (client request; it overrides the "nothing moves unless scrolled
-          or hovered" rule for this one element). Transform only — no
-          filter, shadow or opacity on the group, which would repaint a very
-          large element every frame. will-change: transform on the group,
-          nothing else. The letters never move; the header and footer logos
-          never animate. The SVG box doesn't change, so no layout shift. */
+          or hovered" rule for this one element):
+            .tpof-dot   transform: scale 1 -> 1.07 -> 1
+            .tpof-halo  opacity .86 -> 1 -> .86   (the brightening is what
+                        makes it read as a pulse, not as a wobble)
+          Transform and opacity only — no filter, shadow, width or height,
+          which would repaint a very large element every frame.
+          will-change: transform on the dot group, nothing else. The letters
+          never move; the header and footer logos never animate. The SVG box
+          doesn't change, so no layout shift. */
   @media (prefers-reduced-motion: no-preference) {
     .hero-dot {
       animation: hero-dot-in 420ms var(--ease-brand) both;
     }
     .hero-logo .tpof-dot {
-      animation: dot-pulse 3.6s ease-in-out infinite;
+      animation: dot-pulse 3s ease-in-out infinite;
       will-change: transform;
+    }
+    .hero-logo .tpof-halo {
+      animation: halo-pulse 3s ease-in-out infinite;
+    }
+  }
+  /* The hero logo's slot: a full-width box that is the size container for
+     cqw, so widths below are % of the hero's width. Right edge = the content
+     gutter, centre = 72% of the hero's height — as high as the letters stay
+     readable: from ~46% they sit on bright buildings and 29-39% of the letter
+     pixels fall under 3:1 against the photo; from 72% (the water and the dark
+     trees, level with the lead paragraph) it is <=0.82% at every width 1024-1920. The text column on the left
+     (headline/lead/buttons, app/(site)/page.tsx) reaches ~517px of real glyph
+     extent past the content edge, inside a container capped at 1180px, so
+     the room left for the logo is
+         min(100cqw, 1180px) - 48px (gutters) - 517px (text) - gap
+     with gap = 48px from 1280px and 32px from 1024px (hence -614px / -598px). Each width is the
+     target percentage or that room, whichever is smaller — a plain 44cqw
+     would run into the headline on a wide screen, where the container stops
+     growing but the hero doesn't. Measured against the real glyph extents in
+     tests/hero-logo.spec.ts. */
+  .hero-logo-slot {
+    container-type: inline-size;
+  }
+  .hero-logo-box {
+    position: absolute;
+    right: 1.5rem;
+    top: 72%;
+    transform: translateY(-50%);
+    width: min(34cqw, 100cqw - 598px);
+  }
+  @media (min-width: 1024px) {
+    .hero-logo-box {
+      width: min(38cqw, 100cqw - 598px);
+    }
+  }
+  @media (min-width: 1280px) {
+    .hero-logo-box {
+      width: min(44cqw, min(100cqw, 1180px) - 614px);
     }
   }
   .hero-logo svg {
     display: block;
     width: 100%;
     height: auto;
+    /* The halo reaches the top of the viewBox; at the pulse's peak it grows past
+       it, and an <svg>'s default overflow:hidden would shave a flat edge off
+       the top. Visible costs nothing — the box (layout) doesn't change. */
+    overflow: visible;
   }
   @keyframes dot-pulse {
     0%,
@@ -417,7 +463,16 @@
       transform: scale(1);
     }
     50% {
-      transform: scale(1.035);
+      transform: scale(1.07);
+    }
+  }
+  @keyframes halo-pulse {
+    0%,
+    100% {
+      opacity: 0.86;
+    }
+    50% {
+      opacity: 1;
     }
   }
   @keyframes hero-dot-in {

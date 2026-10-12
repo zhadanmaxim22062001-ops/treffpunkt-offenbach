@@ -5,7 +5,7 @@
     <radialGradient id="sdb" cx=".74" cy=".74" r=".60"><stop offset="0" stop-color="#0B2138" stop-opacity=".22"/><stop offset=".55" stop-color="#0B2138" stop-opacity=".10"/><stop offset="1" stop-color="#0B2138" stop-opacity="0"/></radialGradient>
   </defs>
   <g class="tpof-dot" style="transform-origin:493.5px 222.5px">
-    <circle cx="493.5" cy="222.5" r="177.0" fill="url(#hab)" opacity=".86"/>
+    <circle class="tpof-halo" cx="493.5" cy="222.5" r="177.0" fill="url(#hab)" opacity=".86"/>
     <circle cx="493.5" cy="222.5" r="177.0" fill="url(#sdb)"/>
     <circle cx="493.5" cy="222.5" r="110.0" fill="#2884CD"/>
   </g>

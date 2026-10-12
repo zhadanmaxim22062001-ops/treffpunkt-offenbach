@@ -6,7 +6,7 @@
 <radialGradient id="df" cx=".74" cy=".74" r=".60"><stop offset="0" stop-color="#0B2138" stop-opacity=".22"/><stop offset=".55" stop-color="#0B2138" stop-opacity=".10"/><stop offset="1" stop-color="#0B2138" stop-opacity="0"/></radialGradient>
 </defs>
 <g class="tpof-dot" style="transform-origin:177.0px 177.0px">
-<circle cx="177.0" cy="177.0" r="177.0" fill="url(#hf)" opacity=".86"/>
+<circle class="tpof-halo" cx="177.0" cy="177.0" r="177.0" fill="url(#hf)" opacity=".86"/>
 <circle cx="177.0" cy="177.0" r="177.0" fill="url(#df)"/>
 <circle cx="237.0" cy="237.0" r="165.0" fill="url(#sf)"/>
 <circle cx="177.0" cy="177.0" r="110.0" fill="#2884CD"/>

@@ -89,22 +89,25 @@ export default function Home() {
                 dark wash. */}
             <div className="hero-scrim absolute inset-0" aria-hidden="true" />
             {/* The logo, TREFF ● PUNKT (logo-compact-inverse, no shadow — the cast
-                shadow turns the halo grey on a photo), bottom-right. 34% of
-                the hero's width (the largest that keeps clear of the lead
-                and buttons on a short 800-900px window: >=30px box gap,
-                measured), the words whole: the dot sits in the middle
-                of the lockup, so the right edge can't bleed without cutting
-                the T. Positioned by the outer box (pure layout, no
-                animation) so the inner logo can scale/fade/pulse without
-                fighting it. Hidden below md as before: the brand is already
-                in the header on a phone, and a large decorative logo would
-                crowd the headline there (see the README's Logo section). */}
-            <div
-              className="pointer-events-none absolute hidden md:block"
-              style={{ width: "34%", right: "2%", bottom: 0 }}
-              aria-hidden="true"
-            >
-              <HeroLogo className="hero-dot" />
+                shadow turns the halo grey on a photo). Its right edge ALIGNS
+                with the content column's right gutter (the same container the
+                headline hangs from on the left) — an alignment, not a bleed, so
+                the T of PUNKT is never cut. Vertically centred at 72% of the
+                hero (level with the lead paragraph; higher puts the white letters
+                on bright buildings — see .hero-logo-slot in globals.css). Sized in container-query units of the full-width slot
+                (cqw = % of the hero's width); see .hero-logo-box in globals.css
+                for the per-breakpoint widths and the clear-space rule they obey.
+                Positioned by the outer boxes (pure layout, no animation) so the
+                inner logo can fade in and pulse without fighting it. Hidden below
+                md as before: the brand is already in the header on a phone, and
+                a large decorative logo would crowd the headline there (see the
+                README's Logo section). */}
+            <div className="hero-logo-slot pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
+              <div className="relative mx-auto h-full w-full max-w-[1180px] px-6">
+                <div className="hero-logo-box">
+                  <HeroLogo className="hero-dot" />
+                </div>
+              </div>
             </div>
           </>
         ) : (
