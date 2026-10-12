@@ -143,7 +143,9 @@ test.describe("empty strip names the nearest Frist and the next Termin", () => {
     test.skip(new Date() > new Date("2026-10-23T22:00:00Z"), "deadline has passed");
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
-    await page.goto("/radar?ab=2026-10-11");
+    // The default window starts today (Berlin) — "In den nächsten zehn Tagen" only reads that way then.
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+    await page.goto(`/radar?ab=${today}`);
     const panel = page.locator("p", { hasText: "ist nichts eingetragen" }).first();
     const text = (await panel.innerText()).replace(/\s+/g, " ");
     expect(text).toMatch(/^In den nächsten zehn Tagen ist nichts eingetragen\.|^Keine Termine vom/);

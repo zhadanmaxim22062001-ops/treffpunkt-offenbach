@@ -12,6 +12,28 @@ test("inlined hero logo is a byte copy of public/brand/logo-compact-inverse.svg"
   expect(HERO_LOGO_SVG).toBe(readFileSync("public/brand/logo-compact-inverse.svg", "utf8"));
 });
 
+test("inlined copy: no duplicate ids in the document, and the glow under the letters survives inlining", async ({ page }) => {
+  await page.setViewportSize({ width: 1360, height: 900 });
+  await page.goto("/");
+  const r = await page.evaluate(() => {
+    const ids = [...document.querySelectorAll("[id]")].map((e) => e.id);
+    const svg = document.querySelector(".hero-logo svg")!;
+    const filters = [...svg.querySelectorAll("g[filter]")].map((g) => getComputedStyle(g).filter);
+    const target = svg.querySelector("g[filter]")?.getAttribute("filter")?.match(/url\(#([^)]+)\)/)?.[1];
+    return {
+      dups: ids.filter((x, i) => ids.indexOf(x) !== i),
+      filters,
+      filterDefined: !!target && document.querySelectorAll(`filter[id="${target}"]`).length === 1,
+      dropShadow: !!target && !!document.getElementById(target)?.querySelector("feDropShadow"),
+    };
+  });
+  expect(r.dups).toEqual([]);
+  expect(r.filters.length).toBeGreaterThan(0);
+  expect(r.filters.every((f) => f.startsWith("url("))).toBe(true);
+  expect(r.filterDefined).toBe(true);
+  expect(r.dropShadow).toBe(true);
+});
+
 const SIZES: [number, number][] = [
   [768, 1024], [768, 700], [800, 600], [860, 600], [900, 600], [900, 700], [1024, 600], [1024, 768],
   [1280, 720], [1280, 800], [1360, 900], [1440, 1080], [1920, 1080],

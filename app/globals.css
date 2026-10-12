@@ -71,16 +71,16 @@
   --c-hero-scrim: #0b2138;
   --c-hero-ink: #f5f9fc;
   /* The two blues of the association's own logo (the dot and its pale halo),
-     measured from the original artwork. They are the LOGO's colours and
-     nothing else's: #5898C4 on white is only 3.2:1 — fine for a graphic
+     the association's own logo, as they redrew it. They are the LOGO's colours and
+     nothing else's: #2884CD on white is only 3.98:1 — fine for a graphic
      shape, not for text, links, buttons, chips or focus rings, which is why
      the UI keeps its own --c-accent and never borrows these. The logo SVGs
      under /brand carry the same two values inline (an <img> can't read CSS
      variables), so these tokens exist to document them in one place and to
      colour the logo's swatches in /styleguide. Theme-invariant on purpose,
      like the --c-hero-* tokens above. */
-  --c-brand-dot: #5898c4;
-  --c-brand-halo: #c0e0eb;
+  --c-brand-dot: #2884cd;
+  --c-brand-halo: #a4e0fa;
   /* Sticky header's outer height (row + 1px border), per the logo size that
      fits at each breakpoint: compact lockup 48px + 24px row padding below
      640px, 60px + 24px from 640px up. components/Header.tsx

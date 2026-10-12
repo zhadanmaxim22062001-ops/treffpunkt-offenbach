@@ -28,8 +28,9 @@ export default function Styleguide() {
           Das Logo ist das des Vereins und wird nicht verändert: keine andere Schrift, keine andere Laufweite, kein
           anderer Punkt, keine Farbe, kein Filter, und der Schatten bleibt. Aus den Originalkonturen vektorisiert, alle
           Dateien liegen unter <code className="font-mono text-[12px]">/brand</code>. Hell- und Dunkelvariante
-          unterscheiden sich <strong>nur</strong> in der Textfarbe (#3B3B3B → #F2F6F9); beide sind immer im DOM, CSS
-          zeigt eine — kein Skript, kein Filter.
+          unterscheiden sich in der Textfarbe (#1F1F1F → #F2F6F9) und darin, dass die hellen Buchstaben auf einem
+          weichen dunklen Schein (#0B2138) liegen — er ist Teil der Datei, nicht der Seite; beide Varianten sind immer
+          im DOM, CSS zeigt eine — kein Skript, kein Filter auf der Seite.
         </p>
         <div className="flex flex-wrap items-end gap-12">
           <figure className="m-0">
@@ -82,15 +83,15 @@ export default function Styleguide() {
 
         <h3 className="mt-14 font-display text-[17px] font-semibold">Die zwei Blautöne des Logos</h3>
         <p className="prose-body mt-3 max-w-[60ch] text-[14px] text-muted">
-          Eigene Tokens, nur für das Logo: <code className="font-mono text-[12px]">--c-brand-dot</code> (#5898C4) und{" "}
-          <code className="font-mono text-[12px]">--c-brand-halo</code> (#C0E0EB). Der Kernpunkt hat auf Weiß nur{" "}
-          <span className="tnum">3,2</span>:1 — als Fläche in Ordnung, für Text, Links, Buttons, Chips und Fokusringe
+          Eigene Tokens, nur für das Logo: <code className="font-mono text-[12px]">--c-brand-dot</code> (#2884CD) und{" "}
+          <code className="font-mono text-[12px]">--c-brand-halo</code> (#A4E0FA). Der Kernpunkt hat auf Weiß nur{" "}
+          <span className="tnum">3,98</span>:1 — als Fläche in Ordnung, für Text, Links, Buttons, Chips und Fokusringe
           nicht. Die Oberfläche bleibt bei <code className="font-mono text-[12px]">--c-accent</code>.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           {[
-            ["Kernpunkt", "--c-brand-dot", "#5898C4"],
-            ["Lichthof", "--c-brand-halo", "#C0E0EB"],
+            ["Kernpunkt", "--c-brand-dot", "#2884CD"],
+            ["Lichthof", "--c-brand-halo", "#A4E0FA"],
           ].map(([name, token, hex]) => (
             <div key={token} className="w-[170px] border" style={{ borderColor: "var(--c-line)" }}>
               <div style={{ background: `var(${token})`, height: 56 }} />

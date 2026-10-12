@@ -5,8 +5,9 @@ import { clsx } from "clsx";
  * redrawn here. This component only picks the right file and sizes it; it
  * must never recolour, filter, re-letterspace or "tidy" anything about it.
  *
- * Two lockups, each with a light-ground and a dark-ground file (the ONLY
- * difference between the pair is the text colour, #3B3B3B -> #F2F6F9):
+ * Two lockups, each with a light-ground and a dark-ground file (the pair differs
+ * in text colour, #1F1F1F -> #F2F6F9, plus a soft dark glow under the light
+ * letters inside the inverse file):
  *   full     three lines, GEWERBEVEREIN / TREFF ● PUNKT / Offenbach e.V.
  *   compact  one line, TREFF ● PUNKT — for narrow headers
  *
