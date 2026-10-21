@@ -40,20 +40,31 @@ const SIZES: [number, number][] = [
 ];
 
 /**
- * The expected width, derived from the rule in globals.css (.hero-logo-box):
- * the target percentage of the hero's width, or the room left beside the text
- * column inside the 1180px container — whichever is smaller. Written out here
- * on purpose, not read back from the CSS, so a CSS change has to be a
- * deliberate change to this test too.
+ * The layout rules from globals.css (.hero-logo-box), written out here on
+ * purpose and not read back from the CSS, so a CSS change has to be a
+ * deliberate change to this test too:
+ *   target width   40% from 1280px, 34% from 1024px, 30% below
+ *   right offset   +32px / +16px / 0 past the content gutter, but never closer
+ *                  than 16px to the viewport edge (that limit wins)
+ *   text gap       48px from 1280px, 32px below — measured to the real glyph
+ *                  extent of headline, lead and buttons
+ *   width          the smaller of the target and the room beside the text
+ *   centre         78% of the hero's height, unless that would put the logo's
+ *                  bottom edge within 24px of the hero's bottom
  */
-function expectedWidthPct(viewportWidth: number, heroWidth: number): number {
-  if (viewportWidth >= 1280) return Math.min(44, ((Math.min(heroWidth, 1180) - 614) / heroWidth) * 100);
-  if (viewportWidth >= 1024) return Math.min(38, ((heroWidth - 598) / heroWidth) * 100);
-  return Math.min(34, ((heroWidth - 598) / heroWidth) * 100);
+function rules(viewportWidth: number, heroWidth: number) {
+  const wide = viewportWidth >= 1280, mid = viewportWidth >= 1024;
+  const target = wide ? 40 : mid ? 34 : 30;
+  const offset = wide ? 32 : mid ? 16 : 0;
+  const gap = wide ? 48 : 32;
+  const edge = (heroWidth - Math.min(heroWidth, 1180)) / 2;
+  const margin = Math.max(16, edge + 24 - offset);
+  const room = heroWidth - margin - edge - 543 - gap;
+  return { widthPx: Math.min((target / 100) * heroWidth, room), margin, gap };
 }
 
 for (const [w, h] of SIZES) {
-  test(`hero logo: aligned to the gutter, level with the lead, whole, clear of the text: ${w}x${h}`, async ({ page }) => {
+  test(`hero logo: past the gutter, centred at 78%, whole, clear of the text: ${w}x${h}`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
     await page.goto("/");
     await page.waitForTimeout(1200);
@@ -76,22 +87,28 @@ for (const [w, h] of SIZES) {
       addText(h1);
       h1.parentElement!.querySelectorAll("p").forEach(addText);
       hero.querySelectorAll("a").forEach((a) => rights.push(a.getBoundingClientRect().right));
-      const gutter = hero.querySelector(".hero-logo-slot > div")!.getBoundingClientRect();
       return {
         heroW: H.width,
-        widthPct: (S.width / H.width) * 100,
+        heroH: H.height,
+        widthPx: S.width,
+        heightPx: S.height,
         gapToText: S.left - Math.max(...rights),
-        rightEdgeOffset: S.right - (gutter.right - 24),
+        rightEdgeFromViewport: H.right - S.right,
+        lastGlyphMargin: H.right - L.right,
         centrePct: ((S.top + S.height * 0.5 - H.top) / H.height) * 100,
+        bottomClear: H.bottom - S.bottom,
         lettersInside: L.left >= H.left && L.right <= H.right && L.top >= H.top && L.bottom <= H.bottom,
       };
     });
+    const x = rules(w, r.heroW);
     expect(r.lettersInside, "(a) no letter cut by the viewport or the hero").toBe(true);
-    expect(Math.abs(r.rightEdgeOffset), "right edge on the content gutter").toBeLessThan(1);
-    expect(Math.abs(r.centrePct - 72), "vertical centre at 72% of the hero").toBeLessThan(1);
-    expect(Math.abs(r.widthPct - expectedWidthPct(w, r.heroW)), "width = target % or the room beside the text").toBeLessThan(0.3);
-    // (b) clear space between the logo's left edge and the right edge of headline, lead and buttons
-    expect(r.gapToText, "(b) clear space").toBeGreaterThanOrEqual(w >= 1280 ? 48 : 32);
+    expect(r.lastGlyphMargin, "(a) >=16px clear margin right of the last glyph").toBeGreaterThanOrEqual(16);
+    expect(Math.abs(r.widthPx - x.widthPx), "width = target % or the room beside the text").toBeLessThan(1.5);
+    expect(Math.abs(r.rightEdgeFromViewport - x.margin), "right edge: offset past the gutter, 16px viewport limit").toBeLessThan(1);
+    const expectedCentre = Math.min(78, ((r.heroH - 24 - r.heightPx / 2) / r.heroH) * 100);
+    expect(Math.abs(r.centrePct - expectedCentre), "vertical centre 78%, bottom edge held 24px up").toBeLessThan(0.6);
+    expect(r.bottomClear, "bottom edge >=24px above the hero's bottom").toBeGreaterThanOrEqual(24 - 0.5);
+    expect(r.gapToText, "(b) clear space to headline, lead and buttons").toBeGreaterThanOrEqual(x.gap);
   });
 }
 

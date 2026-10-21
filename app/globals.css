@@ -414,38 +414,50 @@
     }
   }
   /* The hero logo's slot: a full-width box that is the size container for
-     cqw, so widths below are % of the hero's width. Right edge = the content
-     gutter, centre = 72% of the hero's height — as high as the letters stay
-     readable: from ~46% they sit on bright buildings and 29-39% of the letter
-     pixels fall under 3:1 against the photo; from 72% (the water and the dark
-     trees, level with the lead paragraph) it is <=0.82% at every width 1024-1920. The text column on the left
-     (headline/lead/buttons, app/(site)/page.tsx) reaches ~517px of real glyph
-     extent past the content edge, inside a container capped at 1180px, so
-     the room left for the logo is
-         min(100cqw, 1180px) - 48px (gutters) - 517px (text) - gap
-     with gap = 48px from 1280px and 32px from 1024px (hence -614px / -598px). Each width is the
-     target percentage or that room, whichever is smaller — a plain 44cqw
-     would run into the headline on a wide screen, where the container stops
-     growing but the hero doesn't. Measured against the real glyph extents in
-     tests/hero-logo.spec.ts. */
+     cqw, so lengths below are relative to the hero's width. Three rules, in
+     priority order — the earlier one wins and the logo shrinks:
+       (a) no letter is ever cut by the viewport or the hero: at least 16px of
+           clear margin stays to the right of the last glyph;
+       (b) clear space to the text column (headline, lead, buttons): 48px from
+           1280px, 32px from 1024px — the text reaches ~517px of real glyph
+           extent past the content edge (container capped at 1180px);
+       (c) only then the target width: 40% at 1280, 34% at 1024, 30% below.
+     The right edge sits PAST the content gutter — 32px from 1280px, 16px from
+     1024px — but never closer than 16px to the viewport edge (that limit is
+     what holds the offset down on a narrow hero, where the gutter is only
+     24px from the edge). Moving right only widens the gap to the text.
+     Vertical centre: 78% of the hero's height (lower = more water and dark
+     trees behind the white letters; at 46% 29-39% of the letter pixels fell
+     under 3:1 against the photo), but the logo's bottom edge stays >=24px
+     above the hero's bottom. Measured in tests/hero-logo.spec.ts. */
   .hero-logo-slot {
     container-type: inline-size;
   }
   .hero-logo-box {
+    --edge: calc((100cqw - min(100cqw, 1180px)) / 2); /* hero side margin outside the container */
+    --offset: 0px;
+    --gap: 32px;
+    --target: 30cqw;
+    --margin: max(16px, calc(var(--edge) + 24px - var(--offset))); /* viewport edge -> logo's right edge */
+    --w: min(var(--target), calc(100cqw - var(--margin) - var(--edge) - 543px - var(--gap)));
     position: absolute;
-    right: 1.5rem;
-    top: 72%;
+    right: var(--margin);
+    width: var(--w);
+    /* centre 78%, bottom edge >= 24px above the hero's bottom (box height = width x 390/1051) */
+    top: min(78%, calc(100% - 24px - var(--w) * 0.18553));
     transform: translateY(-50%);
-    width: min(34cqw, 100cqw - 598px);
   }
   @media (min-width: 1024px) {
     .hero-logo-box {
-      width: min(38cqw, 100cqw - 598px);
+      --offset: 16px;
+      --target: 34cqw;
     }
   }
   @media (min-width: 1280px) {
     .hero-logo-box {
-      width: min(44cqw, min(100cqw, 1180px) - 614px);
+      --offset: 32px;
+      --gap: 48px;
+      --target: 40cqw;
     }
   }
   .hero-logo svg {

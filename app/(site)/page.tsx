@@ -89,12 +89,12 @@ export default function Home() {
                 dark wash. */}
             <div className="hero-scrim absolute inset-0" aria-hidden="true" />
             {/* The logo, TREFF ● PUNKT (logo-compact-inverse, no shadow — the cast
-                shadow turns the halo grey on a photo). Its right edge ALIGNS
-                with the content column's right gutter (the same container the
-                headline hangs from on the left) — an alignment, not a bleed, so
-                the T of PUNKT is never cut. Vertically centred at 72% of the
-                hero (level with the lead paragraph; higher puts the white letters
-                on bright buildings — see .hero-logo-slot in globals.css). Sized in container-query units of the full-width slot
+                shadow turns the halo grey on a photo). Its right edge sits just
+                PAST the content column's right gutter — never closer than 16px
+                to the viewport edge, so the T of PUNKT is never cut. Vertically
+                centred at 78% of the hero (lower = more water and dark trees
+                behind the white letters; bottom edge >=24px above the hero's
+                bottom — see .hero-logo-slot in globals.css for all the rules). Sized in container-query units of the full-width slot
                 (cqw = % of the hero's width); see .hero-logo-box in globals.css
                 for the per-breakpoint widths and the clear-space rule they obey.
                 Positioned by the outer boxes (pure layout, no animation) so the
@@ -103,10 +103,8 @@ export default function Home() {
                 a large decorative logo would crowd the headline there (see the
                 README's Logo section). */}
             <div className="hero-logo-slot pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
-              <div className="relative mx-auto h-full w-full max-w-[1180px] px-6">
-                <div className="hero-logo-box">
-                  <HeroLogo className="hero-dot" />
-                </div>
+              <div className="hero-logo-box">
+                <HeroLogo className="hero-dot" />
               </div>
             </div>
           </>
