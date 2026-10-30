@@ -89,14 +89,15 @@ export default function Home() {
                 dark wash. */}
             <div className="hero-scrim absolute inset-0" aria-hidden="true" />
             {/* The logo, TREFF ● PUNKT (logo-compact-inverse, no shadow — the cast
-                shadow turns the halo grey on a photo). Its right edge sits just
-                PAST the content column's right gutter — never closer than 16px
-                to the viewport edge, so the T of PUNKT is never cut. Vertically
-                centred at 78% of the hero (lower = more water and dark trees
-                behind the white letters; bottom edge >=24px above the hero's
-                bottom — see .hero-logo-slot in globals.css for all the rules). Sized in container-query units of the full-width slot
-                (cqw = % of the hero's width); see .hero-logo-box in globals.css
-                for the per-breakpoint widths and the clear-space rule they obey.
+                shadow turns the halo grey on a photo). Small on purpose
+                (clamp(320px, 26cqw, 460px)) and anchored toward the edge of
+                the photo, away from the text: the T's right edge sits at
+                min(hero - 48px, content gutter + 160px) from 1280px, hero -
+                24px from 1024px. Vertically centred at 86% of the hero (on the
+                river, below the photo's bright bank), bottom edge >=24px above
+                the hero's bottom. No glyph is ever cut and
+                the clear space to headline, lead and buttons wins over the
+                size — see .hero-logo-slot in globals.css for all the rules.
                 Positioned by the outer boxes (pure layout, no animation) so the
                 inner logo can fade in and pulse without fighting it. Hidden below
                 md as before: the brand is already in the header on a phone, and

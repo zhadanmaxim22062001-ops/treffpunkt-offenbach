@@ -2,18 +2,24 @@ import { test, expect } from "@playwright/test";
 
 /**
  * THE GATE for the hero logo over the photograph: the share of letter pixels
- * under 3:1 contrast must stay <= 1% at every tested width. Fail it and stop.
- * Median and single-pixel worst case are INFORMATIONAL — they are logged,
- * never asserted on, and nobody compensates for them.
+ * under 3:1 contrast, measured against the BARE photo (no logo, no glow), must
+ * stay <= 1% at every tested width. Fail it and stop.
+ *
+ * Informational only — logged, never asserted on, never compensated for:
+ * the median, the single-pixel worst case, and the glow-aware share (about 3%,
+ * because the F and P cross the pale halo, which is the artwork).
+ *
+ * 1520x824 (a 1920x1080 screen at 125% scaling) and 1280x720 (at 150%) are
+ * mandatory: they are what real visitors have.
  *
  * Method: the white letters (#F2F6F9) are found by diffing a screenshot with
  * the logo against one without it, then each letter pixel is compared with the
  * bare photo pixel beneath it (WCAG contrast ratio).
  */
-const SIZES: [number, number][] = [[1024, 768], [1280, 800], [1360, 900], [1440, 1080], [1920, 1080]];
+const SIZES: [number, number][] = [[1024, 768], [1280, 720], [1280, 800], [1360, 900], [1440, 1080], [1520, 824], [1920, 1080]];
 
 for (const [w, h] of SIZES) {
-  test(`GATE: <=1% of the hero logo's letter pixels under 3:1 against the photo: ${w}x${h}`, async ({ page }) => {
+  test(`GATE: <=1% of the hero logo's letter pixels under 3:1 against the BARE photo: ${w}x${h}`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: w, height: h });
     await page.goto("/");

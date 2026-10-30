@@ -112,10 +112,14 @@ test.describe("dateEnd: pages", () => {
       expect(ld.datePublished).toBeUndefined();
     }
     const xml = await (await request.get("/radar/feed.xml")).text();
+    // The feed only lists items that are still current: the Weihnachtsmarkt runs to 30.12.2026;
+    // the Vereinshütte item drops out after its 23.10.2026 deadline. Whatever IS listed has no pubDate.
+    const chunks = xml.split("<item>").slice(1);
+    const weihnachtsmarkt = chunks.find((chunk) => chunk.includes(`/radar/${SLUG}`));
+    expect(weihnachtsmarkt, "Weihnachtsmarkt is in the feed").toBeDefined();
     for (const slug of [SLUG, HUETTE]) {
-      const item = xml.split("<item>").find((chunk) => chunk.includes(`/radar/${slug}`)) ?? "";
-      expect(item, slug).not.toBe("");
-      expect(item).not.toContain("<pubDate>");
+      const item = chunks.find((chunk) => chunk.includes(`/radar/${slug}`));
+      if (item) expect(item, slug).not.toContain("<pubDate>");
     }
   });
 

@@ -414,50 +414,49 @@
     }
   }
   /* The hero logo's slot: a full-width box that is the size container for
-     cqw, so lengths below are relative to the hero's width. Three rules, in
+     cqw, so lengths below are relative to the hero's width. Rules, in
      priority order — the earlier one wins and the logo shrinks:
-       (a) no letter is ever cut by the viewport or the hero: at least 16px of
-           clear margin stays to the right of the last glyph;
+       (a) no glyph is ever cut by the viewport or the hero (768-2560);
        (b) clear space to the text column (headline, lead, buttons): 48px from
-           1280px, 32px from 1024px — the text reaches ~517px of real glyph
-           extent past the content edge (container capped at 1180px);
-       (c) only then the target width: 40% at 1280, 34% at 1024, 30% below.
-     The right edge sits PAST the content gutter — 32px from 1280px, 16px from
-     1024px — but never closer than 16px to the viewport edge (that limit is
-     what holds the offset down on a narrow hero, where the gutter is only
-     24px from the edge). Moving right only widens the gap to the text.
-     Vertical centre: 78% of the hero's height (lower = more water and dark
-     trees behind the white letters; at 46% 29-39% of the letter pixels fell
-     under 3:1 against the photo), but the logo's bottom edge stays >=24px
-     above the hero's bottom. Measured in tests/hero-logo.spec.ts. */
+           1280px, 32px below — the text reaches ~517px of real glyph extent
+           past the content edge (container capped at 1180px);
+       (c) only then the target: width = clamp(320px, 26cqw, 460px).
+     The right edge of the last glyph (the T) is anchored AWAY from the text,
+     toward the edge of the photo:
+           from 1280px:  min(hero - 48px, content gutter + 160px)
+           1024-1279px:  hero - 24px
+     i.e. the right margin is max(48px, edge - 136px) / 24px, where edge is the
+     hero's side margin outside the 1180px container.
+     Vertical centre: 86% of the hero's height, one value for every width
+     (never tuned per breakpoint — that would fit this one photo), but the
+     logo's bottom edge stays >=24px above the hero's bottom. Why 86: the photo
+     has a bright band (sunlit grass bank + promenade) whose height moves with
+     the hero's aspect ratio; below it is the river, the darkest wide area.
+     Sweep of the centre over 1024x768, 1280x720, 1280x800, 1360x900,
+     1440x1080, 1520x824, 1920x1080 — worst viewport's share of letter pixels
+     under 3:1 against the bare photo: 78% -> 1.90%, 80% -> 1.72%,
+     82% -> 0.94%, 84% -> 0.29%, 86% -> 0.02%. Measured in tests/hero-logo.spec.ts at, among
+     others, 1520x824 (a 1920x1080 screen at 125% scaling) and 1280x720 (150%) —
+     the widths real visitors have, not just the round ones. */
   .hero-logo-slot {
     container-type: inline-size;
   }
   .hero-logo-box {
     --edge: calc((100cqw - min(100cqw, 1180px)) / 2); /* hero side margin outside the container */
-    --offset: 0px;
     --gap: 32px;
-    --target: 30cqw;
-    --margin: max(16px, calc(var(--edge) + 24px - var(--offset))); /* viewport edge -> logo's right edge */
-    --w: min(var(--target), calc(100cqw - var(--margin) - var(--edge) - 543px - var(--gap)));
+    --margin: 24px; /* viewport edge -> the T's right edge */
+    --w: min(clamp(320px, 26cqw, 460px), calc(100cqw - var(--margin) - var(--edge) - 543px - var(--gap)));
     position: absolute;
     right: var(--margin);
     width: var(--w);
-    /* centre 78%, bottom edge >= 24px above the hero's bottom (box height = width x 390/1051) */
-    top: min(78%, calc(100% - 24px - var(--w) * 0.18553));
+    /* centre 86%, bottom edge >= 24px above the hero's bottom (box height = width x 390/1051) */
+    top: min(86%, calc(100% - 24px - var(--w) * 0.18553));
     transform: translateY(-50%);
-  }
-  @media (min-width: 1024px) {
-    .hero-logo-box {
-      --offset: 16px;
-      --target: 34cqw;
-    }
   }
   @media (min-width: 1280px) {
     .hero-logo-box {
-      --offset: 32px;
       --gap: 48px;
-      --target: 40cqw;
+      --margin: max(48px, calc(var(--edge) - 136px));
     }
   }
   .hero-logo svg {

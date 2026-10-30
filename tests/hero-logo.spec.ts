@@ -36,35 +36,35 @@ test("inlined copy: no duplicate ids in the document, and the glow under the let
 
 const SIZES: [number, number][] = [
   [768, 1024], [768, 700], [800, 600], [860, 600], [900, 600], [900, 700], [1024, 600], [1024, 768],
-  [1100, 700], [1279, 800], [1280, 720], [1280, 800], [1360, 900], [1440, 1080], [1920, 1080], [2560, 1440],
+  [1100, 700], [1279, 800], [1280, 720], [1280, 800], [1360, 900], [1440, 1080], [1520, 824], [1920, 1080], [2560, 1440],
 ];
 
 /**
  * The layout rules from globals.css (.hero-logo-box), written out here on
  * purpose and not read back from the CSS, so a CSS change has to be a
  * deliberate change to this test too:
- *   target width   40% from 1280px, 34% from 1024px, 30% below
- *   right offset   +32px / +16px / 0 past the content gutter, but never closer
- *                  than 16px to the viewport edge (that limit wins)
+ *   width          the smaller of clamp(320px, 26% of the hero, 460px) and the
+ *                  room beside the text
+ *   right edge     the T's right edge sits min(hero - 48px, content gutter +
+ *                  160px) from 1280px, hero - 24px below (the margin from the
+ *                  viewport edge is therefore max(48, edge - 136) / 24)
  *   text gap       48px from 1280px, 32px below — measured to the real glyph
  *                  extent of headline, lead and buttons
- *   width          the smaller of the target and the room beside the text
- *   centre         78% of the hero's height, unless that would put the logo's
+ *   centre         86% of the hero's height, unless that would put the logo's
  *                  bottom edge within 24px of the hero's bottom
  */
 function rules(viewportWidth: number, heroWidth: number) {
-  const wide = viewportWidth >= 1280, mid = viewportWidth >= 1024;
-  const target = wide ? 40 : mid ? 34 : 30;
-  const offset = wide ? 32 : mid ? 16 : 0;
+  const wide = viewportWidth >= 1280;
   const gap = wide ? 48 : 32;
   const edge = (heroWidth - Math.min(heroWidth, 1180)) / 2;
-  const margin = Math.max(16, edge + 24 - offset);
+  const margin = wide ? Math.max(48, edge - 136) : 24;
   const room = heroWidth - margin - edge - 543 - gap;
-  return { widthPx: Math.min((target / 100) * heroWidth, room), margin, gap };
+  const target = Math.min(460, Math.max(320, 0.26 * heroWidth));
+  return { widthPx: Math.min(target, room), margin, gap };
 }
 
 for (const [w, h] of SIZES) {
-  test(`hero logo: past the gutter, centred at 78%, whole, clear of the text: ${w}x${h}`, async ({ page }) => {
+  test(`hero logo: small, anchored to the photo's edge, centred at 86%, whole, clear of the text: ${w}x${h}`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
     await page.goto("/");
     await page.waitForTimeout(1200);
@@ -103,10 +103,10 @@ for (const [w, h] of SIZES) {
     const x = rules(w, r.heroW);
     expect(r.lettersInside, "(a) no letter cut by the viewport or the hero").toBe(true);
     expect(r.lastGlyphMargin, "(a) >=16px clear margin right of the last glyph").toBeGreaterThanOrEqual(16);
-    expect(Math.abs(r.widthPx - x.widthPx), "width = target % or the room beside the text").toBeLessThan(1.5);
-    expect(Math.abs(r.rightEdgeFromViewport - x.margin), "right edge: offset past the gutter, 16px viewport limit").toBeLessThan(1);
-    const expectedCentre = Math.min(78, ((r.heroH - 24 - r.heightPx / 2) / r.heroH) * 100);
-    expect(Math.abs(r.centrePct - expectedCentre), "vertical centre 78%, bottom edge held 24px up").toBeLessThan(0.6);
+    expect(Math.abs(r.widthPx - x.widthPx), "width = clamp(320, 26%, 460) or the room beside the text").toBeLessThan(1.5);
+    expect(Math.abs(r.rightEdgeFromViewport - x.margin), "right edge anchored toward the photo edge").toBeLessThan(1);
+    const expectedCentre = Math.min(86, ((r.heroH - 24 - r.heightPx / 2) / r.heroH) * 100);
+    expect(Math.abs(r.centrePct - expectedCentre), "vertical centre 86%, bottom edge held 24px up").toBeLessThan(0.6);
     expect(r.bottomClear, "bottom edge >=24px above the hero's bottom").toBeGreaterThanOrEqual(24 - 0.5);
     expect(r.gapToText, "(b) clear space to headline, lead and buttons").toBeGreaterThanOrEqual(x.gap);
   });
